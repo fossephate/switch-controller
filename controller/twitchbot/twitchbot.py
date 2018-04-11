@@ -3,14 +3,7 @@
 import socket
 from time import sleep
 import re
-
-# config
-HOST = "irc.twitch.tv"              # the Twitch IRC server
-PORT = 6667                         # always use port 6667!
-NICK = "fosseisanerd"            # your Twitch username, lowercase
-PASS = "oauth:" # your Twitch OAuth token
-CHAN = "#twitchplaysconsoles"                   # the channel you want to join
-RATE = (20/30) # messages per second
+from .config import *
 
 CHAT_MSG=re.compile(r"^:\w+!\w+@\w+\.tmi\.twitch\.tv PRIVMSG #\w+ :")
 
