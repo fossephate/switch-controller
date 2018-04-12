@@ -19,7 +19,14 @@ class TwitchBot():
 		sock -- the socket over which to send the message
 		msg  -- the message to be sent
 		"""
-		self.sock.send("PRIVMSG #{} :{}".format(cfg.CHAN, msg))
+		#self.sock.send("PRIVMSG #{} :{}".format(CHAN, msg))
+		# full_msg = "PRIVMSG #{} :{}".format(CHAN, msg)
+
+		full_msg = "PRIVMSG " + CHAN + " :" + msg + "\r\n"
+		
+		msg_encoded = full_msg.encode("utf-8")
+		self.sock.send(msg_encoded)
+
 
 	def ban(self, user):
 		"""

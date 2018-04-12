@@ -40,11 +40,12 @@ start = time.clock()
 def delayed_reset(delay=0.1):
 	Timer(delay, controller.reset).start()
 
-def send_and_reset(duration=0.1):
+def send_and_reset(duration=0.1, reset=1):
 	controller.getOutput()
 	controller.send(controller.output)
 	sleep(duration)
-	controller.reset()
+	if(reset):
+		controller.reset()
 
 
 
@@ -179,7 +180,7 @@ while True:
 					delayed_reset(duration)
 
 				if(cmd == "minus"):
-					controller.plus = 1
+					controller.minus = 1
 					delayed_reset(duration)
 				if(cmd == "plus"):
 					controller.plus = 1
@@ -211,45 +212,46 @@ while True:
 			del nextCommands[-1]
 
 			duration = 0
+			reset = 1
 
 			if(cmd == "left"):
 				controller.LX = STICK_MIN
-				duration = 0.3
+				duration = 0.6
 			if(cmd == "right"):
 				controller.LX = STICK_MAX
-				duration = 0.3
+				duration = 0.6
 			if(cmd == "up"):
 				controller.LY = STICK_MIN
-				duration = 0.3
+				duration = 0.6
 			if(cmd == "down"):
 				controller.LY = STICK_MAX
-				duration = 0.3
+				duration = 0.6
 
 			if(cmd == "hleft"):
 				controller.LX = STICK_MIN
-				duration = 2.0
+				duration = 1.5
 			if(cmd == "hright"):
 				controller.LX = STICK_MAX
-				duration = 2.0
+				duration = 1.5
 			if(cmd == "hup"):
 				controller.LY = STICK_MIN
-				duration = 2.0
+				duration = 1.5
 			if(cmd == "hdown"):
 				controller.LY = STICK_MAX
-				duration = 2.0
+				duration = 1.5
 
 			if(cmd == "hhleft"):
 				controller.LX = STICK_MIN
-				duration = 10.0
+				duration = 5.0
 			if(cmd == "hhright"):
 				controller.LX = STICK_MAX
-				duration = 10.0
+				duration = 5.0
 			if(cmd == "hhup"):
 				controller.LY = STICK_MIN
-				duration = 10.0
+				duration = 5.0
 			if(cmd == "hhdown"):
 				controller.LY = STICK_MAX
-				duration = 10.0
+				duration = 5.0
 
 			
 			if(cmd == "dleft"):
@@ -281,10 +283,16 @@ while True:
 			
 			if(cmd == "a"):
 				controller.a = 1
-				duration = 0.01
+				duration = 0.3
 			if(cmd == "b"):
 				controller.b = 1
-				duration = 0.01
+				duration = 0.4
+			if(cmd == "hb"):
+				controller.b = 1
+				duration = 0.5
+			if(cmd == "hhb"):
+				controller.b = 1
+				duration = 0.8
 			if(cmd == "x"):
 				controller.x = 1
 				duration = 0.9
@@ -304,12 +312,49 @@ while True:
 				controller.zr = 1
 				duration = 0.01
 			if(cmd == "minus"):
-				controller.plus = 1
+				controller.minus = 1
 				duration = 0.01
-			if(cmd == "plus"):
-				controller.plus = 1
-				duration = 0.01
-			send_and_reset(duration)
+			# if(cmd == "plus"):
+			# 	controller.plus = 1
+			# 	duration = 0.01
+
+			if(cmd == "long jump"):
+				controller.LY = STICK_MIN
+				duration = 0.3
+				nextCommands.insert(0, "long jump2")
+				reset = 0
+			if(cmd == "long jump2"):
+				controller.LY = STICK_MIN
+				controller.zl = 1
+				duration = 0.1
+				nextCommands.insert(0, "long jump3")
+				reset = 0
+			if(cmd == "long jump3"):
+				controller.LY = STICK_MIN
+				controller.b = 1
+				duration = 0.5
+
+			if(cmd == "jump forward"):
+				controller.LY = STICK_MIN
+				duration = 0.3
+				nextCommands.insert(0, "jump forward2")
+				reset = 0
+			if(cmd == "jump forward2"):
+				controller.LY = STICK_MIN
+				controller.b = 1
+				duration = 0.4
+
+			if(cmd == "jump back"):
+				controller.LY = STICK_MAX
+				duration = 0.3
+				nextCommands.insert(0, "jump forward2")
+				reset = 0
+			if(cmd == "jump back2"):
+				controller.LY = STICK_MAX
+				controller.b = 1
+				duration = 0.4
+
+			send_and_reset(duration, reset)
 
 			controller.getOutput()
 			controller.send(controller.output)
