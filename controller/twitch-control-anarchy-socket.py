@@ -21,6 +21,13 @@ from twitchbot.twitchbot import *
 # for time delaying the input:
 from threading import Timer
 
+# for socketio
+from socketIO_client_nexus import SocketIO, LoggingNamespace, BaseNamespace
+import logging
+logging.getLogger('socketIO-client').setLevel(logging.DEBUG)
+logging.basicConfig()
+
+from threading import Thread
 
 
 screenWidth, screenHeight = pyautogui.size()
@@ -54,7 +61,25 @@ commandQueue = []
 nextCommands = []
 
 
-while True:
+def on_ping2(*args):
+	print("test")
+
+
+
+#socketIO = SocketIO("https://104.196.121.41:80/socket.io", 80, LoggingNamespace)
+#socketIO.once("controllerState", on_controller_state)
+# socketIO = SocketIO("http://fosse.co:8110", verify=False, wait_for_connection=False)
+# socketIO.on("ping2", on_ping2)
+# socketIO.wait()
+# print("test")
+
+
+wtf = 0
+
+
+def loop():
+	if(wtf == 0):
+		start = time.clock()
 
 	# control switch here:
 
@@ -97,7 +122,7 @@ To chain: (ex. up, up, up)---------------\
 
 		if(len(commands) > 20):
 			commands = []
-			continue
+
 		for cmd in commands:
 			commandQueue.append(cmd)
 
@@ -560,4 +585,125 @@ To chain: (ex. up, up, up)---------------\
 
 			controller.getOutput()
 			controller.send(controller.output)
+
+
+
+
+
+
+
+
+
+
+
+
+class Client(object):
+
+	def on_event(self, event):
+		print(event)
+
+	def on_controller_state(*args):
+		print("controller state:", args)
+
+		controller.reset()
+
+		inputs = args[1].split()
+
+		btns = inputs[0]
+		LX = inputs[1]
+		LY = inputs[2]
+		RX = inputs[3]
+		RY = inputs[4]
+
+		#btns = "000000000000000000000000000"
+
+		controller.dpad = int(btns[0])
+		if (btns[1] == '1'):
+			controller.lclick = 1;
+		if (btns[2] == '1'):
+			controller.l = 1;
+		if (btns[3] == '1'):
+			controller.zl = 1;
+		if (btns[4] == '1'):
+			controller.minus = 1;
+		if (btns[5] == '1'):
+			controller.capture = 1;
+		if (btns[6] == '1'):
+			controller.a = 1;
+		if (btns[7] == '1'):
+			controller.b = 1;
+		if (btns[8] == '1'):
+			controller.x = 1;
+		if (btns[9] == '1'):
+			controller.y = 1;
+		if (btns[10] == '1'):
+			controller.rclick = 1;
+		if (btns[11] == '1'):
+			controller.r = 1;
+		if (btns[12] == '1'):
+			controller.zr = 1;
+		if (btns[13] == '1'):
+			controller.plus = 1
+		if (btns[14] == '1'):
+			controller.home = 1
+
+		controller.LX = int(LX)
+		controller.LY = int(LY)
+		controller.RX = int(RX)
+		controller.RY = int(RY)
+
+
+		duration = 0.01
+		reset = 0
+		send_and_reset(duration, reset)
+		controller.getOutput()
+		controller.send(controller.output)
+
+
+	def __init__(self):
+		self.socketio = SocketIO("http://fosse.co:8110")
+		self.socketio.on("controllerState", self.on_controller_state)
+		self.socketio.emit("IamController")
+
+		self.receive_events_thread = Thread(target=self._receive_events_thread)
+		self.receive_events_thread.daemon = True
+		self.receive_events_thread.start()
+
+		while True:
+			loop()
+
+			# so I don't get stuck:
+			if(win32api.GetAsyncKeyState(win32con.VK_ESCAPE)):
+				controller.send('RELEASE')
+				controller.ser.close()
+				exit()
+
+	def _receive_events_thread(self):
+		self.socketio.wait()
+
+Client()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

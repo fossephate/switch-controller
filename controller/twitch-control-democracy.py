@@ -49,7 +49,7 @@ def send_and_reset(duration=0.1, reset=1):
 	if(reset):
 		controller.reset()
 
-validCommands = ["up", "down", "left", "right", "hup", "hdown", "hleft", "hright", "hhup", "hhdown", "hhleft", "hhright", "look up", "look down", "look left", "look right", "dup", "ddown", "dleft", "dright", "a", "b", "x", "y", "l", "zl", "r", "zr", "plus", "minus", "long jump", "long jump2"]
+validCommands = ["", "up", "down", "left", "right", "u", "d", "l", "r", "hup", "hdown", "hleft", "hright", "hhup", "hhdown", "hhleft", "hhright", "hu", "hd", "hl", "hr", "su", "sd", "sl", "sr", "sup", "sdown", "sleft", "sright", "ssu", "ssd", "ssl", "ssr", "ssup", "ssdown", "ssleft", "ssright", "look up", "look down", "look left", "look right", "lu", "ld", "ll", "lr", "hlu", "hld", "hll", "hlr", "slu", "sld", "sll", "slr", "dup", "ddown", "dleft", "dright", "du", "dd", "dl", "dr", "a", "b", "x", "y", "ha", "hb", "hx", "hy", "l", "zl", "r", "zr", "plus", "minus", "long jump", "long jump2", "long jump3", "jump forward", "jump forward2", "jump back", "jump back2"]
 
 commandQueue = []
 nextCommands = []
@@ -241,76 +241,132 @@ while True:
 			duration = 0
 			reset = 1
 
-			if(cmd == "left"):
+			if(cmd == "ssleft" or cmd == "ssl"):
+				controller.LX = STICK_MIN
+				duration = 0.1
+			if(cmd == "ssright" or cmd == "ssr"):
+				controller.LX = STICK_MAX
+				duration = 0.1
+			if(cmd == "ssup" or cmd == "ssu"):
+				controller.LY = STICK_MIN
+				duration = 0.1
+			if(cmd == "ssdown" or cmd == "ssd"):
+				controller.LY = STICK_MAX
+				duration = 0.1
+
+			if(cmd == "sleft" or cmd == "sl"):
+				controller.LX = STICK_MIN
+				duration = 0.3
+			if(cmd == "sright" or cmd == "sr"):
+				controller.LX = STICK_MAX
+				duration = 0.3
+			if(cmd == "sup" or cmd == "su"):
+				controller.LY = STICK_MIN
+				duration = 0.3
+			if(cmd == "sdown" or cmd == "sd"):
+				controller.LY = STICK_MAX
+				duration = 0.3
+
+			if(cmd == "left" or cmd == "l"):
 				controller.LX = STICK_MIN
 				duration = 0.6
-			if(cmd == "right"):
+			if(cmd == "right" or cmd == "r"):
 				controller.LX = STICK_MAX
 				duration = 0.6
-			if(cmd == "up"):
+			if(cmd == "up" or cmd == "u"):
 				controller.LY = STICK_MIN
 				duration = 0.6
-			if(cmd == "down"):
+			if(cmd == "down" or cmd == "d"):
 				controller.LY = STICK_MAX
 				duration = 0.6
 
-			if(cmd == "hleft"):
+			if(cmd == "hleft" or cmd == "hl"):
 				controller.LX = STICK_MIN
 				duration = 1.5
-			if(cmd == "hright"):
+			if(cmd == "hright" or cmd == "hr"):
 				controller.LX = STICK_MAX
 				duration = 1.5
-			if(cmd == "hup"):
+			if(cmd == "hup" or cmd == "hu"):
 				controller.LY = STICK_MIN
 				duration = 1.5
-			if(cmd == "hdown"):
+			if(cmd == "hdown" or cmd == "hd"):
 				controller.LY = STICK_MAX
 				duration = 1.5
 
 			if(cmd == "hhleft"):
 				controller.LX = STICK_MIN
-				duration = 5.0
+				duration = 4.0
 			if(cmd == "hhright"):
 				controller.LX = STICK_MAX
-				duration = 5.0
+				duration = 4.0
 			if(cmd == "hhup"):
 				controller.LY = STICK_MIN
-				duration = 5.0
+				duration = 4.0
 			if(cmd == "hhdown"):
 				controller.LY = STICK_MAX
-				duration = 5.0
+				duration = 4.0
 
 			
-			if(cmd == "dleft"):
+			if(cmd == "dleft" or cmd == "dl"):
 				controller.dpad = DPAD_LEFT
 				duration = 0.3
-			if(cmd == "dright"):
+			if(cmd == "dright" or cmd == "dr"):
 				controller.dpad = DPAD_RIGHT
 				duration = 0.3
-			if(cmd == "dup"):
+			if(cmd == "dup" or cmd == "du"):
 				controller.dpad = DPAD_UP
 				duration = 0.3
-			if(cmd == "ddown"):
+			if(cmd == "ddown" or cmd == "dd"):
 				controller.dpad = DPAD_DOWN
 				duration = 0.3
-			
-			if(cmd == "look left"):
+
+
+
+			if(cmd == "slook left" or cmd == "sll"):
 				controller.RX = STICK_MIN
-				duration = 0.4
-			if(cmd == "look right"):
+				duration = 0.1
+			if(cmd == "slook right" or cmd == "slr"):
 				controller.RX = STICK_MAX
-				duration = 0.4
-			
-			if(cmd == "look up"):
+				duration = 0.1
+			if(cmd == "slook up" or cmd == "slu"):
+				controller.RY = STICK_MIN
+				duration = 0.1
+			if(cmd == "slook down" or cmd == "sld"):
+				controller.RY = STICK_MAX
+				duration = 0.1
+
+			if(cmd == "look left" or cmd == "ll"):
+				controller.RX = STICK_MIN
+				duration = 0.3
+			if(cmd == "look right" or cmd == "lr"):
+				controller.RX = STICK_MAX
+				duration = 0.3
+			if(cmd == "look up" or cmd == "lu"):
 				controller.RY = STICK_MIN
 				duration = 0.3
-			if(cmd == "look down"):
+			if(cmd == "look down" or cmd == "ld"):
 				controller.RY = STICK_MAX
 				duration = 0.3
+
+			if(cmd == "hlook left" or cmd == "hll"):
+				controller.RX = STICK_MIN
+				duration = 0.6
+			if(cmd == "hlook right" or cmd == "hlr"):
+				controller.RX = STICK_MAX
+				duration = 0.6
+			if(cmd == "hlook up" or cmd == "hlu"):
+				controller.RY = STICK_MIN
+				duration = 0.6
+			if(cmd == "hlook down" or cmd == "hld"):
+				controller.RY = STICK_MAX
+				duration = 0.6
 			
 			if(cmd == "a"):
 				controller.a = 1
 				duration = 0.3
+			if(cmd == "ha"):
+				controller.a = 1
+				duration = 0.5
 			if(cmd == "b"):
 				controller.b = 1
 				duration = 0.4
@@ -322,10 +378,16 @@ while True:
 				duration = 0.8
 			if(cmd == "x"):
 				controller.x = 1
-				duration = 0.9
+				duration = 0.3
+			if(cmd == "hx"):
+				controller.y = 1
+				duration = 0.5
 			if(cmd == "y"):
 				controller.y = 1
-				duration = 0.8
+				duration = 0.3
+			if(cmd == "hy"):
+				controller.y = 1
+				duration = 0.7
 			if(cmd == "l"):
 				controller.l = 1
 				duration = 0.01
@@ -359,7 +421,7 @@ while True:
 			if(cmd == "long jump3"):
 				controller.LY = STICK_MIN
 				controller.b = 1
-				duration = 0.5
+				duration = 1.7
 
 			if(cmd == "jump forward"):
 				controller.LY = STICK_MIN
@@ -380,6 +442,75 @@ while True:
 				controller.LY = STICK_MAX
 				controller.b = 1
 				duration = 0.4
+
+
+			if("+" in cmd):
+				btns = [x.strip() for x in cmd.split('+')]
+				for btn in btns:
+					if(btn == "left"):
+						controller.LX = STICK_MIN
+						duration = 0.6
+					if(btn == "right"):
+						controller.LX = STICK_MAX
+						duration = 0.6
+					if(btn == "up"):
+						controller.LY = STICK_MIN
+						duration = 0.6
+					if(btn == "down"):
+						controller.LY = STICK_MAX
+						duration = 0.6
+					if(btn == "dleft"):
+						controller.dpad = DPAD_LEFT
+						duration = 0.3
+					if(btn == "dright"):
+						controller.dpad = DPAD_RIGHT
+						duration = 0.3
+					if(btn == "dup"):
+						controller.dpad = DPAD_UP
+						duration = 0.3
+					if(btn == "ddown"):
+						controller.dpad = DPAD_DOWN
+						duration = 0.3
+					
+					if(btn == "look left"):
+						controller.RX = STICK_MIN
+						duration = 0.4
+					if(btn == "look right"):
+						controller.RX = STICK_MAX
+						duration = 0.4
+					if(btn == "look up"):
+						controller.RY = STICK_MIN
+						duration = 0.3
+					if(btn == "look down"):
+						controller.RY = STICK_MAX
+						duration = 0.3
+					if(btn == "a"):
+						controller.a = 1
+						duration = 0.3
+					if(btn == "b"):
+						controller.b = 1
+						duration = 0.4
+					if(btn == "x"):
+						controller.x = 1
+						duration = 0.9
+					if(btn == "y"):
+						controller.y = 1
+						duration = 0.8
+					if(btn == "l"):
+						controller.l = 1
+						duration = 0.01
+					if(btn == "r"):
+						controller.r = 1
+						duration = 0.01
+					if(btn == "zl"):
+						controller.zl = 1
+						duration = 0.01
+					if(btn == "zr"):
+						controller.zr = 1
+						duration = 0.01
+					if(btn == "minus"):
+						controller.minus = 1
+						duration = 0.01
 
 
 			send_and_reset(duration, reset)
