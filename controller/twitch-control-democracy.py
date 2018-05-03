@@ -227,8 +227,8 @@ while True:
 	diffInMilliSeconds = diffInSeconds*1000
 
 	if(diffInMilliSeconds > 160):
+		
 		start = time.clock()
-		controller.send(controller.output)
 		if(len(commandQueue) > 0):
 			nextCommands.append(commandQueue[0])
 			del commandQueue[0]
@@ -514,6 +514,3 @@ while True:
 
 
 			send_and_reset(duration, reset)
-
-			controller.getOutput()
-			controller.send(controller.output)

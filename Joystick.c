@@ -49,35 +49,35 @@ void parseLine(char* line) {
 	HAT2 = 0;
 
 	switch (btns[0]) {
-	case '0':
-		HAT2 = HAT_TOP;
-		break;
-	case '1':
-		HAT2 = HAT_TOP_RIGHT;
-		break;
-	case '2':
-		HAT2 = HAT_RIGHT;
-		break;
-	case '3':
-		HAT2 = HAT_BOTTOM_RIGHT;
-		break;
-	case '4':
-		HAT2 = HAT_BOTTOM;
-		break;
-	case '5':
-		HAT2 = HAT_BOTTOM_LEFT;
-		break;
-	case '6':
-		HAT2 = HAT_LEFT;
-		break;
-	case '7':
-		HAT2 = HAT_TOP_LEFT;
-		break;
-	case '8':
-		HAT2 = HAT_CENTER;
-		break;
-	default:
-		break;
+		case '0':
+			HAT2 = HAT_TOP;
+			break;
+		case '1':
+			HAT2 = HAT_TOP_RIGHT;
+			break;
+		case '2':
+			HAT2 = HAT_RIGHT;
+			break;
+		case '3':
+			HAT2 = HAT_BOTTOM_RIGHT;
+			break;
+		case '4':
+			HAT2 = HAT_BOTTOM;
+			break;
+		case '5':
+			HAT2 = HAT_BOTTOM_LEFT;
+			break;
+		case '6':
+			HAT2 = HAT_LEFT;
+			break;
+		case '7':
+			HAT2 = HAT_TOP_LEFT;
+			break;
+		case '8':
+			HAT2 = HAT_CENTER;
+			break;
+		default:
+			break;
 	}
 	
 	if (btns[1] == '1') {
@@ -143,7 +143,7 @@ ISR(USART1_RX_vect) {
 
 // Main entry point.
 int main(void) {
-	Serial_Init(9600, false);
+	Serial_Init(38400, false);
 	Serial_CreateStream(NULL);
 
 	sei();
@@ -154,8 +154,7 @@ int main(void) {
 	// We'll then enable global interrupts for our use.
 	GlobalInterruptEnable();
 	// Once that's done, we'll enter an infinite loop.
-	for (;;)
-	{
+	for (;;) {
 		// We need to run our task to process and deliver data for our IN and OUT endpoints.
 		HID_Task();
 		// We also need to run the main USB management task.
@@ -201,12 +200,12 @@ void EVENT_USB_Device_ConfigurationChanged(void) {
 // Process control requests sent to the device from the USB host.
 void EVENT_USB_Device_ControlRequest(void) {
 	// We can handle two control requests: a GetReport and a SetReport.
-	switch (USB_ControlRequest.bRequest)
-	{
+	switch (USB_ControlRequest.bRequest) {
+
 		// GetReport is a request for data from the device.
 	case HID_REQ_GetReport:
-		if (USB_ControlRequest.bmRequestType == (REQDIR_DEVICETOHOST | REQTYPE_CLASS | REQREC_INTERFACE))
-		{
+
+		if (USB_ControlRequest.bmRequestType == (REQDIR_DEVICETOHOST | REQTYPE_CLASS | REQREC_INTERFACE)) {
 			// We'll create an empty report.
 			USB_JoystickReport_Input_t JoystickInputData;
 			// We'll then populate this report with what we want to send to the host.
@@ -221,8 +220,8 @@ void EVENT_USB_Device_ControlRequest(void) {
 
 		break;
 	case HID_REQ_SetReport:
-		if (USB_ControlRequest.bmRequestType == (REQDIR_HOSTTODEVICE | REQTYPE_CLASS | REQREC_INTERFACE))
-		{
+
+		if (USB_ControlRequest.bmRequestType == (REQDIR_HOSTTODEVICE | REQTYPE_CLASS | REQREC_INTERFACE)) {
 			// We'll create a place to store our data received from the host.
 			USB_JoystickReport_Output_t JoystickOutputData;
 			// Since this is a control endpoint, we need to clear up the SETUP packet on this endpoint.
@@ -240,17 +239,16 @@ void EVENT_USB_Device_ControlRequest(void) {
 // Process and deliver data from IN and OUT endpoints.
 void HID_Task(void) {
 	// If the device isn't connected and properly configured, we can't do anything here.
-	if (USB_DeviceState != DEVICE_STATE_Configured)
+	if (USB_DeviceState != DEVICE_STATE_Configured) {
 		return;
+	}
 
 	// We'll start with the OUT endpoint.
 	Endpoint_SelectEndpoint(JOYSTICK_OUT_EPADDR);
 	// We'll check to see if we received something on the OUT endpoint.
-	if (Endpoint_IsOUTReceived())
-	{
+	if (Endpoint_IsOUTReceived()) {
 		// If we did, and the packet has data, we'll react to it.
-		if (Endpoint_IsReadWriteAllowed())
-		{
+		if (Endpoint_IsReadWriteAllowed()) {
 			// We'll create a place to store our data received from the host.
 			USB_JoystickReport_Output_t JoystickOutputData;
 			// We'll then take in that data, setting it up in our storage.
@@ -265,8 +263,7 @@ void HID_Task(void) {
 	// We'll then move on to the IN endpoint.
 	Endpoint_SelectEndpoint(JOYSTICK_IN_EPADDR);
 	// We first check to see if the host is ready to accept data.
-	if (Endpoint_IsINReady())
-	{
+	if (Endpoint_IsINReady()) {
 		// We'll create an empty report.
 		USB_JoystickReport_Input_t JoystickInputData;
 		// We'll then populate this report with what we want to send to the host.
@@ -285,12 +282,12 @@ void HID_Task(void) {
 void GetNextReport(USB_JoystickReport_Input_t* const ReportData) {
 	/* Clear the report contents */
 	memset(ReportData, 0, sizeof(USB_JoystickReport_Input_t));
-	ReportData->LX = STICK_CENTER;
-	ReportData->LY = STICK_CENTER;
-	ReportData->RX = STICK_CENTER;
-	ReportData->RY = STICK_CENTER;
-	ReportData->HAT = HAT_CENTER;
-	ReportData->Button = SWITCH_RELEASE;
+	//ReportData->LX = STICK_CENTER;
+	//ReportData->LY = STICK_CENTER;
+	//ReportData->RX = STICK_CENTER;
+	//ReportData->RY = STICK_CENTER;
+	//ReportData->HAT = HAT_CENTER;
+	//ReportData->Button = SWITCH_RELEASE;
 
 
 	ReportData->Button |= buttons;

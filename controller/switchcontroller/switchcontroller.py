@@ -119,4 +119,4 @@ class SwitchController():
 		self.ser.write(f'{msg}\r\n'.encode('utf-8'));
 
 	def connect(self, port):
-		self.ser = serial.Serial(port, 9600)
+		self.ser = serial.Serial(port, 38400)

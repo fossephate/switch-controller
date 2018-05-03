@@ -11,6 +11,11 @@ class TwitchBot():
 	
 	def __init__(self):
 		self.sock = socket.socket()
+		self.CHAN = ""
+		self.PASS = ""
+		self.NICK = ""
+		self.HOST = ""
+		self.PORT = 0
 
 	def chat(self, msg):
 		"""
@@ -47,11 +52,17 @@ class TwitchBot():
 		"""
 		chat(self.sock, ".timeout {}".format(user, secs))
 
-	def connect(self, HOST, PASS, PORT, CHANNEL):
-		self.sock.connect((HOST, PORT))
-		self.sock.send("PASS {}\r\n".format(PASS).encode("utf-8"))
-		self.sock.send("NICK {}\r\n".format(NICK).encode("utf-8"))
-		self.sock.send("JOIN {}\r\n".format(CHAN).encode("utf-8"))
+	def connect(self, HOST, PASS, PORT, CHANNEL, NICK):
+		self.HOST = HOST
+		self.PASS = PASS
+		self.CHAN = CHAN
+		self.NICK = NICK
+		self.PORT = PORT
+
+		self.sock.connect((self.HOST, self.PORT))
+		self.sock.send("PASS {}\r\n".format(self.PASS).encode("utf-8"))
+		self.sock.send("NICK {}\r\n".format(self.NICK).encode("utf-8"))
+		self.sock.send("JOIN {}\r\n".format(self.CHAN).encode("utf-8"))
 
 	def stayConnected(self):
 		response = "none"
