@@ -202,7 +202,7 @@ void EVENT_USB_Device_ControlRequest(void) {
 	// We can handle two control requests: a GetReport and a SetReport.
 	switch (USB_ControlRequest.bRequest) {
 
-		// GetReport is a request for data from the device.
+	// GetReport is a request for data from the device.
 	case HID_REQ_GetReport:
 
 		if (USB_ControlRequest.bmRequestType == (REQDIR_DEVICETOHOST | REQTYPE_CLASS | REQREC_INTERFACE)) {
@@ -219,6 +219,7 @@ void EVENT_USB_Device_ControlRequest(void) {
 		}
 
 		break;
+
 	case HID_REQ_SetReport:
 
 		if (USB_ControlRequest.bmRequestType == (REQDIR_HOSTTODEVICE | REQTYPE_CLASS | REQREC_INTERFACE)) {
@@ -281,7 +282,7 @@ void HID_Task(void) {
 // Prepare the next report for the host.
 void GetNextReport(USB_JoystickReport_Input_t* const ReportData) {
 	/* Clear the report contents */
-	memset(ReportData, 0, sizeof(USB_JoystickReport_Input_t));
+	//memset(ReportData, 0, sizeof(USB_JoystickReport_Input_t));
 	//ReportData->LX = STICK_CENTER;
 	//ReportData->LY = STICK_CENTER;
 	//ReportData->RX = STICK_CENTER;
@@ -290,7 +291,9 @@ void GetNextReport(USB_JoystickReport_Input_t* const ReportData) {
 	//ReportData->Button = SWITCH_RELEASE;
 
 
-	ReportData->Button |= buttons;
+	//ReportData->Button |= buttons;
+
+	ReportData->Button = buttons;
 	ReportData->HAT = HAT2;
 
 	ReportData->LX = LX2;

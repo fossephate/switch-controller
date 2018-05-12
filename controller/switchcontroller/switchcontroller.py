@@ -116,7 +116,12 @@ class SwitchController():
 		self.output += " " + str(self.RY)
 
 	def send(self, msg):
-		self.ser.write(f'{msg}\r\n'.encode('utf-8'));
+		try:
+			self.ser.write(f'{msg}\r\n'.encode('utf-8'));
+		except:
+			print("some write error")
+			pass
+
 
 	def connect(self, port):
 		self.ser = serial.Serial(port, 38400)

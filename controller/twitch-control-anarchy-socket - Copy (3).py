@@ -81,6 +81,10 @@ nextCommands = []
 oldArgs = "800000000000000 128 128 128 128"
 
 
+def on_ping2(*args):
+	print("test")
+
+
 
 
 
@@ -91,10 +95,7 @@ oldArgs = "800000000000000 128 128 128 128"
 class Client(object):
 
 	def __init__(self):
-		# self.socketio = SocketIO("http://fosse.co:8110")
-		# self.socketio = SocketIO("127.0.0.1:8110")
-		self.socketio = SocketIO("http://twitchplaysnintendoswitch.com:8110")
-
+		self.socketio = SocketIO("http://fosse.co:8110")
 		self.socketio.on("controllerState", self.on_controller_state)
 		self.socketio.on("controllerCommand", self.on_controller_state)
 		self.socketio.on("chat message", self.on_chat_message)
@@ -119,25 +120,17 @@ class Client(object):
 		
 
 	def on_event(self, event):
-		#print(event)
-		pass
+		print(event)
 
 	def on_controller_command(*args):
 		nextCommands.append(args)
 
 	def on_chat_message(*args):
-		
-		message = args[1]
-		message = message.strip()
-		message = message.lower()
-
-		username = "streamrChat"
-
-		client.handleChat(username, message)
+		print(args[1])
 
 	def on_controller_state(*args, set=1):
 
-		print("controller state:", args[1])
+		print("controller state:", args)
 
 		#if(set):
 		#oldArgs = args
@@ -197,56 +190,77 @@ class Client(object):
 
 
 	def handleChat(self, username, message):
-		print(message)
+		return
 
-		commands = [x.strip() for x in message.split(',')]
-		cmd = "none"
 
-		if(commands[0] == "!controls"):
-			msg = "@" + username + " look at the description Kappa (this is a bot)"
-			msg = "\
-(Case does NOT matter)----------------------\
-(sleft/sright/sup/sdown holds for 0.1 seconds)-------------\
-(left/right/up/down holds for 0.3 seconds)----------------\
-(hleft/hright/hup/hdown holds for 1.5 seconds)-----------\
-(add 2 h's for 4 seconds held)-----------------------------\
-A/B/X/Y / HA/HB/HX/HY / L/R/ZL/ZR--------------------------\
-To press buttons together: (ex. a, up+b, x)----------------\
-To chain: (ex. up, up, up)---------------\
-"
+
+	def loop(self):
+		# control switch here:
+
+		botend = time.clock()
+		diffInSeconds = self.botend - self.botstart
+		diffInMilliSeconds = diffInSeconds*1000
+
+		if(diffInMilliSeconds > 1000*60*5):
+			self.botstart = time.clock()
+			msg = "Join the discord server! https://discord.gg/ARTbddH\
+			hate the stream delay? go here! https://fosse.co/js/streamr/node/console/"
 			twitchBot.chat(msg)
 
-		valid = True
-		for cmd in commands:
-			if (cmd not in validCommands and "+" not in cmd):
-				valid = False
-			if ("plus" in cmd and username not in whitelist):
-				valid = False
-			if ("home" in cmd and username not in adminlist):
-				valid = False
-			if ("lockon" in cmd):
-				self.lockon = not self.lockon
+		response = twitchBot.stayConnected()
+		#response = "none"
+		if(response != "none"):
+			username = re.search(r"\w+", response).group(0) # return the entire match
+			username = username.lower()
+			message = CHAT_MSG.sub("", response)
+			message = message.strip()
+			message = message.lower()
 
-		if (not valid):
-			commands = ["none"]
+			commands = [x.strip() for x in message.split(',')]
+			cmd = "none"
+
+			if(commands[0] == "!controls"):
+				msg = "@" + username + " look at the description Kappa (this is a bot)"
+				msg = "\
+	(Case does NOT matter)----------------------\
+	(sleft/sright/sup/sdown holds for 0.1 seconds)-------------\
+	(left/right/up/down holds for 0.3 seconds)----------------\
+	(hleft/hright/hup/hdown holds for 1.5 seconds)-----------\
+	(add 2 h's for 4 seconds held)-----------------------------\
+	A/B/X/Y / HA/HB/HX/HY / L/R/ZL/ZR--------------------------\
+	To press buttons together: (ex. a, up+b, x)----------------\
+	To chain: (ex. up, up, up)---------------\
+	"
+				twitchBot.chat(msg)
+
+			valid = True
+			for cmd in commands:
+				if (cmd not in validCommands and "+" not in cmd):
+					valid = False
+				if ("plus" in cmd and username not in whitelist):
+					valid = False
+				if ("home" in cmd and username not in adminlist):
+					valid = False
+				if ("lockon" in cmd):
+					self.lockon = not self.lockon
+
+			if (not valid):
+				commands = ["none"]
 
 
-		if(len(commands) > 20):
-			commands = []
-		for cmd in commands:
-			commandQueue.append(cmd)
+			if(len(commands) > 20):
+				commands = []
+			for cmd in commands:
+				commandQueue.append(cmd)
 
 
-
-	def decreaseQueue(self):
-
-		#sleep(0.0001)
+		sleep(0.01)
 
 		self.end = time.clock()
 		diffInSeconds = self.end - self.start
 		diffInMilliSeconds = diffInSeconds*1000
 
-		if(diffInMilliSeconds > 8.33333):
+		if(diffInMilliSeconds > 160):
 			self.start = time.clock()
 			#controller.send(controller.output)
 
@@ -839,35 +853,7 @@ To chain: (ex. up, up, up)---------------\
 							controller.zr = 1
 						if(btn == "minus"):
 							controller.minus = 1
-				send_and_reset(duration, reset)
-
-
-
-	def loop(self):
-		# control switch here:
-
-		self.botend = time.clock()
-		diffInSeconds = self.botend - self.botstart
-		diffInMilliSeconds = diffInSeconds*1000
-		if(diffInMilliSeconds > 1000*60*5):
-			self.socketio.emit("IamController")
-			self.botstart = time.clock()
-			msg = "Join the discord server! https://discord.gg/ARTbddH\
-			hate the stream delay? go here! https://twitchplaysnintendoswitch.com"
-			twitchBot.chat(msg)
-
-		response = twitchBot.stayConnected()
-		#response = "none"
-		if(response != "none"):
-			username = re.search(r"\w+", response).group(0) # return the entire match
-			username = username.lower()
-			message = CHAT_MSG.sub("", response)
-			message = message.strip()
-			message = message.lower()
-
-			self.handleChat(username, message)
-
-		self.decreaseQueue()
+			send_and_reset(duration, reset)
 
 
 
@@ -882,7 +868,7 @@ while True:
 
 	# rnd = random.uniform(0, 1)
 	# if(rnd > 0.99):
-	#client.on_controller_state(client.oldArgs2, 0)
+	client.on_controller_state(client.oldArgs2, 0)
 
 	#print(client.oldArgs2)
 
