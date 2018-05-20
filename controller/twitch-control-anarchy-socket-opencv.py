@@ -30,6 +30,23 @@ logging.basicConfig()
 
 from threading import Thread
 
+# OpenCV / image utils:
+import imutils
+import cv2
+from PIL import Image
+
+import ctypes
+from ctypes import *
+import win32api
+import win32con
+import win32com
+import win32com.client
+import win32gui
+import win32ui
+
+# numpy
+import numpy as np
+
 
 screenWidth, screenHeight = pyautogui.size()
 x = screenWidth/2
@@ -71,18 +88,21 @@ def send_and_reset(duration=0.1, reset=1):
 		controller.getOutput()
 		controller.send(controller.output)
 
-validCommands = ["lockon", "hhsprint", "hsprint", "sprint", "!controls", "home", "lstick", "rstick", "spin", "swim", "back flip", "ground pound", "groundpound", "gp", "bf", "cap bounce", "sdive", "sdive2", "hdive", "hdive2", "hdive3", "dive", "dive2", "dive3", "roll", "roll2", "backflip", "backflip2", "sssu", "sssd", "sssl", "sssr", "sb", "suu", "", "up", "down", "left", "right", "u", "d", "l", "r", "hup", "hdown", "hleft", "hright", "hhup", "hhdown", "hhleft", "hhright", "hu", "hd", "hl", "hr", "su", "sd", "sl", "sr", "sup", "sdown", "sleft", "sright", "ssu", "ssd", "ssl", "ssr", "ssup", "ssdown", "ssleft", "ssright", "look up", "look down", "look left", "look right", "lu", "ld", "ll", "lr", "hlu", "hld", "hll", "hlr", "slu", "sld", "sll", "slr", "dup", "ddown", "dleft", "dright", "du", "dd", "dl", "dr", "a", "b", "x", "y", "ha", "hb", "hx", "hy", "hhb", "hhhb", "l", "zl", "r", "zr", "plus", "minus", "long jump", "long jump2", "long jump3", "jump forward", "jump forward2", "jump back", "jump back2", "dive", "dive2"]
-whitelist = ["valentinvanelslande", "beanjr_yt", "yanchan230", "silvermagpi", "hoopa21", "opprose", "mrruidiazisthebestinsmo", "stravos96", "harmjan387", "twitchplaysconsoles", "fosseisanerd"]
+def round_down(num, divisor):
+    return num - (num%divisor)
+
+
+
+
+
+validCommands = ["restart", "goto cave", "goto sonic", "goto skyrim", "goto rocket league", "goto arms", "goto celeste", "goto mk8", "goto splatoon2", "goto isaac", "goto mario", "goto botw", "goto kirby", "goto smo", "goto", "lockon", "hhsprint", "hsprint", "sprint", "!controls", "home", "lstick", "rstick", "spin", "swim", "back flip", "ground pound", "groundpound", "gp", "bf", "cap bounce", "sdive", "sdive2", "hdive", "hdive2", "hdive3", "dive", "dive2", "dive3", "roll", "roll2", "backflip", "backflip2", "sssu", "sssd", "sssl", "sssr", "sb", "suu", "", "up", "down", "left", "right", "u", "d", "l", "r", "hup", "hdown", "hleft", "hright", "hhup", "hhdown", "hhleft", "hhright", "hu", "hd", "hl", "hr", "su", "sd", "sl", "sr", "sup", "sdown", "sleft", "sright", "ssu", "ssd", "ssl", "ssr", "ssup", "ssdown", "ssleft", "ssright", "look up", "look down", "look left", "look right", "lu", "ld", "ll", "lr", "hlu", "hld", "hll", "hlr", "slu", "sld", "sll", "slr", "dup", "ddown", "dleft", "dright", "du", "dd", "dl", "dr", "a", "b", "x", "y", "ha", "hb", "hx", "hy", "hhb", "hhhb", "l", "zl", "r", "zr", "plus", "minus", "long jump", "long jump2", "long jump3", "jump forward", "jump forward2", "jump back", "jump back2", "dive", "dive2"]
+whitelist = ["alua2020", "grady404", "valentinvanelslande", "beanjr_yt", "yanchan230", "silvermagpi", "hoopa21", "opprose", "mrruidiazisthebestinsmo", "stravos96", "harmjan387", "twitchplaysconsoles", "fosseisanerd"]
 adminlist = ["twitchplaysconsoles", "fosseisanerd"]
 
 commandQueue = []
 nextCommands = []
 #lockon = False
 oldArgs = "800000000000000 128 128 128 128"
-
-
-def on_ping2(*args):
-	print("test")
 
 
 
@@ -95,7 +115,10 @@ def on_ping2(*args):
 class Client(object):
 
 	def __init__(self):
-		self.socketio = SocketIO("http://fosse.co:8110")
+		# self.socketio = SocketIO("http://fosse.co:8110")
+		# self.socketio = SocketIO("127.0.0.1:8110")
+		self.socketio = SocketIO("http://twitchplaysnintendoswitch.com:8110")
+
 		self.socketio.on("controllerState", self.on_controller_state)
 		self.socketio.on("controllerCommand", self.on_controller_state)
 		self.socketio.on("chat message", self.on_chat_message)
@@ -113,6 +136,8 @@ class Client(object):
 		self.botend = time.clock()
 
 		self.lockon = False
+		self.laglessEnabled = True
+		self.currentGame = "none"
 
 		self.oldArgs2 = "800000000000000 128 128 128 128"
 
@@ -120,17 +145,28 @@ class Client(object):
 		
 
 	def on_event(self, event):
-		print(event)
+		#print(event)
+		pass
 
 	def on_controller_command(*args):
 		nextCommands.append(args)
 
 	def on_chat_message(*args):
-		print(args[1])
+		
+		message = args[1]
+		message = message.strip()
+		message = message.lower()
+
+		username = "streamrChat"
+
+		client.handleChat(username, message)
 
 	def on_controller_state(*args, set=1):
 
-		print("controller state:", args)
+		if(not client.laglessEnabled):
+			return
+
+		print("controller state:", args[1])
 
 		#if(set):
 		#oldArgs = args
@@ -177,90 +213,302 @@ class Client(object):
 		if (btns[14] == '1'):
 			controller.home = 0
 
-		controller.LX = int(LX)
-		controller.LY = 255-int(LY)
-		controller.RX = int(RX)
-		controller.RY = 255-int(RY)
+		try:
+			controller.LX = int(LX)
+			controller.LY = 255-int(LY)
+			controller.RX = int(RX)
+			controller.RY = 255-int(RY)
+		except:
+			pass
 
 
-		duration = 0.1
+		duration = 0.01
 		reset = 0
 		send_and_reset(duration, reset)
 
 
 
-	def handleChat(self, username, message):
+
+
+	def findImage(self, frame, imagefile):
+
+
+		img_rgb = frame# where we're looking for the icon
+		img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
+		template = cv2.imread(imagefile, 0)
+		w, h = template.shape[::-1]
+
+		iconLocationX = -1
+		iconLocationY = -1
+
+		res = cv2.matchTemplate(img_gray,template,cv2.TM_CCOEFF_NORMED)
+		threshold = 0.6
+		loc = np.where(res >= threshold)
+		location = None
+		# for pt in zip(*loc[::-1]):
+		for pt in zip(*[loc[-1], loc[-2]]):
+			# min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+			# pt = max_loc
+			cv2.rectangle(img_rgb, pt, (pt[0] + w, pt[1] + h), (0,0,255), 2)
+			iconLocationX = pt[0] + (w/2)
+			iconLocationX = pt[1] + (h/2)
+			cv2.circle(img_rgb, (int(iconLocationX), int(iconLocationY)), int(2), (0, 255, 255), 2)
+			# print(pt)
+			location = [pt[0], pt[1]]
+		
+		# cv2.imshow("icon match", img_rgb)
+		# cv2.waitKey(10)
+
+		return location
+
+
+		# img = cv2.imread("messi5.jpg",0)
+		# img = frame
+		# img2 = img.copy()
+		# template = cv2.imread("icons/SMO.png", 0)
+		# w, h = template.shape[::-1]
+
+
+		# # All the 6 methods for comparison in a list
+		# img = img2.copy()
+		# method = eval('cv2.TM_CCOEFF_NORMED')
+		# # Apply template Matching
+		# res = cv2.matchTemplate(img,template,cv2.TM_CCOEFF_NORMED)
+		# min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+		# # If the method is TM_SQDIFF or TM_SQDIFF_NORMED, take minimum
+		# if method in [cv2.TM_SQDIFF, cv2.TM_SQDIFF_NORMED]:
+		#     top_left = min_loc
+		# else:
+		#     top_left = max_loc
+		# bottom_right = (top_left[0] + w, top_left[1] + h)
+		# cv2.rectangle(img, top_left, bottom_right, 255, 2)
+		# plt.subplot(121),plt.imshow(res,cmap = 'gray')
+		# plt.title('Matching Result'), plt.xticks([]), plt.yticks([])
+		# plt.subplot(122),plt.imshow(img,cmap = 'gray')
+		# plt.title('Detected Point'), plt.xticks([]), plt.yticks([])
+		# plt.suptitle(meth)
+		# plt.show()
+
+
+
+	def goto_game(self, imagefile, delay=50, nameofgame="Twitch Plays"):
+
+		# disable lagless while we do this:
+		self.laglessEnabled = False
+
+		# get to game selection screen:
+		controller.reset()
+		controller.home = 1
+		send_and_reset(0.1, 1)
+		sleep(2)
+		controller.LX = STICK_MAX
+		send_and_reset(3, 1)
+		controller.a = 1
+		send_and_reset(0.1)
+
+		sleep(2)
+
+		
+
+
+		# SSx1 = 255 - 1920;# left monitor
+		# SSy1 = 70;
+		# SSWidth = 1280
+		# SSHeight = 720
+		SSx1 = 319 - 1920;# left monitor
+		SSy1 = 61;
+		SSWidth = 1280
+		SSHeight = 720
+
+		#get window position and info
+		hwnd = win32gui.FindWindow(None, "OBS")
+		# hwnd = win32gui.GetDesktopWindow()#for screenshot of entire screen
+
+		wDC = win32gui.GetWindowDC(hwnd)
+		myDC = win32ui.CreateDCFromHandle(wDC)
+		newDC = myDC.CreateCompatibleDC()
+		myBitMap = win32ui.CreateBitmap()
+		myBitMap.CreateCompatibleBitmap(myDC, SSWidth, SSHeight)
+		newDC.SelectObject(myBitMap)
+		newDC.BitBlt((0,0),(SSWidth, SSHeight) , myDC, (SSx1,SSy1), win32con.SRCCOPY)
+
+		bmpinfo = myBitMap.GetInfo()
+		bmpstr = myBitMap.GetBitmapBits(True)
+		img = Image.frombuffer(
+		    'RGB',
+		    (bmpinfo['bmWidth'], bmpinfo['bmHeight']),
+		    bmpstr, 'raw', 'BGRX', 0, 1)
+
+		# Free Resources
+		myDC.DeleteDC()
+		newDC.DeleteDC()
+		win32gui.ReleaseDC(hwnd, wDC)
+		win32gui.DeleteObject(myBitMap.GetHandle())
+
+		#img = ImageGrab.grab(bbox=(x1, y1, x2, y2))#.crop(box) #x, y, w, h
+		img_np = np.array(img)
+		frame = cv2.cvtColor(img_np, cv2.COLOR_BGR2RGB)
+		hsv = cv2.cvtColor(img_np, cv2.COLOR_BGR2HSV)
+
+
+		iconLoc = self.findImage(frame, imagefile)
+		# cursorLoc = self.findImage(frame, "icons/selectbar.png")
+
+
+		if iconLoc == None:
+			controller.a = 1
+			send_and_reset(0.1)
+			self.laglessEnabled = True
+			return
+
+
+		print(iconLoc)
+
+
+		# iconLoc[0] = int(round(iconLoc[0]/100)-1)# the number of times to move right
+		# iconLoc[1] = int(round(iconLoc[1]/100)-2)# the number of times to move down
+
+		# so that when we round down it always above the nearest multiple of 185
+		iconLoc[0] += 10
+		iconLoc[1] += 10
+
+		iconLoc[0] = int((round_down(iconLoc[0], 185)/185))# the number of times to move right
+		iconLoc[1] = int((round_down(iconLoc[1], 185)/185)-1)# the number of times to move down
+
+		# iconLoc[0] = int(iconLoc[0]/2)
+		# iconLoc[1] = int(iconLoc[1]/2)
+
+		print(iconLoc)
+
+
+		for i in range(0, iconLoc[0]):
+			controller.LX = STICK_MAX
+			send_and_reset(0.1, 1)
+			sleep(0.5)
+		for i in range(0, iconLoc[1]):
+			controller.LY = STICK_MAX
+			send_and_reset(0.1, 1)
+			sleep(0.5)
+
+		controller.a = 1
+		send_and_reset(0.1)
+		sleep(2)
+		controller.a = 1
+		send_and_reset(0.1)
+		sleep(2)
+		controller.a = 1
+		send_and_reset(0.1)
+		sleep(2)
+		controller.a = 1
+		send_and_reset(0.1)
+		sleep(2)
+		controller.a = 1
+		send_and_reset(0.1)
+		sleep(2)
+		controller.a = 1
+		send_and_reset(0.1)
+		sleep(delay)
+		controller.a = 1
+		send_and_reset(0.1)
+		controller.a = 1
+		send_and_reset(0.1)
+		controller.a = 1
+		send_and_reset(0.1)
+		controller.a = 1
+		send_and_reset(0.1)
+		sleep(2)
+		controller.a = 1
+		send_and_reset(0.1)
+		controller.a = 1
+		send_and_reset(0.1)
+		sleep(2)
+		controller.a = 1
+		send_and_reset(0.1)
+
+		twitchBot.chat("!game " + nameofgame)
+
+		
+		# draw a circle on the image:
+		# x = 200
+		# y = 200
+		# r = 5
+		# cv2.circle(frame, (int(x), int(y)), int(r), (0, 255, 255), 2)
+
+		# show screen capture and mask
+		#cv2.imshow("screen capture", frame)
+
+		# mask = cv2.inRange(hsv, colorLower1, colorUpper1)
+		# cv2.imshow("mask", mask)
+		cv2.waitKey(1)
+
+
+		self.laglessEnabled = True
+
 		return
 
 
 
-	def loop(self):
-		# control switch here:
+	def handleChat(self, username, message):
+		print(message)
 
-		botend = time.clock()
-		diffInSeconds = self.botend - self.botstart
-		diffInMilliSeconds = diffInSeconds*1000
+		commands = [x.strip() for x in message.split(',')]
+		cmd = "none"
 
-		if(diffInMilliSeconds > 1000*60*5):
-			self.botstart = time.clock()
-			msg = "Join the discord server! https://discord.gg/ARTbddH\
-			hate the stream delay? go here! https://fosse.co/js/streamr/node/console/"
+		if(commands[0] == "!controls"):
+			msg = "@" + username + " look at the description Kappa (this is a bot)"
+# 			msg = "\
+# (Case does NOT matter)----------------------\
+# (sleft/sright/sup/sdown holds for 0.1 seconds)-------------\
+# (left/right/up/down holds for 0.3 seconds)----------------\
+# (hleft/hright/hup/hdown holds for 1.5 seconds)-----------\
+# (add 2 h's for 4 seconds held)-----------------------------\
+# A/B/X/Y / HA/HB/HX/HY / L/R/ZL/ZR--------------------------\
+# To press buttons together: (ex. a, up+b, x)----------------\
+# To chain: (ex. up, up, up)---------------\
+# "
+			msg = "goto https://twitchplaysnintendoswitch.com or look at the description for the chat controls\
+			 you can also type goto <name of game> to switch games"
 			twitchBot.chat(msg)
 
-		response = twitchBot.stayConnected()
-		#response = "none"
-		if(response != "none"):
-			username = re.search(r"\w+", response).group(0) # return the entire match
-			username = username.lower()
-			message = CHAT_MSG.sub("", response)
-			message = message.strip()
-			message = message.lower()
+		valid = True
+		for cmd in commands:
+			if (cmd not in validCommands and "+" not in cmd):
+				valid = False
+			if ("plus" in cmd and username not in whitelist):
+				valid = False
+			if ("home" in cmd and username not in adminlist):
+				valid = False
+			# if ("goto smo" in cmd and username not in adminlist):
+			# 	valid = False
+			# if ("goto botw" in cmd and username not in adminlist):
+			# 	valid = False
+			# if ("goto celeste" in cmd and username not in adminlist):
+			# 	valid = False
+			# if ("goto kirby" in cmd and username not in adminlist):
+			# 	valid = False
+			if ("lockon" in cmd):
+				self.lockon = not self.lockon
 
-			commands = [x.strip() for x in message.split(',')]
-			cmd = "none"
-
-			if(commands[0] == "!controls"):
-				msg = "@" + username + " look at the description Kappa (this is a bot)"
-				msg = "\
-	(Case does NOT matter)----------------------\
-	(sleft/sright/sup/sdown holds for 0.1 seconds)-------------\
-	(left/right/up/down holds for 0.3 seconds)----------------\
-	(hleft/hright/hup/hdown holds for 1.5 seconds)-----------\
-	(add 2 h's for 4 seconds held)-----------------------------\
-	A/B/X/Y / HA/HB/HX/HY / L/R/ZL/ZR--------------------------\
-	To press buttons together: (ex. a, up+b, x)----------------\
-	To chain: (ex. up, up, up)---------------\
-	"
-				twitchBot.chat(msg)
-
-			valid = True
-			for cmd in commands:
-				if (cmd not in validCommands and "+" not in cmd):
-					valid = False
-				if ("plus" in cmd and username not in whitelist):
-					valid = False
-				if ("home" in cmd and username not in adminlist):
-					valid = False
-				if ("lockon" in cmd):
-					self.lockon = not self.lockon
-
-			if (not valid):
-				commands = ["none"]
+		if (not valid):
+			commands = []
 
 
-			if(len(commands) > 20):
-				commands = []
-			for cmd in commands:
-				commandQueue.append(cmd)
+		if(len(commands) > 20):
+			commands = []
+		for cmd in commands:
+			commandQueue.append(cmd)
 
 
-		sleep(0.01)
+
+	def decreaseQueue(self):
+
+		#sleep(0.0001)
 
 		self.end = time.clock()
 		diffInSeconds = self.end - self.start
 		diffInMilliSeconds = diffInSeconds*1000
 
-		if(diffInMilliSeconds > 160):
+		if(diffInMilliSeconds > 8.33333):
 			self.start = time.clock()
 			#controller.send(controller.output)
 
@@ -332,10 +580,12 @@ class Client(object):
 					reset = 1
 
 				if(cmd == "left" or cmd == "l"):
+				# if(cmd == "left"):
 					controller.LX = STICK_MIN
 					duration = 0.6
 					reset = 1
 				if(cmd == "right" or cmd == "r"):
+				# if(cmd == "right"):
 					controller.LX = STICK_MAX
 					duration = 0.6
 					reset = 1
@@ -791,6 +1041,36 @@ class Client(object):
 					#nextCommands.insert(0, "spin6")
 					reset = 1
 
+				if(cmd == "goto smo"):
+					self.goto_game("icons/smo.png", 30, "Super Mario Odyssey")
+				if(cmd == "goto botw"):
+					self.goto_game("icons/botw.png", 20, "The Legend of Zelda: Breath of the Wild")
+				if(cmd == "goto celeste"):
+					self.goto_game("icons/celeste.png", 10, "Celeste")
+				if(cmd == "goto kirby"):
+					self.goto_game("icons/kirby.png", 10)
+				if(cmd == "goto splatoon2"):
+					self.goto_game("icons/splatoon2.png", 10, "Splatoon 2")
+				if(cmd == "goto isaac"):
+					self.goto_game("icons/isaac.png", 10)
+				if(cmd == "goto mario"):
+					self.goto_game("icons/mario.png", 10)
+				if(cmd == "goto sonic"):
+					self.goto_game("icons/sonic.png", 10)
+				if(cmd == "goto mk8"):
+					self.goto_game("icons/mk8.png", 10, "Mario Kart 8")
+				if(cmd == "goto arms"):
+					self.goto_game("icons/arms.png", 10)
+				if(cmd == "goto skyrim"):
+					self.goto_game("icons/skyrim.png", 40, "The Elder Scrolls V: Skyrim")
+				if(cmd == "goto cave"):
+					self.goto_game("icons/cave.png", 10)
+				if(cmd == "goto rocket league"):
+					self.goto_game("icons/rocketleague.png", 10, "Rocket League")
+
+				if(cmd == "restart"):
+					self.socketio.emit("restart")
+
 				if("+" in cmd):
 					btns = [x.strip() for x in cmd.split('+')]
 
@@ -853,7 +1133,35 @@ class Client(object):
 							controller.zr = 1
 						if(btn == "minus"):
 							controller.minus = 1
-			send_and_reset(duration, reset)
+				send_and_reset(duration, reset)
+
+
+
+	def loop(self):
+		# control switch here:
+
+		self.botend = time.clock()
+		diffInSeconds = self.botend - self.botstart
+		diffInMilliSeconds = diffInSeconds*1000
+		if(diffInMilliSeconds > 1000*60*5):
+			self.socketio.emit("IamController")
+			self.botstart = time.clock()
+			msg = "Join the discord server! https://discord.gg/ARTbddH\
+			hate the stream delay? go here! https://twitchplaysnintendoswitch.com"
+			twitchBot.chat(msg)
+
+		response = twitchBot.stayConnected()
+		#response = "none"
+		if(response != "none"):
+			username = re.search(r"\w+", response).group(0) # return the entire match
+			username = username.lower()
+			message = CHAT_MSG.sub("", response)
+			message = message.strip()
+			message = message.lower()
+
+			self.handleChat(username, message)
+
+		self.decreaseQueue()
 
 
 
@@ -868,13 +1176,19 @@ while True:
 
 	# rnd = random.uniform(0, 1)
 	# if(rnd > 0.99):
-	client.on_controller_state(client.oldArgs2, 0)
+	#client.on_controller_state(client.oldArgs2, 0)
 
 	#print(client.oldArgs2)
 
 	client.loop()
 
 	sleep(0.0001)
+
+	
+	# if win32api.GetAsyncKeyState(ord("P")):
+	# 	laglessEnabled = not laglessEnabled
+
+
 
 	# so I don't get stuck:
 	if(win32api.GetAsyncKeyState(win32con.VK_ESCAPE)):

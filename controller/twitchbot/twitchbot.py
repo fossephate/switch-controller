@@ -4,6 +4,7 @@ import socket
 from time import sleep
 import re
 from .config import *
+import requests
 
 CHAT_MSG=re.compile(r"^:\w+!\w+@\w+\.tmi\.twitch\.tv PRIVMSG #\w+ :")
 
@@ -80,6 +81,26 @@ class TwitchBot():
 			#message = CHAT_MSG.sub("", response)
 			#print(username + ": " + message)
 			return response
+
+	def set_title_game(self, title, game):
+		scope = "&scope=channel_editor"
+		client_id = "&client_id=" + CLIENT_ID
+		redirect_uri = "&redirect_uri=https://twitchplaysnintendoswitch.com/8110/auth/twitch/callback"
+		response_type = "&response_type=code"
+		url = "https://api.twitch.tv/kraken/oauth2/authorize?" + client_id + redirect_uri + response_type + scope
+		params = {"Client-ID" : ""+ CLIENT_ID +"",
+		          "Accept" : "application/vnd.twitchtv.v5+json"}
+		resp = requests.get(url=url, headers=params)
+		print(resp)
+
+		#https://twitchplaysnintendoswitch.com/8110/auth/twitch/callback
+
+		url = "https://api.twitch.tv/kraken/channels/twitchplaysconsoles"
+		headers = {"Client-ID" : ""+ CLIENT_ID +"", "Authorization": "OAuth " + OAUTH}
+		data = {"channel": {"status": "Twitch Plays Nintendo Switch!"}}
+		response = requests.put(url=url, headers=headers, params = data)
+		print(response)
+
 
 # Make sure you prefix the quotes with an 'r'!
 #CHAT_MSG=re.compile(r"^:\w+!\w+@\w+\.tmi\.twitch\.tv PRIVMSG #\w+ :")
