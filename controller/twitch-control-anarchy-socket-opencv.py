@@ -55,7 +55,7 @@ prevX = 0
 prevY = 0
 
 controller = SwitchController()
-controller.connect("COM6")
+controller.connect("COM3")
 
 twitchBot = TwitchBot()
 twitchBot.connect(HOST, PASS2, PORT, CHAN, NICK2)
@@ -95,7 +95,7 @@ def round_down(num, divisor):
 
 
 
-validCommands = ["restart", "goto cave", "goto sonic", "goto skyrim", "goto rocket league", "goto arms", "goto celeste", "goto mk8", "goto splatoon2", "goto isaac", "goto mario", "goto botw", "goto kirby", "goto smo", "goto", "lockon", "hhsprint", "hsprint", "sprint", "!controls", "home", "lstick", "rstick", "spin", "swim", "back flip", "ground pound", "groundpound", "gp", "bf", "cap bounce", "sdive", "sdive2", "hdive", "hdive2", "hdive3", "dive", "dive2", "dive3", "roll", "roll2", "backflip", "backflip2", "sssu", "sssd", "sssl", "sssr", "sb", "suu", "", "up", "down", "left", "right", "u", "d", "l", "r", "hup", "hdown", "hleft", "hright", "hhup", "hhdown", "hhleft", "hhright", "hu", "hd", "hl", "hr", "su", "sd", "sl", "sr", "sup", "sdown", "sleft", "sright", "ssu", "ssd", "ssl", "ssr", "ssup", "ssdown", "ssleft", "ssright", "look up", "look down", "look left", "look right", "lu", "ld", "ll", "lr", "hlu", "hld", "hll", "hlr", "slu", "sld", "sll", "slr", "dup", "ddown", "dleft", "dright", "du", "dd", "dl", "dr", "a", "b", "x", "y", "ha", "hb", "hx", "hy", "hhb", "hhhb", "l", "zl", "r", "zr", "plus", "minus", "long jump", "long jump2", "long jump3", "jump forward", "jump forward2", "jump back", "jump back2", "dive", "dive2"]
+validCommands = ["votenay", "voteyea", "restart", "goto wizard", "goto cave", "goto sonic", "goto skyrim", "goto rocket league", "goto arms", "goto celeste", "goto mk8", "goto splatoon2", "goto isaac", "goto mario", "goto botw", "goto kirby", "goto smo", "goto", "lockon", "hhsprint", "hsprint", "sprint", "!controls", "home", "lstick", "rstick", "spin", "swim", "back flip", "ground pound", "groundpound", "gp", "bf", "cap bounce", "sdive", "sdive2", "hdive", "hdive2", "hdive3", "dive", "dive2", "dive3", "roll", "roll2", "backflip", "backflip2", "sssu", "sssd", "sssl", "sssr", "sb", "suu", "", "up", "down", "left", "right", "u", "d", "l", "r", "hup", "hdown", "hleft", "hright", "hhup", "hhdown", "hhleft", "hhright", "hu", "hd", "hl", "hr", "su", "sd", "sl", "sr", "sup", "sdown", "sleft", "sright", "ssu", "ssd", "ssl", "ssr", "ssup", "ssdown", "ssleft", "ssright", "look up", "look down", "look left", "look right", "lu", "ld", "ll", "lr", "hlu", "hld", "hll", "hlr", "slu", "sld", "sll", "slr", "dup", "ddown", "dleft", "dright", "du", "dd", "dl", "dr", "a", "b", "x", "y", "ha", "hb", "hx", "hy", "hhb", "hhhb", "l", "zl", "r", "zr", "plus", "minus", "long jump", "long jump2", "long jump3", "jump forward", "jump forward2", "jump back", "jump back2", "dive", "dive2"]
 whitelist = ["alua2020", "grady404", "valentinvanelslande", "beanjr_yt", "yanchan230", "silvermagpi", "hoopa21", "opprose", "mrruidiazisthebestinsmo", "stravos96", "harmjan387", "twitchplaysconsoles", "fosseisanerd"]
 adminlist = ["twitchplaysconsoles", "fosseisanerd"]
 
@@ -103,6 +103,7 @@ commandQueue = []
 nextCommands = []
 #lockon = False
 oldArgs = "800000000000000 128 128 128 128"
+
 
 
 
@@ -136,6 +137,11 @@ class Client(object):
 		self.botend = time.clock()
 
 		self.lockon = False
+
+		self.yeaVotes = 0
+		self.nayVotes = 0
+		self.voting = False
+
 		self.laglessEnabled = True
 		self.currentGame = "none"
 
@@ -185,7 +191,7 @@ class Client(object):
 
 		controller.dpad = int(btns[0])
 		if (btns[1] == '1'):
-			controller.lclick = 1;
+			controller.lstick = 1;
 		if (btns[2] == '1'):
 			controller.l = 1;
 		if (btns[3] == '1'):
@@ -203,7 +209,7 @@ class Client(object):
 		if (btns[9] == '1'):
 			controller.y = 1;
 		if (btns[10] == '1'):
-			controller.rclick = 1;
+			controller.rstick = 1;
 		if (btns[11] == '1'):
 			controller.r = 1;
 		if (btns[12] == '1'):
@@ -446,6 +452,41 @@ class Client(object):
 
 		return
 
+	def end_goto_vote(self, imagefile, delay, nameofgame="Twitch Plays"):
+		# twitchBot.chat("Voting has ended!")
+		msg = "With " + str(self.yeaVotes) + " VoteYea and " + str(self.nayVotes) + " VoteNay"
+		
+		leaving = False
+
+		if(self.yeaVotes > self.nayVotes):
+			msg = msg + " We will be LEAVING"
+			leaving = True
+		else:
+			msg = msg + " We will be STAYING"
+
+		twitchBot.chat(msg)
+
+		self.voting = False
+
+		if(leaving):
+			self.goto_game(imagefile, delay, nameofgame)
+
+
+	def goto_game_vote(self, imagefile, delay=50, nameofgame="Twitch Plays"):
+
+		if(self.voting == True):
+			return
+
+		self.yeaVotes = 0
+		self.nayVotes = 0
+		twitchBot.chat("A vote has been started to goto " + nameofgame + "! vote now with VoteYea to LEAVE and VoteNay to STAY! Voting ends in 20 seconds!")
+		self.voting = True
+
+		voteTimer = Timer(20.0, self.end_goto_vote, (imagefile, delay, nameofgame))
+		voteTimer.start()
+
+		return
+
 
 
 	def handleChat(self, username, message):
@@ -478,6 +519,7 @@ class Client(object):
 				valid = False
 			if ("home" in cmd and username not in adminlist):
 				valid = False
+
 			# if ("goto smo" in cmd and username not in adminlist):
 			# 	valid = False
 			# if ("goto botw" in cmd and username not in adminlist):
@@ -489,12 +531,12 @@ class Client(object):
 			if ("lockon" in cmd):
 				self.lockon = not self.lockon
 
+		if(len(commands) > 20):
+			valid = False
+
 		if (not valid):
 			commands = []
 
-
-		if(len(commands) > 20):
-			commands = []
 		for cmd in commands:
 			commandQueue.append(cmd)
 
@@ -1042,31 +1084,40 @@ class Client(object):
 					reset = 1
 
 				if(cmd == "goto smo"):
-					self.goto_game("icons/smo.png", 30, "Super Mario Odyssey")
+					self.goto_game_vote("icons/smo.png", 30, "Super Mario Odyssey")
 				if(cmd == "goto botw"):
-					self.goto_game("icons/botw.png", 20, "The Legend of Zelda: Breath of the Wild")
+					self.goto_game_vote("icons/botw.png", 20, "The Legend of Zelda: Breath of the Wild")
 				if(cmd == "goto celeste"):
-					self.goto_game("icons/celeste.png", 10, "Celeste")
+					self.goto_game_vote("icons/celeste.png", 10, "Celeste")
 				if(cmd == "goto kirby"):
-					self.goto_game("icons/kirby.png", 10)
+					self.goto_game_vote("icons/kirby.png", 10)
 				if(cmd == "goto splatoon2"):
-					self.goto_game("icons/splatoon2.png", 10, "Splatoon 2")
-				if(cmd == "goto isaac"):
-					self.goto_game("icons/isaac.png", 10)
+					self.goto_game_vote("icons/splatoon2.png", 10, "Splatoon 2")
 				if(cmd == "goto mario"):
-					self.goto_game("icons/mario.png", 10)
+					self.goto_game_vote("icons/mario.png", 10)
 				if(cmd == "goto sonic"):
-					self.goto_game("icons/sonic.png", 10)
+					self.goto_game_vote("icons/sonic.png", 10, "Sonic Mania")
 				if(cmd == "goto mk8"):
-					self.goto_game("icons/mk8.png", 10, "Mario Kart 8")
+					self.goto_game_vote("icons/mk8.png", 10, "Mario Kart 8")
 				if(cmd == "goto arms"):
-					self.goto_game("icons/arms.png", 10)
+					self.goto_game_vote("icons/arms.png", 10)
 				if(cmd == "goto skyrim"):
-					self.goto_game("icons/skyrim.png", 40, "The Elder Scrolls V: Skyrim")
-				if(cmd == "goto cave"):
-					self.goto_game("icons/cave.png", 10)
+					self.goto_game_vote("icons/skyrim.png", 40, "The Elder Scrolls V: Skyrim")
 				if(cmd == "goto rocket league"):
-					self.goto_game("icons/rocketleague.png", 10, "Rocket League")
+					self.goto_game_vote("icons/rocketleague.png", 10, "Rocket League")
+				if(cmd == "goto wizard"):
+					self.goto_game_vote("icons/wizard.png", 10, "Wizard of Legend")
+				# if(cmd == "goto cave"):
+				# 	self.goto_game("icons/cave.png", 10)
+				# if(cmd == "goto isaac"):
+				# 	self.goto_game("icons/isaac.png", 10)
+
+				if(self.voting):
+					if(cmd == "voteyea"):
+						self.yeaVotes += 1
+					if(cmd == "votenay"):
+						self.nayVotes += 1
+
 
 				if(cmd == "restart"):
 					self.socketio.emit("restart")
