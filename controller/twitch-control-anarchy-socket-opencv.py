@@ -44,6 +44,12 @@ import win32com.client
 import win32gui
 import win32ui
 
+# to get json info
+import urllib.request, json
+
+# to exit:
+import sys
+
 # numpy
 import numpy as np
 
@@ -95,9 +101,10 @@ def round_down(num, divisor):
 
 
 
-validCommands = ["votenay", "voteyea", "restart", "goto wizard", "goto cave", "goto sonic", "goto skyrim", "goto rocket league", "goto arms", "goto celeste", "goto mk8", "goto splatoon2", "goto isaac", "goto mario", "goto botw", "goto kirby", "goto smo", "goto", "lockon", "hhsprint", "hsprint", "sprint", "!controls", "home", "lstick", "rstick", "spin", "swim", "back flip", "ground pound", "groundpound", "gp", "bf", "cap bounce", "sdive", "sdive2", "hdive", "hdive2", "hdive3", "dive", "dive2", "dive3", "roll", "roll2", "backflip", "backflip2", "sssu", "sssd", "sssl", "sssr", "sb", "suu", "", "up", "down", "left", "right", "u", "d", "l", "r", "hup", "hdown", "hleft", "hright", "hhup", "hhdown", "hhleft", "hhright", "hu", "hd", "hl", "hr", "su", "sd", "sl", "sr", "sup", "sdown", "sleft", "sright", "ssu", "ssd", "ssl", "ssr", "ssup", "ssdown", "ssleft", "ssright", "look up", "look down", "look left", "look right", "lu", "ld", "ll", "lr", "hlu", "hld", "hll", "hlr", "slu", "sld", "sll", "slr", "dup", "ddown", "dleft", "dright", "du", "dd", "dl", "dr", "a", "b", "x", "y", "ha", "hb", "hx", "hy", "hhb", "hhhb", "l", "zl", "r", "zr", "plus", "minus", "long jump", "long jump2", "long jump3", "jump forward", "jump forward2", "jump back", "jump back2", "dive", "dive2"]
-whitelist = ["alua2020", "grady404", "valentinvanelslande", "beanjr_yt", "yanchan230", "silvermagpi", "hoopa21", "opprose", "mrruidiazisthebestinsmo", "stravos96", "harmjan387", "twitchplaysconsoles", "fosseisanerd"]
-adminlist = ["twitchplaysconsoles", "fosseisanerd"]
+validCommands = ["goto torquel", "goto pokemon quest", "restart", "restart script", "restart video", "restart server", "!help", "votenay", "voteyea", "goto wizard", "goto cave", "goto sonic", "goto skyrim", "goto rocket league", "goto arms", "goto celeste", "goto mk8", "goto splatoon2", "goto isaac", "goto mario", "goto botw", "goto kirby", "goto smo", "goto", "lockon", "hhsprint", "hsprint", "sprint", "!controls", "!goto", "home", "lstick", "rstick", "spin", "swim", "back flip", "ground pound", "groundpound", "gp", "bf", "cap bounce", "sdive", "sdive2", "hdive", "hdive2", "hdive3", "dive", "dive2", "dive3", "roll", "roll2", "backflip", "backflip2", "sssu", "sssd", "sssl", "sssr", "sb", "suu", "", "up", "down", "left", "right", "u", "d", "l", "r", "hup", "hdown", "hleft", "hright", "hhup", "hhdown", "hhleft", "hhright", "hu", "hd", "hl", "hr", "su", "sd", "sl", "sr", "sup", "sdown", "sleft", "sright", "ssu", "ssd", "ssl", "ssr", "ssup", "ssdown", "ssleft", "ssright", "look up", "look down", "look left", "look right", "lu", "ld", "ll", "lr", "hlu", "hld", "hll", "hlr", "slu", "sld", "sll", "slr", "dup", "ddown", "dleft", "dright", "du", "dd", "dl", "dr", "a", "b", "x", "y", "ha", "hb", "hx", "hy", "hhb", "hhhb", "l", "zl", "r", "zr", "plus", "minus", "long jump", "long jump2", "long jump3", "jump forward", "jump forward2", "jump back", "jump back2", "dive", "dive2"]
+pluslist = ["generzon344", "joeakuaku", "azeywub", "alua2020", "grady404", "valentinvanelslande", "beanjr_yt", "yanchan230", "silvermagpi", "hoopa21", "opprose", "mrruidiazisthebestinsmo", "stravos96", "harmjan387", "twitchplaysconsoles", "fosseisanerd"]
+modlist = ["stravos96", "yanchan230", "silvermagpi", "twitchplaysconsoles", "fosseisanerd", "tpnsbot"]
+adminlist = ["silvermagpi", "twitchplaysconsoles", "fosseisanerd"]
 
 commandQueue = []
 nextCommands = []
@@ -123,7 +130,10 @@ class Client(object):
 		self.socketio.on("controllerState", self.on_controller_state)
 		self.socketio.on("controllerCommand", self.on_controller_state)
 		self.socketio.on("chat message", self.on_chat_message)
+		self.socketio.on("turnTimeLeft", self.on_turn_time_left)
 		self.socketio.emit("IamController")
+
+		self.currentPlayer = ""
 
 
 		self.receive_events_thread = Thread(target=self._receive_events_thread)
@@ -135,6 +145,9 @@ class Client(object):
 		
 		self.botstart = time.clock()
 		self.botend = time.clock()
+
+		self.controllerStart = time.clock()
+		self.controllerEnd = time.clock()
 
 		self.lockon = False
 
@@ -156,6 +169,12 @@ class Client(object):
 
 	def on_controller_command(*args):
 		nextCommands.append(args)
+
+	def on_turn_time_left(*args):
+		try:
+			 client.currentPlayer = args[1]["username"]
+		except:
+			pass
 
 	def on_chat_message(*args):
 		
@@ -199,7 +218,10 @@ class Client(object):
 		if (btns[4] == '1'):
 			controller.minus = 1;
 		if (btns[5] == '1'):
-			controller.capture = 0;
+			if (client.currentPlayer in modlist):
+				controller.capture = 1
+			else:
+				controller.capture = 0
 		if (btns[6] == '1'):
 			controller.a = 1;
 		if (btns[7] == '1'):
@@ -215,9 +237,15 @@ class Client(object):
 		if (btns[12] == '1'):
 			controller.zr = 1;
 		if (btns[13] == '1'):
-			controller.plus = 0
+			if (client.currentPlayer in pluslist):
+				controller.plus = 1
+			else:
+				controller.plus = 0
 		if (btns[14] == '1'):
-			controller.home = 0
+			if (client.currentPlayer in modlist):
+				controller.home = 1
+			else:
+				controller.home = 0
 
 		try:
 			controller.LX = int(LX)
@@ -495,29 +523,29 @@ class Client(object):
 		commands = [x.strip() for x in message.split(',')]
 		cmd = "none"
 
-		if(commands[0] == "!controls"):
-			msg = "@" + username + " look at the description Kappa (this is a bot)"
-# 			msg = "\
-# (Case does NOT matter)----------------------\
-# (sleft/sright/sup/sdown holds for 0.1 seconds)-------------\
-# (left/right/up/down holds for 0.3 seconds)----------------\
-# (hleft/hright/hup/hdown holds for 1.5 seconds)-----------\
-# (add 2 h's for 4 seconds held)-----------------------------\
-# A/B/X/Y / HA/HB/HX/HY / L/R/ZL/ZR--------------------------\
-# To press buttons together: (ex. a, up+b, x)----------------\
-# To chain: (ex. up, up, up)---------------\
-# "
-			msg = "goto https://twitchplaysnintendoswitch.com or look at the description for the chat controls\
-			 you can also type goto <name of game> to switch games"
+		if(commands[0] == "!controls" or commands[0] == "!help"):
+			msg = "goto https://twitchplaysnintendoswitch.com or look at the description for the chat controls,\
+			 you can also type 'goto [game]' (without brackets) to switch games. use !goto for a list of games!"
+			twitchBot.chat(msg)
+
+		if(commands[0] == "!goto"):
+			msg = "use 'goto [game]' (without brackets) to switch games! list: smo, botw, kirby, wizard, splatoon2, skyrim, sonic, celeste, torquel, pokemon quest, mk8, arms"
 			twitchBot.chat(msg)
 
 		valid = True
 		for cmd in commands:
 			if (cmd not in validCommands and "+" not in cmd):
 				valid = False
-			if ("plus" in cmd and username not in whitelist):
+			if ("plus" in cmd and username not in pluslist):
 				valid = False
 			if ("home" in cmd and username not in adminlist):
+				valid = False
+
+			# if ("restart video" in cmd and username not in modlist):
+			# 	valid = False
+			if ("restart server" in cmd and username not in modlist):
+				valid = False
+			if ("restart script" in cmd and username not in modlist):
 				valid = False
 
 			# if ("goto smo" in cmd and username not in adminlist):
@@ -1093,8 +1121,6 @@ class Client(object):
 					self.goto_game_vote("icons/kirby.png", 10)
 				if(cmd == "goto splatoon2"):
 					self.goto_game_vote("icons/splatoon2.png", 10, "Splatoon 2")
-				if(cmd == "goto mario"):
-					self.goto_game_vote("icons/mario.png", 10)
 				if(cmd == "goto sonic"):
 					self.goto_game_vote("icons/sonic.png", 10, "Sonic Mania")
 				if(cmd == "goto mk8"):
@@ -1107,10 +1133,16 @@ class Client(object):
 					self.goto_game_vote("icons/rocketleague.png", 10, "Rocket League")
 				if(cmd == "goto wizard"):
 					self.goto_game_vote("icons/wizard.png", 10, "Wizard of Legend")
+				if(cmd == "goto pokemon quest"):
+					self.goto_game_vote("icons/pokemonquest.png", 10, "Pokemon Quest")
+				if(cmd == "goto torquel"):
+					self.goto_game_vote("icons/torquel.png", 10)
 				# if(cmd == "goto cave"):
 				# 	self.goto_game("icons/cave.png", 10)
 				# if(cmd == "goto isaac"):
 				# 	self.goto_game("icons/isaac.png", 10)
+				# if(cmd == "goto mario"):
+				# 	self.goto_game_vote("icons/mario.png", 10)
 
 				if(self.voting):
 					if(cmd == "voteyea"):
@@ -1119,8 +1151,15 @@ class Client(object):
 						self.nayVotes += 1
 
 
-				if(cmd == "restart"):
+				if(cmd == "restart video" or cmd == "restart"):
 					self.socketio.emit("restart")
+
+				if(cmd == "restart server"):
+					self.socketio.emit("serverRestart")
+
+				if(cmd == "restart script"):
+					sys.exit()
+
 
 				if("+" in cmd):
 					btns = [x.strip() for x in cmd.split('+')]
@@ -1189,6 +1228,7 @@ class Client(object):
 
 
 	def loop(self):
+
 		# control switch here:
 
 		self.botend = time.clock()
@@ -1201,16 +1241,33 @@ class Client(object):
 			hate the stream delay? go here! https://twitchplaysnintendoswitch.com"
 			twitchBot.chat(msg)
 
+		self.controllerEnd = time.clock()
+		diffInSeconds2 = self.controllerEnd - self.controllerStart
+		diffInMilliSeconds2 = diffInSeconds2*1000
+		if(diffInMilliSeconds2 > 3000):
+			self.socketio.emit("IamController")
+			self.controllerStart = time.clock()
+
+
+		# get modlist:
+		# with urllib.request.urlopen("https://tmi.twitch.tv/group/user/twitchplaysconsoles/chatters") as url:
+		# 	data = json.loads(url.read().decode())
+		# 	print(data)
+
+
 		response = twitchBot.stayConnected()
 		#response = "none"
 		if(response != "none"):
-			username = re.search(r"\w+", response).group(0) # return the entire match
-			username = username.lower()
-			message = CHAT_MSG.sub("", response)
-			message = message.strip()
-			message = message.lower()
-
-			self.handleChat(username, message)
+			# prevent crash
+			try:
+				username = re.search(r"\w+", response).group(0) # return the entire match
+				username = username.lower()
+				message = CHAT_MSG.sub("", response)
+				message = message.strip()
+				message = message.lower()
+				self.handleChat(username, message)
+			except:
+				pass
 
 		self.decreaseQueue()
 
