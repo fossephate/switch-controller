@@ -25,7 +25,7 @@ from threading import Timer
 # for socketio
 from socketIO_client_nexus import SocketIO, LoggingNamespace, BaseNamespace
 import logging
-logging.getLogger('socketIO-client').setLevel(logging.DEBUG)
+logging.getLogger("socketIO-client").setLevel(logging.DEBUG)
 logging.basicConfig()
 
 from threading import Thread
@@ -49,6 +49,7 @@ import urllib.request, json
 
 # to exit:
 import sys
+import os
 
 # numpy
 import numpy as np
@@ -101,8 +102,8 @@ def round_down(num, divisor):
 
 
 
-validCommands = ["goto torquel", "goto pokemon quest", "restart", "restart script", "restart video", "restart server", "!help", "votenay", "voteyea", "goto wizard", "goto cave", "goto sonic", "goto skyrim", "goto rocket league", "goto arms", "goto celeste", "goto mk8", "goto splatoon2", "goto isaac", "goto mario", "goto botw", "goto kirby", "goto smo", "goto", "lockon", "hhsprint", "hsprint", "sprint", "!controls", "!goto", "home", "lstick", "rstick", "spin", "swim", "back flip", "ground pound", "groundpound", "gp", "bf", "cap bounce", "sdive", "sdive2", "hdive", "hdive2", "hdive3", "dive", "dive2", "dive3", "roll", "roll2", "backflip", "backflip2", "sssu", "sssd", "sssl", "sssr", "sb", "suu", "", "up", "down", "left", "right", "u", "d", "l", "r", "hup", "hdown", "hleft", "hright", "hhup", "hhdown", "hhleft", "hhright", "hu", "hd", "hl", "hr", "su", "sd", "sl", "sr", "sup", "sdown", "sleft", "sright", "ssu", "ssd", "ssl", "ssr", "ssup", "ssdown", "ssleft", "ssright", "look up", "look down", "look left", "look right", "lu", "ld", "ll", "lr", "hlu", "hld", "hll", "hlr", "slu", "sld", "sll", "slr", "dup", "ddown", "dleft", "dright", "du", "dd", "dl", "dr", "a", "b", "x", "y", "ha", "hb", "hx", "hy", "hhb", "hhhb", "l", "zl", "r", "zr", "plus", "minus", "long jump", "long jump2", "long jump3", "jump forward", "jump forward2", "jump back", "jump back2", "dive", "dive2"]
-pluslist = ["generzon344", "joeakuaku", "azeywub", "alua2020", "grady404", "valentinvanelslande", "beanjr_yt", "yanchan230", "silvermagpi", "hoopa21", "opprose", "mrruidiazisthebestinsmo", "stravos96", "harmjan387", "twitchplaysconsoles", "fosseisanerd"]
+validCommands = ["!commands", "goto torquel", "goto pokemon quest", "restart", "restart1", "restart2", "restart3", "restart script", "restart video", "restart video1", "restart video2", "restart video3", "restart server", "!help", "votenay", "voteyea", "goto wizard", "goto cave", "goto sonic", "goto skyrim", "goto rocket league", "goto arms", "goto celeste", "goto mk8", "goto splatoon2", "goto isaac", "goto mario", "goto botw", "goto kirby", "goto smo", "goto", "lockon", "hhsprint", "hsprint", "sprint", "!controls", "!goto", "home", "lstick", "rstick", "spin", "swim", "back flip", "ground pound", "groundpound", "gp", "bf", "cap bounce", "sdive", "sdive2", "hdive", "hdive2", "hdive3", "dive", "dive2", "dive3", "roll", "roll2", "backflip", "backflip2", "sssu", "sssd", "sssl", "sssr", "sb", "suu", "", "up", "down", "left", "right", "u", "d", "l", "r", "hup", "hdown", "hleft", "hright", "hhup", "hhdown", "hhleft", "hhright", "hu", "hd", "hl", "hr", "su", "sd", "sl", "sr", "sup", "sdown", "sleft", "sright", "ssu", "ssd", "ssl", "ssr", "ssup", "ssdown", "ssleft", "ssright", "look up", "look down", "look left", "look right", "lu", "ld", "ll", "lr", "hlu", "hld", "hll", "hlr", "slu", "sld", "sll", "slr", "dup", "ddown", "dleft", "dright", "du", "dd", "dl", "dr", "a", "b", "x", "y", "ha", "hb", "hx", "hy", "hhb", "hhhb", "l", "zl", "r", "zr", "plus", "minus", "long jump", "long jump2", "long jump3", "jump forward", "jump forward2", "jump back", "jump back2", "dive", "dive2"]
+pluslist = ["zellie", "generzon344", "joeakuaku", "azeywub", "alua2020", "grady404", "valentinvanelslande", "beanjr_yt", "yanchan230", "silvermagpi", "hoopa21", "opprose", "mrruidiazisthebestinsmo", "stravos96", "harmjan387", "twitchplaysconsoles", "fosseisanerd"]
 modlist = ["stravos96", "yanchan230", "silvermagpi", "twitchplaysconsoles", "fosseisanerd", "tpnsbot"]
 adminlist = ["silvermagpi", "twitchplaysconsoles", "fosseisanerd"]
 
@@ -209,39 +210,39 @@ class Client(object):
 		RY = inputs[4]
 
 		controller.dpad = int(btns[0])
-		if (btns[1] == '1'):
+		if (btns[1] == "1"):
 			controller.lstick = 1;
-		if (btns[2] == '1'):
+		if (btns[2] == "1"):
 			controller.l = 1;
-		if (btns[3] == '1'):
+		if (btns[3] == "1"):
 			controller.zl = 1;
-		if (btns[4] == '1'):
+		if (btns[4] == "1"):
 			controller.minus = 1;
-		if (btns[5] == '1'):
+		if (btns[5] == "1"):
 			if (client.currentPlayer in modlist):
 				controller.capture = 1
 			else:
 				controller.capture = 0
-		if (btns[6] == '1'):
+		if (btns[6] == "1"):
 			controller.a = 1;
-		if (btns[7] == '1'):
+		if (btns[7] == "1"):
 			controller.b = 1;
-		if (btns[8] == '1'):
+		if (btns[8] == "1"):
 			controller.x = 1;
-		if (btns[9] == '1'):
+		if (btns[9] == "1"):
 			controller.y = 1;
-		if (btns[10] == '1'):
+		if (btns[10] == "1"):
 			controller.rstick = 1;
-		if (btns[11] == '1'):
+		if (btns[11] == "1"):
 			controller.r = 1;
-		if (btns[12] == '1'):
+		if (btns[12] == "1"):
 			controller.zr = 1;
-		if (btns[13] == '1'):
+		if (btns[13] == "1"):
 			if (client.currentPlayer in pluslist):
 				controller.plus = 1
 			else:
 				controller.plus = 0
-		if (btns[14] == '1'):
+		if (btns[14] == "1"):
 			if (client.currentPlayer in modlist):
 				controller.home = 1
 			else:
@@ -305,7 +306,7 @@ class Client(object):
 
 		# # All the 6 methods for comparison in a list
 		# img = img2.copy()
-		# method = eval('cv2.TM_CCOEFF_NORMED')
+		# method = eval("cv2.TM_CCOEFF_NORMED")
 		# # Apply template Matching
 		# res = cv2.matchTemplate(img,template,cv2.TM_CCOEFF_NORMED)
 		# min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
@@ -316,10 +317,10 @@ class Client(object):
 		#     top_left = max_loc
 		# bottom_right = (top_left[0] + w, top_left[1] + h)
 		# cv2.rectangle(img, top_left, bottom_right, 255, 2)
-		# plt.subplot(121),plt.imshow(res,cmap = 'gray')
-		# plt.title('Matching Result'), plt.xticks([]), plt.yticks([])
-		# plt.subplot(122),plt.imshow(img,cmap = 'gray')
-		# plt.title('Detected Point'), plt.xticks([]), plt.yticks([])
+		# plt.subplot(121),plt.imshow(res,cmap = "gray")
+		# plt.title("Matching Result"), plt.xticks([]), plt.yticks([])
+		# plt.subplot(122),plt.imshow(img,cmap = "gray")
+		# plt.title("Detected Point"), plt.xticks([]), plt.yticks([])
 		# plt.suptitle(meth)
 		# plt.show()
 
@@ -369,9 +370,9 @@ class Client(object):
 		bmpinfo = myBitMap.GetInfo()
 		bmpstr = myBitMap.GetBitmapBits(True)
 		img = Image.frombuffer(
-		    'RGB',
-		    (bmpinfo['bmWidth'], bmpinfo['bmHeight']),
-		    bmpstr, 'raw', 'BGRX', 0, 1)
+		    "RGB",
+		    (bmpinfo["bmWidth"], bmpinfo["bmHeight"]),
+		    bmpstr, "raw", "BGRX", 0, 1)
 
 		# Free Resources
 		myDC.DeleteDC()
@@ -520,16 +521,20 @@ class Client(object):
 	def handleChat(self, username, message):
 		print(message)
 
-		commands = [x.strip() for x in message.split(',')]
+		commands = [x.strip() for x in message.split(",")]
 		cmd = "none"
 
 		if(commands[0] == "!controls" or commands[0] == "!help"):
 			msg = "goto https://twitchplaysnintendoswitch.com or look at the description for the chat controls,\
-			 you can also type 'goto [game]' (without brackets) to switch games. use !goto for a list of games!"
+			 you can also type \"goto [game]\" (without brackets) to switch games. use !goto for a list of games! use !commands for a list of commands!"
 			twitchBot.chat(msg)
 
 		if(commands[0] == "!goto"):
-			msg = "use 'goto [game]' (without brackets) to switch games! list: smo, botw, kirby, wizard, splatoon2, skyrim, sonic, celeste, torquel, pokemon quest, mk8, arms"
+			msg = "use \"goto [game]\" (without brackets) to switch games! list: smo, botw, kirby, wizard, splatoon2, skyrim, sonic, celeste, torquel, pokemon quest, mk8, arms"
+			twitchBot.chat(msg)
+
+		if(commands[0] == "!commands"):
+			msg = "(mods only): \"restart script\", \"restart server\" (anyone): \"restart video1\", \"restart video2\", \"restart video3\""
 			twitchBot.chat(msg)
 
 		valid = True
@@ -1151,18 +1156,31 @@ class Client(object):
 						self.nayVotes += 1
 
 
-				if(cmd == "restart video" or cmd == "restart"):
-					self.socketio.emit("restart")
+				if(cmd == "restart video" or cmd == "restart" or cmd == "restart1" or cmd == "restart video1"):
+					# self.socketio.emit("restart")
+					twitchBot.chat("Restarting lagless1!")
+					os.system("taskkill /f /im streamr")
+
+				if(cmd == "restart video2" or cmd == "restart2"):
+					twitchBot.chat("Restarting lagless2!")
+					os.system("taskkill /f /im jsmpeg-vnc.exe")
+
+				if(cmd == "restart video3" or cmd == "restart3"):
+					twitchBot.chat("Restarting lagless3!")
+					os.system("taskkill /f /im ffmpeg.exe")
+					os.system("taskkill /f /im node.exe")
 
 				if(cmd == "restart server"):
-					self.socketio.emit("serverRestart")
+					twitchBot.chat("Restarting the Server! maybe @fosse if you're using this!")
+					self.socketio.emit("restart server")
 
 				if(cmd == "restart script"):
+					twitchBot.chat("Restarting the Python Script!")
 					sys.exit()
 
 
 				if("+" in cmd):
-					btns = [x.strip() for x in cmd.split('+')]
+					btns = [x.strip() for x in cmd.split("+")]
 
 					for btn in btns:
 						duration = 0.3
