@@ -102,10 +102,11 @@ def round_down(num, divisor):
 
 
 
-validCommands = ["!commands", "goto torquel", "goto pokemon quest", "restart", "restart1", "restart2", "restart3", "restart script", "restart video", "restart video1", "restart video2", "restart video3", "restart server", "!help", "votenay", "voteyea", "goto wizard", "goto cave", "goto sonic", "goto skyrim", "goto rocket league", "goto arms", "goto celeste", "goto mk8", "goto splatoon2", "goto isaac", "goto mario", "goto botw", "goto kirby", "goto smo", "goto", "lockon", "hhsprint", "hsprint", "sprint", "!controls", "!goto", "home", "lstick", "rstick", "spin", "swim", "back flip", "ground pound", "groundpound", "gp", "bf", "cap bounce", "sdive", "sdive2", "hdive", "hdive2", "hdive3", "dive", "dive2", "dive3", "roll", "roll2", "backflip", "backflip2", "sssu", "sssd", "sssl", "sssr", "sb", "suu", "", "up", "down", "left", "right", "u", "d", "l", "r", "hup", "hdown", "hleft", "hright", "hhup", "hhdown", "hhleft", "hhright", "hu", "hd", "hl", "hr", "su", "sd", "sl", "sr", "sup", "sdown", "sleft", "sright", "ssu", "ssd", "ssl", "ssr", "ssup", "ssdown", "ssleft", "ssright", "look up", "look down", "look left", "look right", "lu", "ld", "ll", "lr", "hlu", "hld", "hll", "hlr", "slu", "sld", "sll", "slr", "dup", "ddown", "dleft", "dright", "du", "dd", "dl", "dr", "a", "b", "x", "y", "ha", "hb", "hx", "hy", "hhb", "hhhb", "l", "zl", "r", "zr", "plus", "minus", "long jump", "long jump2", "long jump3", "jump forward", "jump forward2", "jump back", "jump back2", "dive", "dive2"]
-pluslist = ["zellie", "generzon344", "joeakuaku", "azeywub", "alua2020", "grady404", "valentinvanelslande", "beanjr_yt", "yanchan230", "silvermagpi", "hoopa21", "opprose", "mrruidiazisthebestinsmo", "stravos96", "harmjan387", "twitchplaysconsoles", "fosseisanerd"]
+validCommands = ["goto human", "goto shovel", "goto octopath", "goto explosion", "goto jackbox4", "goto jackbox3", "!commands", "goto fallout", "goto fortnite", "goto torquel", "goto pokemon quest", "restart", "restart1", "restart2", "restart3", "restart script", "restart video", "restart video1", "restart video2", "restart video3", "restart server", "!help", "votenay", "voteyea", "goto wizard", "goto cave", "goto sonic", "goto skyrim", "goto rocket league", "goto arms", "goto celeste", "goto mk8", "goto splatoon2", "goto isaac", "goto mario", "goto botw", "goto kirby", "goto smo", "goto", "lockon", "hhsprint", "hsprint", "sprint", "!controls", "!goto", "home", "lstick", "rstick", "spin", "swim", "back flip", "ground pound", "groundpound", "gp", "bf", "cap bounce", "sdive", "sdive2", "hdive", "hdive2", "hdive3", "dive", "dive2", "dive3", "roll", "roll2", "backflip", "backflip2", "sssu", "sssd", "sssl", "sssr", "sb", "suu", "", "up", "down", "left", "right", "u", "d", "l", "r", "hup", "hdown", "hleft", "hright", "hhup", "hhdown", "hhleft", "hhright", "hu", "hd", "hl", "hr", "su", "sd", "sl", "sr", "sup", "sdown", "sleft", "sright", "ssu", "ssd", "ssl", "ssr", "ssup", "ssdown", "ssleft", "ssright", "look up", "look down", "look left", "look right", "lu", "ld", "ll", "lr", "hlu", "hld", "hll", "hlr", "slu", "sld", "sll", "slr", "dup", "ddown", "dleft", "dright", "du", "dd", "dl", "dr", "a", "b", "x", "y", "ha", "hb", "hx", "hy", "hhb", "hhhb", "l", "zl", "r", "zr", "plus", "minus", "long jump", "long jump2", "long jump3", "jump forward", "jump forward2", "jump back", "jump back2", "dive", "dive2"]
+pluslist = ["vjezuz", "zellie", "generzon344", "joeakuaku", "azeywub", "alua2020", "grady404", "valentinvanelslande", "beanjr_yt", "yanchan230", "silvermagpi", "hoopa21", "opprose", "mrruidiazisthebestinsmo", "stravos96", "harmjan387", "twitchplaysconsoles", "fosseisanerd"]
 modlist = ["stravos96", "yanchan230", "silvermagpi", "twitchplaysconsoles", "fosseisanerd", "tpnsbot"]
 adminlist = ["silvermagpi", "twitchplaysconsoles", "fosseisanerd"]
+voted = []
 
 commandQueue = []
 nextCommands = []
@@ -161,6 +162,7 @@ class Client(object):
 
 		self.oldArgs2 = "800000000000000 128 128 128 128"
 
+		# self.lastChatUsername = None
 
 		
 
@@ -219,9 +221,12 @@ class Client(object):
 		if (btns[4] == "1"):
 			controller.minus = 1;
 		if (btns[5] == "1"):
-			if (client.currentPlayer in modlist):
-				controller.capture = 1
-			else:
+			try:
+				if (client.currentPlayer.lower() in modlist):
+					controller.capture = 1
+				else:
+					controller.capture = 0
+			except:
 				controller.capture = 0
 		if (btns[6] == "1"):
 			controller.a = 1;
@@ -238,14 +243,20 @@ class Client(object):
 		if (btns[12] == "1"):
 			controller.zr = 1;
 		if (btns[13] == "1"):
-			if (client.currentPlayer in pluslist):
-				controller.plus = 1
-			else:
+			try:
+				if (client.currentPlayer.lower() in pluslist):
+					controller.plus = 1
+				else:
+					controller.plus = 0
+			except:
 				controller.plus = 0
 		if (btns[14] == "1"):
-			if (client.currentPlayer in modlist):
-				controller.home = 1
-			else:
+			try:
+				if (client.currentPlayer.lower() in modlist):
+					controller.home = 1
+				else:
+					controller.home = 0
+			except:
 				controller.home = 0
 
 		try:
@@ -330,6 +341,8 @@ class Client(object):
 
 		# disable lagless while we do this:
 		self.laglessEnabled = False
+		# set voted players to none
+		del voted[:]
 
 		# get to game selection screen:
 		controller.reset()
@@ -351,7 +364,7 @@ class Client(object):
 		# SSWidth = 1280
 		# SSHeight = 720
 		SSx1 = 319 - 1920;# left monitor
-		SSy1 = 61;
+		SSy1 = 61 + 360;
 		SSWidth = 1280
 		SSHeight = 720
 
@@ -385,16 +398,109 @@ class Client(object):
 		frame = cv2.cvtColor(img_np, cv2.COLOR_BGR2RGB)
 		hsv = cv2.cvtColor(img_np, cv2.COLOR_BGR2HSV)
 
-
 		iconLoc = self.findImage(frame, imagefile)
 		# cursorLoc = self.findImage(frame, "icons/selectbar.png")
 
 
 		if iconLoc == None:
-			controller.a = 1
-			send_and_reset(0.1)
-			self.laglessEnabled = True
-			return
+
+			# move down and try again:
+			# move down 3 times and up once:
+			controller.LY = STICK_MAX
+			send_and_reset(0.1, 1)
+			sleep(0.5)
+			controller.LY = STICK_MAX
+			send_and_reset(0.1, 1)
+			sleep(0.5)
+			controller.LY = STICK_MAX
+			send_and_reset(0.1, 1)
+			sleep(0.5)
+			controller.LY = STICK_MIN
+			send_and_reset(0.1, 1)
+			sleep(0.5)
+
+
+			wDC = win32gui.GetWindowDC(hwnd)
+			myDC = win32ui.CreateDCFromHandle(wDC)
+			newDC = myDC.CreateCompatibleDC()
+			myBitMap = win32ui.CreateBitmap()
+			myBitMap.CreateCompatibleBitmap(myDC, SSWidth, SSHeight)
+			newDC.SelectObject(myBitMap)
+			newDC.BitBlt((0,0),(SSWidth, SSHeight) , myDC, (SSx1,SSy1), win32con.SRCCOPY)
+
+			bmpinfo = myBitMap.GetInfo()
+			bmpstr = myBitMap.GetBitmapBits(True)
+			img = Image.frombuffer(
+			    "RGB",
+			    (bmpinfo["bmWidth"], bmpinfo["bmHeight"]),
+			    bmpstr, "raw", "BGRX", 0, 1)
+
+			# Free Resources
+			myDC.DeleteDC()
+			newDC.DeleteDC()
+			win32gui.ReleaseDC(hwnd, wDC)
+			win32gui.DeleteObject(myBitMap.GetHandle())
+
+			#img = ImageGrab.grab(bbox=(x1, y1, x2, y2))#.crop(box) #x, y, w, h
+			img_np = np.array(img)
+			frame = cv2.cvtColor(img_np, cv2.COLOR_BGR2RGB)
+			hsv = cv2.cvtColor(img_np, cv2.COLOR_BGR2HSV)
+			iconLoc = self.findImage(frame, imagefile)
+
+			# try 1 more time:
+			if iconLoc == None:
+
+				# move down and try again:
+				# move down 3 times and up once:
+				controller.LY = STICK_MAX
+				send_and_reset(0.1, 1)
+				sleep(0.5)
+				controller.LY = STICK_MAX
+				send_and_reset(0.1, 1)
+				sleep(0.5)
+				controller.LY = STICK_MAX
+				send_and_reset(0.1, 1)
+				sleep(0.5)
+				controller.LY = STICK_MIN
+				send_and_reset(0.1, 1)
+				sleep(0.5)
+
+
+				wDC = win32gui.GetWindowDC(hwnd)
+				myDC = win32ui.CreateDCFromHandle(wDC)
+				newDC = myDC.CreateCompatibleDC()
+				myBitMap = win32ui.CreateBitmap()
+				myBitMap.CreateCompatibleBitmap(myDC, SSWidth, SSHeight)
+				newDC.SelectObject(myBitMap)
+				newDC.BitBlt((0,0),(SSWidth, SSHeight) , myDC, (SSx1,SSy1), win32con.SRCCOPY)
+
+				bmpinfo = myBitMap.GetInfo()
+				bmpstr = myBitMap.GetBitmapBits(True)
+				img = Image.frombuffer(
+				    "RGB",
+				    (bmpinfo["bmWidth"], bmpinfo["bmHeight"]),
+				    bmpstr, "raw", "BGRX", 0, 1)
+
+				# Free Resources
+				myDC.DeleteDC()
+				newDC.DeleteDC()
+				win32gui.ReleaseDC(hwnd, wDC)
+				win32gui.DeleteObject(myBitMap.GetHandle())
+
+				#img = ImageGrab.grab(bbox=(x1, y1, x2, y2))#.crop(box) #x, y, w, h
+				img_np = np.array(img)
+				frame = cv2.cvtColor(img_np, cv2.COLOR_BGR2RGB)
+				hsv = cv2.cvtColor(img_np, cv2.COLOR_BGR2HSV)
+				iconLoc = self.findImage(frame, imagefile)
+
+				# give up if we still can't find it:
+				if iconLoc == None:
+					controller.LY = STICK_MIN
+					send_and_reset(1.5, 1)
+					controller.a = 1
+					send_and_reset(0.1)
+					self.laglessEnabled = True
+					return
 
 
 		print(iconLoc)
@@ -403,7 +509,7 @@ class Client(object):
 		# iconLoc[0] = int(round(iconLoc[0]/100)-1)# the number of times to move right
 		# iconLoc[1] = int(round(iconLoc[1]/100)-2)# the number of times to move down
 
-		# so that when we round down it always above the nearest multiple of 185
+		# so that when we round down its always above the nearest multiple of 185
 		iconLoc[0] += 10
 		iconLoc[1] += 10
 
@@ -497,6 +603,8 @@ class Client(object):
 
 		self.voting = False
 
+		del voted[:]
+
 		if(leaving):
 			self.goto_game(imagefile, delay, nameofgame)
 
@@ -530,7 +638,7 @@ class Client(object):
 			twitchBot.chat(msg)
 
 		if(commands[0] == "!goto"):
-			msg = "use \"goto [game]\" (without brackets) to switch games! list: smo, botw, kirby, wizard, splatoon2, skyrim, sonic, celeste, torquel, pokemon quest, mk8, arms"
+			msg = "use \"goto [game]\" (without brackets) to switch games! list: smo, botw, fortnite, fallout, kirby, wizard, splatoon2, skyrim, sonic, celeste, torquel, pokemon quest, shovel, human, octopath, jackbox3, jackbox4, mk8, explosion, arms"
 			twitchBot.chat(msg)
 
 		if(commands[0] == "!commands"):
@@ -563,6 +671,17 @@ class Client(object):
 			# 	valid = False
 			if ("lockon" in cmd):
 				self.lockon = not self.lockon
+
+			if(self.voting):
+				if(cmd == "voteyea" and username not in voted):
+					voted.append(username)
+					self.yeaVotes += 1
+				if(cmd == "votenay" and username not in voted):
+					print("votenay'd")
+					voted.append(username)
+					self.nayVotes += 1
+
+
 
 		if(len(commands) > 20):
 			valid = False
@@ -1142,18 +1261,28 @@ class Client(object):
 					self.goto_game_vote("icons/pokemonquest.png", 10, "Pokemon Quest")
 				if(cmd == "goto torquel"):
 					self.goto_game_vote("icons/torquel.png", 10)
+				if(cmd == "goto fallout"):
+					self.goto_game_vote("icons/fallout.png", 10)
+				if(cmd == "goto fortnite"):
+					self.goto_game_vote("icons/fortnite.png", 10, "Fortnite")
+				if(cmd == "goto jackbox3"):
+					self.goto_game_vote("icons/jackbox3.png", 10)
+				if(cmd == "goto jackbox4"):
+					self.goto_game_vote("icons/jackbox4.png", 10)
+				if(cmd == "goto shovel"):
+					self.goto_game_vote("icons/shovel.png", 10)
+				if(cmd == "goto octopath"):
+					self.goto_game_vote("icons/octopathprologuedemo.png", 10)
+				if(cmd == "goto explosion"):
+					self.goto_game_vote("icons/explosion.png", 10)
+				if(cmd == "goto human"):
+					self.goto_game_vote("icons/human.png", 10)
 				# if(cmd == "goto cave"):
 				# 	self.goto_game("icons/cave.png", 10)
 				# if(cmd == "goto isaac"):
 				# 	self.goto_game("icons/isaac.png", 10)
 				# if(cmd == "goto mario"):
 				# 	self.goto_game_vote("icons/mario.png", 10)
-
-				if(self.voting):
-					if(cmd == "voteyea"):
-						self.yeaVotes += 1
-					if(cmd == "votenay"):
-						self.nayVotes += 1
 
 
 				if(cmd == "restart video" or cmd == "restart" or cmd == "restart1" or cmd == "restart video1"):
@@ -1163,12 +1292,11 @@ class Client(object):
 
 				if(cmd == "restart video2" or cmd == "restart2"):
 					twitchBot.chat("Restarting lagless2!")
-					os.system("taskkill /f /im jsmpeg-vnc.exe")
+					self.socketio.emit("restart lagless2")
 
 				if(cmd == "restart video3" or cmd == "restart3"):
 					twitchBot.chat("Restarting lagless3!")
-					os.system("taskkill /f /im ffmpeg.exe")
-					os.system("taskkill /f /im node.exe")
+					self.socketio.emit("restart lagless3")
 
 				if(cmd == "restart server"):
 					twitchBot.chat("Restarting the Server! maybe @fosse if you're using this!")
@@ -1317,7 +1445,7 @@ while True:
 
 
 	# so I don't get stuck:
-	if(win32api.GetAsyncKeyState(win32con.VK_ESCAPE)):
-		controller.send("RELEASE")
-		controller.ser.close()
-		exit()
+	# if(win32api.GetAsyncKeyState(win32con.VK_ESCAPE)):
+	# 	controller.send("RELEASE")
+	# 	controller.ser.close()
+	# 	exit()
