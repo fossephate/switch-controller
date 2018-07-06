@@ -65,19 +65,6 @@ while True:
 	if win32api.GetAsyncKeyState(ord("D")):
 		controller.LX = STICK_MAX
 
-	# if win32api.GetAsyncKeyState(ord("I")):
-	# 	if(controller.RY > STICK_MIN):
-	# 		controller.RY -= 1
-	# if win32api.GetAsyncKeyState(ord("K")):
-	# 	if(controller.RY < STICK_MAX):
-	# 		controller.RY += 1
-	# if win32api.GetAsyncKeyState(ord("J")):
-	# 	if(controller.RX < STICK_MAX):
-	# 		controller.RX += 1
-	# if win32api.GetAsyncKeyState(ord("L")):
-	# 	if(controller.RX > STICK_MIN):
-	# 		controller.RX -= 1
-
 	if win32api.GetAsyncKeyState(ord("I")):
 		controller.RY = STICK_MIN
 	if win32api.GetAsyncKeyState(ord("K")):
@@ -126,7 +113,7 @@ while True:
 
 	# so I don't get stuck:
 	if(win32api.GetAsyncKeyState(win32con.VK_ESCAPE)):
-		controller.send('RELEASE')
+		controller.send("RELEASE")
 		controller.ser.close()
 		exit()
 

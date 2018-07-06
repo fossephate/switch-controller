@@ -115,13 +115,6 @@ oldArgs = "800000000000000 128 128 128 128"
 
 
 
-
-
-
-
-
-
-
 class Client(object):
 
 	def __init__(self):
@@ -133,7 +126,7 @@ class Client(object):
 		self.socketio.on("controllerCommand", self.on_controller_state)
 		self.socketio.on("chat message", self.on_chat_message)
 		self.socketio.on("turnTimeLeft", self.on_turn_time_left)
-		self.socketio.emit("IamController")
+		self.socketio.emit("join", "controller")
 
 		self.currentPlayer = ""
 
@@ -616,7 +609,7 @@ class Client(object):
 
 		self.yeaVotes = 0
 		self.nayVotes = 0
-		twitchBot.chat("A vote has been started to goto " + nameofgame + "! vote now with VoteYea to LEAVE and VoteNay to STAY! Voting ends in 20 seconds!")
+		twitchBot.chat("A vote has been started to goto " + nameofgame + "! Vote now with VoteYea to LEAVE and VoteNay to STAY! Voting ends in 20 seconds!")
 		self.voting = True
 
 		voteTimer = Timer(20.0, self.end_goto_vote, (imagefile, delay, nameofgame))
@@ -1381,7 +1374,7 @@ class Client(object):
 		diffInSeconds = self.botend - self.botstart
 		diffInMilliSeconds = diffInSeconds*1000
 		if(diffInMilliSeconds > 1000*60*5):
-			self.socketio.emit("IamController")
+			self.socketio.emit("join", "controller")
 			self.botstart = time.clock()
 			msg = "Join the discord server! https://discord.gg/ARTbddH\
 			hate the stream delay? go here! https://twitchplaysnintendoswitch.com"
@@ -1390,8 +1383,8 @@ class Client(object):
 		self.controllerEnd = time.clock()
 		diffInSeconds2 = self.controllerEnd - self.controllerStart
 		diffInMilliSeconds2 = diffInSeconds2*1000
-		if(diffInMilliSeconds2 > 3000):
-			self.socketio.emit("IamController")
+		if(diffInMilliSeconds2 > 6000):
+			self.socketio.emit("join", "controller")
 			self.controllerStart = time.clock()
 
 
