@@ -25,7 +25,7 @@ from threading import Timer
 # for socketio
 from socketIO_client_nexus import SocketIO, LoggingNamespace, BaseNamespace
 import logging
-logging.getLogger("socketIO-client").setLevel(logging.DEBUG)
+# logging.getLogger("socketIO-client").setLevel(logging.DEBUG)
 logging.basicConfig()
 
 from threading import Thread
@@ -53,6 +53,9 @@ import os
 
 # numpy
 import numpy as np
+
+# save info
+import pickle
 
 
 screenWidth, screenHeight = pyautogui.size()
@@ -100,9 +103,9 @@ def round_down(num, divisor):
 
 
 
+gotoList = ["mk8", "human", "shovel", "octopath", "explosion", "jackbox4", "jackbox3", "fallout", "skyrim", "splatoon2", "celeste", "smo", "rocketleague", "pokemonquest", "wizard", "sonic", "arms", "kirby", "fortnite", "torquel", "botw"]
 
-
-validCommands = ["goto human", "goto shovel", "goto octopath", "goto explosion", "goto jackbox4", "goto jackbox3", "!commands", "goto fallout", "goto fortnite", "goto torquel", "goto pokemon quest", "restart", "restart1", "restart2", "restart3", "restart script", "restart video", "restart video1", "restart video2", "restart video3", "restart server", "!help", "votenay", "voteyea", "goto wizard", "goto cave", "goto sonic", "goto skyrim", "goto rocket league", "goto arms", "goto celeste", "goto mk8", "goto splatoon2", "goto isaac", "goto mario", "goto botw", "goto kirby", "goto smo", "goto", "lockon", "hhsprint", "hsprint", "sprint", "!controls", "!goto", "home", "lstick", "rstick", "spin", "swim", "back flip", "ground pound", "groundpound", "gp", "bf", "cap bounce", "sdive", "sdive2", "hdive", "hdive2", "hdive3", "dive", "dive2", "dive3", "roll", "roll2", "backflip", "backflip2", "sssu", "sssd", "sssl", "sssr", "sb", "suu", "", "up", "down", "left", "right", "u", "d", "l", "r", "hup", "hdown", "hleft", "hright", "hhup", "hhdown", "hhleft", "hhright", "hu", "hd", "hl", "hr", "su", "sd", "sl", "sr", "sup", "sdown", "sleft", "sright", "ssu", "ssd", "ssl", "ssr", "ssup", "ssdown", "ssleft", "ssright", "look up", "look down", "look left", "look right", "lu", "ld", "ll", "lr", "hlu", "hld", "hll", "hlr", "slu", "sld", "sll", "slr", "dup", "ddown", "dleft", "dright", "du", "dd", "dl", "dr", "a", "b", "x", "y", "ha", "hb", "hx", "hy", "hhb", "hhhb", "l", "zl", "r", "zr", "plus", "minus", "long jump", "long jump2", "long jump3", "jump forward", "jump forward2", "jump back", "jump back2", "dive", "dive2"]
+validCommands = ["!removeplus", "!giveplus", "!goto human", "!goto shovel", "!goto octopath", "!goto explosion", "!goto jackbox4", "!goto jackbox3", "!commands", "!goto fallout", "!goto fortnite", "!goto torquel", "!goto pokemonquest", "!restart", "!restart1", "!restart2", "!restart3", "!restartscript", "!restartserver", "!help", "votenay", "voteyea", "!goto wizard", "!goto cave", "!goto sonic", "!goto skyrim", "!goto rocketleague", "!goto arms", "!goto celeste", "!goto mk8", "!goto splatoon2", "!goto isaac", "!goto mario", "!goto botw", "!goto kirby", "!goto smo", "!goto", "lockon", "hhsprint", "hsprint", "sprint", "!controls", "!goto", "home", "lstick", "rstick", "spin", "swim", "back flip", "ground pound", "groundpound", "gp", "bf", "cap bounce", "sdive", "sdive2", "hdive", "hdive2", "hdive3", "dive", "dive2", "dive3", "roll", "roll2", "backflip", "backflip2", "sssu", "sssd", "sssl", "sssr", "sb", "suu", "", "up", "down", "left", "right", "u", "d", "l", "r", "hup", "hdown", "hleft", "hright", "hhup", "hhdown", "hhleft", "hhright", "hu", "hd", "hl", "hr", "su", "sd", "sl", "sr", "sup", "sdown", "sleft", "sright", "ssu", "ssd", "ssl", "ssr", "ssup", "ssdown", "ssleft", "ssright", "look up", "look down", "look left", "look right", "lu", "ld", "ll", "lr", "hlu", "hld", "hll", "hlr", "slu", "sld", "sll", "slr", "dup", "ddown", "dleft", "dright", "du", "dd", "dl", "dr", "a", "b", "x", "y", "ha", "hb", "hx", "hy", "hhb", "hhhb", "l", "zl", "r", "zr", "plus", "minus", "long jump", "long jump2", "long jump3", "jump forward", "jump forward2", "jump back", "jump back2", "dive", "dive2"]
 pluslist = ["vjezuz", "zellie", "generzon344", "joeakuaku", "azeywub", "alua2020", "grady404", "valentinvanelslande", "beanjr_yt", "yanchan230", "silvermagpi", "hoopa21", "opprose", "mrruidiazisthebestinsmo", "stravos96", "harmjan387", "twitchplaysconsoles", "fosseisanerd"]
 modlist = ["stravos96", "yanchan230", "silvermagpi", "twitchplaysconsoles", "fosseisanerd", "tpnsbot"]
 adminlist = ["silvermagpi", "twitchplaysconsoles", "fosseisanerd"]
@@ -112,6 +115,12 @@ commandQueue = []
 nextCommands = []
 #lockon = False
 oldArgs = "800000000000000 128 128 128 128"
+
+
+# load plus list:
+if(os.path.exists("pluslist.pkl")):
+    with open("pluslist.pkl", "rb") as f:
+        pluslist = pickle.load(f)[0]
 
 
 
@@ -622,20 +631,25 @@ class Client(object):
 	def handleChat(self, username, message):
 		print(message)
 
-		commands = [x.strip() for x in message.split(",")]
+		commands = None
+		if ("," in message):
+			commands = [x.strip() for x in message.split(",")]
+		else:
+			commands = [x.strip() for x in message.split(" ")]
+
 		cmd = "none"
 
 		if(commands[0] == "!controls" or commands[0] == "!help"):
 			msg = "goto https://twitchplaysnintendoswitch.com or look at the description for the chat controls,\
-			 you can also type \"goto [game]\" (without brackets) to switch games. use !goto for a list of games! use !commands for a list of commands!"
+			 you can also type \"!goto [game]\" (without brackets) to switch games. use !goto for a list of games! use !commands for a list of commands!"
 			twitchBot.chat(msg)
 
 		if(commands[0] == "!goto"):
-			msg = "use \"goto [game]\" (without brackets) to switch games! list: smo, botw, fortnite, fallout, kirby, wizard, splatoon2, skyrim, sonic, celeste, torquel, pokemon quest, shovel, human, octopath, jackbox3, jackbox4, mk8, explosion, arms"
+			msg = "use \"!goto [game]\" (without brackets) to switch games! list: smo, botw, fortnite, fallout, kirby, wizard, splatoon2, skyrim, sonic, celeste, torquel, pokemonquest, shovel, human, octopath, jackbox3, jackbox4, mk8, explosion, rocketleague, arms"
 			twitchBot.chat(msg)
 
 		if(commands[0] == "!commands"):
-			msg = "(mods only): \"restart script\", \"restart server\" (anyone): \"restart video1\", \"restart video2\", \"restart video3\""
+			msg = "(mods only): \"!restartscript\", \"!restartserver\" \"!giveplus [user]\", \"!removeplus [user]\" (anyone): \"!restart1\", \"!restart2\", \"!restart3\""
 			twitchBot.chat(msg)
 
 		valid = True
@@ -649,19 +663,11 @@ class Client(object):
 
 			# if ("restart video" in cmd and username not in modlist):
 			# 	valid = False
-			if ("restart server" in cmd and username not in modlist):
+			if ("!restartserver" in cmd and username not in modlist):
 				valid = False
-			if ("restart script" in cmd and username not in modlist):
+			if ("!restartscript" in cmd and username not in modlist):
 				valid = False
 
-			# if ("goto smo" in cmd and username not in adminlist):
-			# 	valid = False
-			# if ("goto botw" in cmd and username not in adminlist):
-			# 	valid = False
-			# if ("goto celeste" in cmd and username not in adminlist):
-			# 	valid = False
-			# if ("goto kirby" in cmd and username not in adminlist):
-			# 	valid = False
 			if ("lockon" in cmd):
 				self.lockon = not self.lockon
 
@@ -674,6 +680,83 @@ class Client(object):
 					voted.append(username)
 					self.nayVotes += 1
 
+		if len(commands) == 2:
+
+			if (commands[0] == "!giveplus" and username in modlist):
+
+				msg = "giving plus permission to: " + commands[1]
+				twitchBot.chat(msg)
+
+				pluslist.append(commands[1])
+
+				# write pluslist to file:
+				with open("pluslist.pkl", "wb") as f:
+					pickle.dump([pluslist], f)
+
+			if (commands[0] == "!removeplus" and username in modlist):
+
+				msg = "removing plus permissions from: " + commands[1]
+				twitchBot.chat(msg)
+
+				# revoke plus permission:
+				if commands[1] in pluslist:
+					pluslist.remove(commands[1])
+
+				# write pluslist to file:
+				with open("pluslist.pkl", "wb") as f:
+					pickle.dump([pluslist], f)
+
+		# goto commands:
+		if (len(commands) == 2 and commands[0] == "!goto"):
+			cmd = commands[1]
+			if(cmd == "smo"):
+				self.goto_game_vote("icons/smo.png", 30, "Super Mario Odyssey")
+			if(cmd == "botw"):
+				self.goto_game_vote("icons/botw.png", 20, "The Legend of Zelda: Breath of the Wild")
+			if(cmd == "celeste"):
+				self.goto_game_vote("icons/celeste.png", 10, "Celeste")
+			if(cmd == "kirby"):
+				self.goto_game_vote("icons/kirby.png", 10)
+			if(cmd == "splatoon2"):
+				self.goto_game_vote("icons/splatoon2.png", 10, "Splatoon 2")
+			if(cmd == "sonic"):
+				self.goto_game_vote("icons/sonic.png", 10, "Sonic Mania")
+			if(cmd == "mk8"):
+				self.goto_game_vote("icons/mk8.png", 10, "Mario Kart 8")
+			if(cmd == "arms"):
+				self.goto_game_vote("icons/arms.png", 10)
+			if(cmd == "skyrim"):
+				self.goto_game_vote("icons/skyrim.png", 40, "The Elder Scrolls V: Skyrim")
+			if(cmd == "rocketleague"):
+				self.goto_game_vote("icons/rocketleague.png", 10, "Rocket League")
+			if(cmd == "wizard"):
+				self.goto_game_vote("icons/wizard.png", 10, "Wizard of Legend")
+			if(cmd == "pokemon quest"):
+				self.goto_game_vote("icons/pokemonquest.png", 10, "Pokemon Quest")
+			if(cmd == "torquel"):
+				self.goto_game_vote("icons/torquel.png", 10)
+			if(cmd == "fallout"):
+				self.goto_game_vote("icons/fallout.png", 10)
+			if(cmd == "fortnite"):
+				self.goto_game_vote("icons/fortnite.png", 10, "Fortnite")
+			if(cmd == "jackbox3"):
+				self.goto_game_vote("icons/jackbox3.png", 10)
+			if(cmd == "jackbox4"):
+				self.goto_game_vote("icons/jackbox4.png", 10)
+			if(cmd == "shovel"):
+				self.goto_game_vote("icons/shovel.png", 10)
+			if(cmd == "octopath"):
+				self.goto_game_vote("icons/octopathprologuedemo.png", 10)
+			if(cmd == "explosion"):
+				self.goto_game_vote("icons/explosion.png", 10)
+			if(cmd == "human"):
+				self.goto_game_vote("icons/human.png", 10)
+			# if(cmd == "!goto cave"):
+			# 	self.goto_game("icons/cave.png", 10)
+			# if(cmd == "!goto isaac"):
+			# 	self.goto_game("icons/isaac.png", 10)
+			# if(cmd == "!goto mario"):
+			# 	self.goto_game_vote("icons/mario.png", 10)
 
 
 		if(len(commands) > 20):
@@ -1228,75 +1311,28 @@ class Client(object):
 					#nextCommands.insert(0, "spin6")
 					reset = 1
 
-				if(cmd == "goto smo"):
-					self.goto_game_vote("icons/smo.png", 30, "Super Mario Odyssey")
-				if(cmd == "goto botw"):
-					self.goto_game_vote("icons/botw.png", 20, "The Legend of Zelda: Breath of the Wild")
-				if(cmd == "goto celeste"):
-					self.goto_game_vote("icons/celeste.png", 10, "Celeste")
-				if(cmd == "goto kirby"):
-					self.goto_game_vote("icons/kirby.png", 10)
-				if(cmd == "goto splatoon2"):
-					self.goto_game_vote("icons/splatoon2.png", 10, "Splatoon 2")
-				if(cmd == "goto sonic"):
-					self.goto_game_vote("icons/sonic.png", 10, "Sonic Mania")
-				if(cmd == "goto mk8"):
-					self.goto_game_vote("icons/mk8.png", 10, "Mario Kart 8")
-				if(cmd == "goto arms"):
-					self.goto_game_vote("icons/arms.png", 10)
-				if(cmd == "goto skyrim"):
-					self.goto_game_vote("icons/skyrim.png", 40, "The Elder Scrolls V: Skyrim")
-				if(cmd == "goto rocket league"):
-					self.goto_game_vote("icons/rocketleague.png", 10, "Rocket League")
-				if(cmd == "goto wizard"):
-					self.goto_game_vote("icons/wizard.png", 10, "Wizard of Legend")
-				if(cmd == "goto pokemon quest"):
-					self.goto_game_vote("icons/pokemonquest.png", 10, "Pokemon Quest")
-				if(cmd == "goto torquel"):
-					self.goto_game_vote("icons/torquel.png", 10)
-				if(cmd == "goto fallout"):
-					self.goto_game_vote("icons/fallout.png", 10)
-				if(cmd == "goto fortnite"):
-					self.goto_game_vote("icons/fortnite.png", 10, "Fortnite")
-				if(cmd == "goto jackbox3"):
-					self.goto_game_vote("icons/jackbox3.png", 10)
-				if(cmd == "goto jackbox4"):
-					self.goto_game_vote("icons/jackbox4.png", 10)
-				if(cmd == "goto shovel"):
-					self.goto_game_vote("icons/shovel.png", 10)
-				if(cmd == "goto octopath"):
-					self.goto_game_vote("icons/octopathprologuedemo.png", 10)
-				if(cmd == "goto explosion"):
-					self.goto_game_vote("icons/explosion.png", 10)
-				if(cmd == "goto human"):
-					self.goto_game_vote("icons/human.png", 10)
-				# if(cmd == "goto cave"):
-				# 	self.goto_game("icons/cave.png", 10)
-				# if(cmd == "goto isaac"):
-				# 	self.goto_game("icons/isaac.png", 10)
-				# if(cmd == "goto mario"):
-				# 	self.goto_game_vote("icons/mario.png", 10)
-
-
-				if(cmd == "restart video" or cmd == "restart" or cmd == "restart1" or cmd == "restart video1"):
+				if(cmd == "!restart1" or cmd == "!restart"):
 					# self.socketio.emit("restart")
 					twitchBot.chat("Restarting lagless1!")
 					os.system("taskkill /f /im streamr")
 
-				if(cmd == "restart video2" or cmd == "restart2"):
+				if(cmd == "!restart2"):
 					twitchBot.chat("Restarting lagless2!")
 					self.socketio.emit("restart lagless2")
 
-				if(cmd == "restart video3" or cmd == "restart3"):
+				if(cmd == "!restart3"):
 					twitchBot.chat("Restarting lagless3!")
 					self.socketio.emit("restart lagless3")
 
-				if(cmd == "restart server"):
+				if(cmd == "!restartserver"):
 					twitchBot.chat("Restarting the Server! maybe @fosse if you're using this!")
 					self.socketio.emit("restart server")
 
-				if(cmd == "restart script"):
+				if(cmd == "!restartscript"):
 					twitchBot.chat("Restarting the Python Script!")
+					# write pluslist to file:
+					with open("pluslist.pkl", "wb") as f:
+						pickle.dump([pluslist], f)
 					sys.exit()
 
 
@@ -1410,35 +1446,10 @@ class Client(object):
 
 		self.decreaseQueue()
 
-
-
-
-
 	def _receive_events_thread(self):
 		self.socketio.wait()
 
 client = Client()
-
 while True:
-
-	# rnd = random.uniform(0, 1)
-	# if(rnd > 0.99):
-	#client.on_controller_state(client.oldArgs2, 0)
-
-	#print(client.oldArgs2)
-
 	client.loop()
-
 	sleep(0.0001)
-
-	
-	# if win32api.GetAsyncKeyState(ord("P")):
-	# 	laglessEnabled = not laglessEnabled
-
-
-
-	# so I don't get stuck:
-	# if(win32api.GetAsyncKeyState(win32con.VK_ESCAPE)):
-	# 	controller.send("RELEASE")
-	# 	controller.ser.close()
-	# 	exit()
