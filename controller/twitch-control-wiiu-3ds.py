@@ -71,7 +71,7 @@ controller.connect("COM3")
 controller2 = None
 try:
 	controller2 = SwitchController()
-	controller2.connect("COM3")
+	controller2.connect("COM4")
 except:
 	print("second controller error")
 	pass
@@ -86,11 +86,14 @@ def delayed_reset(delay=0.1):
 def accurateSleep(duration):
 	s = time.clock()
 	e = time.clock()
+
+	diffInSeconds = 0
 	diffInMilliSeconds = 0
 
 	while (diffInMilliSeconds < duration):
 		e = time.clock()
-		diffInMilliSeconds = (e - s)*1000
+		diffInSeconds = e - s
+		diffInMilliSeconds = diffInSeconds*1000
 
 def send_and_reset(duration=0.1, reset=1):
 	controller.getOutput()
@@ -116,8 +119,8 @@ def round_down(num, divisor):
 
 
 
-gotoList = ["snipperclips", "mk8", "human", "shovel", "octopath", "explosion", "jackbox4", "jackbox3", "fallout", "skyrim", "splatoon2", "celeste", "smo", "rocketleague", "pokemonquest", "wizard", "sonic", "arms", "kirby", "fortnite", "torquel", "botw"]
-validCommands = ["!goto snipperclips", "!pluslist", "!unban", "!ban", "!removeplus", "!giveplus", "!goto human", "!goto shovel", "!goto octopath", "!goto explosion", "!goto jackbox4", "!goto jackbox3", "!commands", "!goto fallout", "!goto fortnite", "!goto torquel", "!goto pokemonquest", "!restart", "!restart1", "!restart2", "!restart3", "!restartscript", "!restartserver", "!help", "votenay", "voteyea", "!goto wizard", "!goto cave", "!goto sonic", "!goto skyrim", "!goto rocketleague", "!goto arms", "!goto celeste", "!goto mk8", "!goto splatoon2", "!goto isaac", "!goto mario", "!goto botw", "!goto kirby", "!goto smo", "!goto", "lockon", "hhsprint", "hsprint", "sprint", "!controls", "!goto", "home", "lstick", "rstick", "spin", "swim", "back flip", "ground pound", "groundpound", "gp", "bf", "cap bounce", "sdive", "sdive2", "hdive", "hdive2", "hdive3", "dive", "dive2", "dive3", "roll", "roll2", "backflip", "backflip2", "sssu", "sssd", "sssl", "sssr", "sb", "suu", "", "up", "down", "left", "right", "u", "d", "l", "r", "hup", "hdown", "hleft", "hright", "hhup", "hhdown", "hhleft", "hhright", "hu", "hd", "hl", "hr", "su", "sd", "sl", "sr", "sup", "sdown", "sleft", "sright", "ssu", "ssd", "ssl", "ssr", "ssup", "ssdown", "ssleft", "ssright", "look up", "look down", "look left", "look right", "lu", "ld", "ll", "lr", "hlu", "hld", "hll", "hlr", "slu", "sld", "sll", "slr", "dup", "ddown", "dleft", "dright", "du", "dd", "dl", "dr", "a", "b", "x", "y", "ha", "hb", "hx", "hy", "hhb", "hhhb", "l", "zl", "r", "zr", "plus", "minus", "long jump", "long jump2", "long jump3", "jump forward", "jump forward2", "jump back", "jump back2", "dive", "dive2"]
+gotoList = ["mk8", "human", "shovel", "octopath", "explosion", "jackbox4", "jackbox3", "fallout", "skyrim", "splatoon2", "celeste", "smo", "rocketleague", "pokemonquest", "wizard", "sonic", "arms", "kirby", "fortnite", "torquel", "botw"]
+validCommands = ["!pluslist", "!unban", "!ban", "!removeplus", "!giveplus", "!goto human", "!goto shovel", "!goto octopath", "!goto explosion", "!goto jackbox4", "!goto jackbox3", "!commands", "!goto fallout", "!goto fortnite", "!goto torquel", "!goto pokemonquest", "!restart", "!restart1", "!restart2", "!restart3", "!restartscript", "!restartserver", "!help", "votenay", "voteyea", "!goto wizard", "!goto cave", "!goto sonic", "!goto skyrim", "!goto rocketleague", "!goto arms", "!goto celeste", "!goto mk8", "!goto splatoon2", "!goto isaac", "!goto mario", "!goto botw", "!goto kirby", "!goto smo", "!goto", "lockon", "hhsprint", "hsprint", "sprint", "!controls", "!goto", "home", "lstick", "rstick", "spin", "swim", "back flip", "ground pound", "groundpound", "gp", "bf", "cap bounce", "sdive", "sdive2", "hdive", "hdive2", "hdive3", "dive", "dive2", "dive3", "roll", "roll2", "backflip", "backflip2", "sssu", "sssd", "sssl", "sssr", "sb", "suu", "", "up", "down", "left", "right", "u", "d", "l", "r", "hup", "hdown", "hleft", "hright", "hhup", "hhdown", "hhleft", "hhright", "hu", "hd", "hl", "hr", "su", "sd", "sl", "sr", "sup", "sdown", "sleft", "sright", "ssu", "ssd", "ssl", "ssr", "ssup", "ssdown", "ssleft", "ssright", "look up", "look down", "look left", "look right", "lu", "ld", "ll", "lr", "hlu", "hld", "hll", "hlr", "slu", "sld", "sll", "slr", "dup", "ddown", "dleft", "dright", "du", "dd", "dl", "dr", "a", "b", "x", "y", "ha", "hb", "hx", "hy", "hhb", "hhhb", "l", "zl", "r", "zr", "plus", "minus", "long jump", "long jump2", "long jump3", "jump forward", "jump forward2", "jump back", "jump back2", "dive", "dive2"]
 pluslist = ["vjezuz", "zellie", "generzon344", "joeakuaku", "azeywub", "alua2020", "grady404", "valentinvanelslande", "beanjr_yt", "yanchan230", "silvermagpi", "hoopa21", "opprose", "mrruidiazisthebestinsmo", "stravos96", "harmjan387", "twitchplaysconsoles", "fosseisanerd"]
 modlist = ["stravos96", "yanchan230", "silvermagpi", "twitchplaysconsoles", "fosseisanerd", "tpnsbot"]
 adminlist = ["silvermagpi", "twitchplaysconsoles", "fosseisanerd"]
@@ -144,6 +147,7 @@ class Client(object):
 
 		self.socketio.on("controllerState", self.on_controller_state)
 		self.socketio.on("controllerState2", self.on_controller_state2)
+		self.socketio.on("chat message", self.on_chat_message)
 		self.socketio.on("turnTimeLeft", self.on_turn_time_left)
 		self.socketio.emit("join", "controller")
 
@@ -174,6 +178,8 @@ class Client(object):
 
 		self.oldArgs2 = "800000000000000 128 128 128 128"
 
+		# self.lastChatUsername = None
+
 		
 
 	def on_event(self, event):
@@ -188,6 +194,16 @@ class Client(object):
 			 client.currentPlayer = args[1]["username"]
 		except:
 			pass
+
+	def on_chat_message(*args):
+		
+		message = args[1]
+		message = message.strip()
+		message = message.lower()
+
+		username = "streamrChat"
+
+		client.handleChat(username, message)
 
 	def on_controller_state(*args, controllerNum=1):
 
@@ -280,360 +296,9 @@ class Client(object):
 		elif(controllerNum == 2):
 			send_and_reset2(duration, reset)
 
-	# player 2:
+	# todo: just make this a parameter on the first function
 	def on_controller_state2(*args):
 		client.on_controller_state(args[1], 2)
-
-
-	def findImage(self, frame, imagefile):
-
-
-		img_rgb = frame# where we're looking for the icon
-		img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
-		template = cv2.imread(imagefile, 0)
-		w, h = template.shape[::-1]
-
-		iconLocationX = -1
-		iconLocationY = -1
-
-		res = cv2.matchTemplate(img_gray,template,cv2.TM_CCOEFF_NORMED)
-		threshold = 0.6
-		loc = np.where(res >= threshold)
-		location = None
-		# for pt in zip(*loc[::-1]):
-		for pt in zip(*[loc[-1], loc[-2]]):
-			# min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-			# pt = max_loc
-			cv2.rectangle(img_rgb, pt, (pt[0] + w, pt[1] + h), (0,0,255), 2)
-			iconLocationX = pt[0] + (w/2)
-			iconLocationX = pt[1] + (h/2)
-			cv2.circle(img_rgb, (int(iconLocationX), int(iconLocationY)), int(2), (0, 255, 255), 2)
-			# print(pt)
-			location = [pt[0], pt[1]]
-		
-		# cv2.imshow("icon match", img_rgb)
-		# cv2.waitKey(10)
-
-		return location
-
-
-		# img = cv2.imread("messi5.jpg",0)
-		# img = frame
-		# img2 = img.copy()
-		# template = cv2.imread("icons/SMO.png", 0)
-		# w, h = template.shape[::-1]
-
-
-		# # All the 6 methods for comparison in a list
-		# img = img2.copy()
-		# method = eval("cv2.TM_CCOEFF_NORMED")
-		# # Apply template Matching
-		# res = cv2.matchTemplate(img,template,cv2.TM_CCOEFF_NORMED)
-		# min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-		# # If the method is TM_SQDIFF or TM_SQDIFF_NORMED, take minimum
-		# if method in [cv2.TM_SQDIFF, cv2.TM_SQDIFF_NORMED]:
-		#     top_left = min_loc
-		# else:
-		#     top_left = max_loc
-		# bottom_right = (top_left[0] + w, top_left[1] + h)
-		# cv2.rectangle(img, top_left, bottom_right, 255, 2)
-		# plt.subplot(121),plt.imshow(res,cmap = "gray")
-		# plt.title("Matching Result"), plt.xticks([]), plt.yticks([])
-		# plt.subplot(122),plt.imshow(img,cmap = "gray")
-		# plt.title("Detected Point"), plt.xticks([]), plt.yticks([])
-		# plt.suptitle(meth)
-		# plt.show()
-
-
-
-	def goto_game(self, imagefile, delay=50, nameofgame="Twitch Plays"):
-
-		# disable lagless while we do this:
-		self.laglessEnabled = False
-		# set voted players to none
-		del voted[:]
-
-		# get to game selection screen:
-		controller.reset()
-		controller.home = 1
-		send_and_reset(0.1, 1)
-		sleep(2)
-		controller.LX = STICK_MAX
-		send_and_reset(3, 1)
-		controller.a = 1
-		send_and_reset(0.1)
-
-		sleep(2)
-
-		
-
-
-		# SSx1 = 255 - 1920;# left monitor
-		# SSy1 = 70;
-		# SSWidth = 1280
-		# SSHeight = 720
-		SSx1 = 319 - 1920;# left monitor
-		SSy1 = 61 + 360;
-		SSWidth = 1280
-		SSHeight = 720
-
-		#get window position and info
-		hwnd = win32gui.FindWindow(None, "OBS")
-		# hwnd = win32gui.GetDesktopWindow()#for screenshot of entire screen
-
-		wDC = win32gui.GetWindowDC(hwnd)
-		myDC = win32ui.CreateDCFromHandle(wDC)
-		newDC = myDC.CreateCompatibleDC()
-		myBitMap = win32ui.CreateBitmap()
-		myBitMap.CreateCompatibleBitmap(myDC, SSWidth, SSHeight)
-		newDC.SelectObject(myBitMap)
-		newDC.BitBlt((0,0),(SSWidth, SSHeight) , myDC, (SSx1,SSy1), win32con.SRCCOPY)
-
-		bmpinfo = myBitMap.GetInfo()
-		bmpstr = myBitMap.GetBitmapBits(True)
-		img = Image.frombuffer(
-		    "RGB",
-		    (bmpinfo["bmWidth"], bmpinfo["bmHeight"]),
-		    bmpstr, "raw", "BGRX", 0, 1)
-
-		# Free Resources
-		myDC.DeleteDC()
-		newDC.DeleteDC()
-		win32gui.ReleaseDC(hwnd, wDC)
-		win32gui.DeleteObject(myBitMap.GetHandle())
-
-		#img = ImageGrab.grab(bbox=(x1, y1, x2, y2))#.crop(box) #x, y, w, h
-		img_np = np.array(img)
-		frame = cv2.cvtColor(img_np, cv2.COLOR_BGR2RGB)
-		hsv = cv2.cvtColor(img_np, cv2.COLOR_BGR2HSV)
-
-		iconLoc = self.findImage(frame, imagefile)
-		# cursorLoc = self.findImage(frame, "icons/selectbar.png")
-
-
-		if iconLoc == None:
-
-			# move down and try again:
-			# move down 3 times and up once:
-			controller.LY = STICK_MAX
-			send_and_reset(0.1, 1)
-			sleep(0.5)
-			controller.LY = STICK_MAX
-			send_and_reset(0.1, 1)
-			sleep(0.5)
-			controller.LY = STICK_MAX
-			send_and_reset(0.1, 1)
-			sleep(0.5)
-			controller.LY = STICK_MIN
-			send_and_reset(0.1, 1)
-			sleep(0.5)
-
-
-			wDC = win32gui.GetWindowDC(hwnd)
-			myDC = win32ui.CreateDCFromHandle(wDC)
-			newDC = myDC.CreateCompatibleDC()
-			myBitMap = win32ui.CreateBitmap()
-			myBitMap.CreateCompatibleBitmap(myDC, SSWidth, SSHeight)
-			newDC.SelectObject(myBitMap)
-			newDC.BitBlt((0,0),(SSWidth, SSHeight) , myDC, (SSx1,SSy1), win32con.SRCCOPY)
-
-			bmpinfo = myBitMap.GetInfo()
-			bmpstr = myBitMap.GetBitmapBits(True)
-			img = Image.frombuffer(
-			    "RGB",
-			    (bmpinfo["bmWidth"], bmpinfo["bmHeight"]),
-			    bmpstr, "raw", "BGRX", 0, 1)
-
-			# Free Resources
-			myDC.DeleteDC()
-			newDC.DeleteDC()
-			win32gui.ReleaseDC(hwnd, wDC)
-			win32gui.DeleteObject(myBitMap.GetHandle())
-
-			#img = ImageGrab.grab(bbox=(x1, y1, x2, y2))#.crop(box) #x, y, w, h
-			img_np = np.array(img)
-			frame = cv2.cvtColor(img_np, cv2.COLOR_BGR2RGB)
-			hsv = cv2.cvtColor(img_np, cv2.COLOR_BGR2HSV)
-			iconLoc = self.findImage(frame, imagefile)
-
-			# try 1 more time:
-			if iconLoc == None:
-
-				# move down and try again:
-				# move down 3 times and up once:
-				controller.LY = STICK_MAX
-				send_and_reset(0.1, 1)
-				sleep(0.5)
-				controller.LY = STICK_MAX
-				send_and_reset(0.1, 1)
-				sleep(0.5)
-				controller.LY = STICK_MAX
-				send_and_reset(0.1, 1)
-				sleep(0.5)
-				controller.LY = STICK_MIN
-				send_and_reset(0.1, 1)
-				sleep(0.5)
-
-
-				wDC = win32gui.GetWindowDC(hwnd)
-				myDC = win32ui.CreateDCFromHandle(wDC)
-				newDC = myDC.CreateCompatibleDC()
-				myBitMap = win32ui.CreateBitmap()
-				myBitMap.CreateCompatibleBitmap(myDC, SSWidth, SSHeight)
-				newDC.SelectObject(myBitMap)
-				newDC.BitBlt((0,0),(SSWidth, SSHeight) , myDC, (SSx1,SSy1), win32con.SRCCOPY)
-
-				bmpinfo = myBitMap.GetInfo()
-				bmpstr = myBitMap.GetBitmapBits(True)
-				img = Image.frombuffer(
-				    "RGB",
-				    (bmpinfo["bmWidth"], bmpinfo["bmHeight"]),
-				    bmpstr, "raw", "BGRX", 0, 1)
-
-				# Free Resources
-				myDC.DeleteDC()
-				newDC.DeleteDC()
-				win32gui.ReleaseDC(hwnd, wDC)
-				win32gui.DeleteObject(myBitMap.GetHandle())
-
-				#img = ImageGrab.grab(bbox=(x1, y1, x2, y2))#.crop(box) #x, y, w, h
-				img_np = np.array(img)
-				frame = cv2.cvtColor(img_np, cv2.COLOR_BGR2RGB)
-				hsv = cv2.cvtColor(img_np, cv2.COLOR_BGR2HSV)
-				iconLoc = self.findImage(frame, imagefile)
-
-				# give up if we still can't find it:
-				if iconLoc == None:
-					controller.LY = STICK_MIN
-					send_and_reset(1.5, 1)
-					controller.a = 1
-					send_and_reset(0.1)
-					self.laglessEnabled = True
-					return
-
-
-		print(iconLoc)
-
-
-		# iconLoc[0] = int(round(iconLoc[0]/100)-1)# the number of times to move right
-		# iconLoc[1] = int(round(iconLoc[1]/100)-2)# the number of times to move down
-
-		# so that when we round down its always above the nearest multiple of 185
-		iconLoc[0] += 10
-		iconLoc[1] += 10
-
-		iconLoc[0] = int((round_down(iconLoc[0], 185)/185))# the number of times to move right
-		iconLoc[1] = int((round_down(iconLoc[1], 185)/185)-1)# the number of times to move down
-
-		# iconLoc[0] = int(iconLoc[0]/2)
-		# iconLoc[1] = int(iconLoc[1]/2)
-
-		print(iconLoc)
-
-
-		for i in range(0, iconLoc[0]):
-			controller.LX = STICK_MAX
-			send_and_reset(0.1, 1)
-			sleep(0.5)
-		for i in range(0, iconLoc[1]):
-			controller.LY = STICK_MAX
-			send_and_reset(0.1, 1)
-			sleep(0.5)
-
-		controller.a = 1
-		send_and_reset(0.1)
-		sleep(2)
-		controller.a = 1
-		send_and_reset(0.1)
-		sleep(2)
-		controller.a = 1
-		send_and_reset(0.1)
-		sleep(2)
-		controller.a = 1
-		send_and_reset(0.1)
-		sleep(2)
-		controller.a = 1
-		send_and_reset(0.1)
-		sleep(2)
-		controller.a = 1
-		send_and_reset(0.1)
-		sleep(delay)
-		controller.a = 1
-		send_and_reset(0.1)
-		controller.a = 1
-		send_and_reset(0.1)
-		controller.a = 1
-		send_and_reset(0.1)
-		controller.a = 1
-		send_and_reset(0.1)
-		sleep(2)
-		controller.a = 1
-		send_and_reset(0.1)
-		controller.a = 1
-		send_and_reset(0.1)
-		sleep(2)
-		controller.a = 1
-		send_and_reset(0.1)
-
-		twitchBot.chat("!game " + nameofgame)
-
-		
-		# draw a circle on the image:
-		# x = 200
-		# y = 200
-		# r = 5
-		# cv2.circle(frame, (int(x), int(y)), int(r), (0, 255, 255), 2)
-
-		# show screen capture and mask
-		#cv2.imshow("screen capture", frame)
-
-		# mask = cv2.inRange(hsv, colorLower1, colorUpper1)
-		# cv2.imshow("mask", mask)
-		cv2.waitKey(1)
-
-
-		self.laglessEnabled = True
-
-		return
-
-	def end_goto_vote(self, imagefile, delay, nameofgame="Twitch Plays"):
-		# twitchBot.chat("Voting has ended!")
-		msg = "With " + str(self.yeaVotes) + " VoteYea and " + str(self.nayVotes) + " VoteNay"
-		
-		leaving = False
-
-		if(self.yeaVotes > self.nayVotes):
-			msg = msg + " We will be LEAVING"
-			leaving = True
-		else:
-			msg = msg + " We will be STAYING"
-
-		twitchBot.chat(msg)
-
-		self.voting = False
-
-		del voted[:]
-
-		if(leaving):
-			self.goto_game(imagefile, delay, nameofgame)
-
-
-	def goto_game_vote(self, imagefile, delay=50, nameofgame="Twitch Plays"):
-
-		if(self.voting == True):
-			return
-
-		self.yeaVotes = 0
-		self.nayVotes = 0
-		twitchBot.chat("A vote has been started to goto " + nameofgame + "! Vote now with VoteYea to LEAVE and VoteNay to STAY! Voting ends in 20 seconds!")
-		self.voting = True
-
-		voteTimer = Timer(20.0, self.end_goto_vote, (imagefile, delay, nameofgame))
-		voteTimer.start()
-
-		return
-
-
 
 	def handleChat(self, username, message):
 		print(message)
@@ -804,8 +469,6 @@ class Client(object):
 				self.goto_game_vote("icons/explosion.png", 10)
 			if(cmd == "human"):
 				self.goto_game_vote("icons/human.png", 10)
-			if(cmd == "snipperclips"):
-				self.goto_game_vote("icons/snipperclips.png", 10)
 			# if(cmd == "!goto cave"):
 			# 	self.goto_game("icons/cave.png", 10)
 			# if(cmd == "!goto isaac"):
@@ -830,7 +493,9 @@ class Client(object):
 		#sleep(0.0001)
 
 		self.end = time.clock()
-		diffInMilliSeconds = (self.end - self.start)*1000
+		diffInSeconds = self.end - self.start
+		diffInMilliSeconds = diffInSeconds*1000
+
 		if(diffInMilliSeconds > 8.33333):
 			self.start = time.clock()
 			#controller.send(controller.output)
@@ -1436,7 +1101,8 @@ class Client(object):
 		# control switch here:
 
 		self.botend = time.clock()
-		diffInMilliSeconds = (self.botend - self.botstart)*1000
+		diffInSeconds = self.botend - self.botstart
+		diffInMilliSeconds = diffInSeconds*1000
 		if(diffInMilliSeconds > 1000*60*5):
 			self.socketio.emit("join", "controller")
 			self.botstart = time.clock()
@@ -1445,7 +1111,8 @@ class Client(object):
 			twitchBot.chat(msg)
 
 		self.controllerEnd = time.clock()
-		diffInMilliSeconds2 = (self.controllerEnd - self.controllerStart)*1000
+		diffInSeconds2 = self.controllerEnd - self.controllerStart
+		diffInMilliSeconds2 = diffInSeconds2*1000
 		if(diffInMilliSeconds2 > 6000):
 			self.socketio.emit("join", "controller")
 			self.controllerStart = time.clock()
@@ -1458,6 +1125,7 @@ class Client(object):
 
 
 		response = twitchBot.stayConnected()
+		#response = "none"
 		if(response != "none"):
 			# prevent crash
 			try:
