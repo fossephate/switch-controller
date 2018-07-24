@@ -14,7 +14,7 @@ import time
 from math import sqrt
 
 # switch controller:
-# from switchcontroller.switchcontroller import *
+from switchcontroller.switchcontroller import *
 
 # twitch:
 from twitchbot.twitchbot import *
@@ -58,6 +58,9 @@ import numpy as np
 # save info
 import pickle
 
+# vjoy
+import pyvjoy
+
 
 screenWidth, screenHeight = pyautogui.size()
 x = screenWidth/2
@@ -68,6 +71,8 @@ prevY = 0
 controller1 = SwitchController()
 # controller1.connect("COM3")
 
+vjoy = pyvjoy.VJoyDevice(1)
+
 # controller2 = None
 # try:
 # 	controller2 = SwitchController()
@@ -76,8 +81,8 @@ controller1 = SwitchController()
 # 	print("second controller error")
 # 	pass
 
-# twitchBot = TwitchBot()
-# twitchBot.connect(HOST, PASS2, PORT, CHAN, NICK2)
+twitchBot = TwitchBot()
+twitchBot.connect(HOST, PASS2, PORT, CHAN, NICK2)
 
 def delayed_reset(delay=0.1):
 	Timer(delay, controller.reset).start()
@@ -101,14 +106,82 @@ def send_and_reset(duration=0.1, reset=1):
 	# 	controller1.getOutput()
 	# 	controller1.send(controller1.output)
 
-	# DO STUFF WITH CONTROLLER / KEYBOARD INPUT HERE:
+	sleep(duration)
+
+	if (controller1.dpad == 7):
+		controller1.up = 1
+		controller1.left = 1
+	elif (controller1.dpad == 1):
+		controller1.up = 1
+		controller1.right = 1
+	elif (controller1.dpad == 5):
+		controller1.down = 1
+		controller1.left = 1
+	elif (controller1.dpad == 3):
+		controller1.down = 1
+		controller1.right = 1
+	elif (controller1.dpad == 0):
+		controller1.up = 1
+	elif (controller1.dpad == 4):
+		controller1.down = 1
+	elif (controller1.dpad == 6):
+		controller1.left = 1
+	elif (controller1.dpad == 2):
+		controller1.right = 1
+
+	vjoy.reset()
+	btns = []
+	btnNum = 0
+
+	if (controller1.up):
+		btns.append(1)
+	if (controller1.down):
+		btns.append(2)
+	if (controller1.left):
+		btns.append(3)
+	if (controller1.right):
+		btns.append(4)
+	if (controller1.lstick):
+		btns.append(5)
+	if (controller1.l):
+		btns.append(6)
+	if (controller1.zl):
+		btns.append(7)
+	if (controller1.minus):
+		btns.append(8)
+	if (controller1.capture):
+		btns.append(9)
 	if (controller1.a):
-		pass
-		# press a button on keyboard
+		btns.append(10)
 	if (controller1.b):
-		pass
-		# press b button on keyboard
-	# etc....
+		btns.append(11)
+	if (controller1.x):
+		btns.append(12)
+	if (controller1.y):
+		btns.append(13)
+	if (controller1.rstick):
+		btns.append(14)
+	if (controller1.r):
+		btns.append(15)
+	if (controller1.zr):
+		btns.append(16)
+	if (controller1.plus):
+		btns.append(17)
+	if (controller1.home):
+		btns.append(18)
+
+	for n in btns:
+		btnNum += 2**n
+
+	vjoy.data.lButtons = btnNum
+	vjoy.data.wAxisX = controller1.LX * 128
+	vjoy.data.wAxisY = controller1.LY * 128
+	vjoy.data.wAxisXRot = controller1.RX * 128
+	vjoy.data.wAxisYRot = controller1.RY * 128
+
+	vjoy.update()
+
+
 
 # todo: combine
 def send_and_reset2(duration=0.1, reset=1):
@@ -169,10 +242,10 @@ class Client(object):
 	def __init__(self):
 		self.socketio = SocketIO("http://twitchplaysnintendoswitch.com:8110")
 
-		self.socketio.on("controllerState1", self.on_controller_state1)
-		self.socketio.on("controllerState2", self.on_controller_state2)
-		self.socketio.on("controllerState3", self.on_controller_state3)
-		self.socketio.on("controllerState4", self.on_controller_state4)
+		# self.socketio.on("controllerState1", self.on_controller_state1)
+		# self.socketio.on("controllerState2", self.on_controller_state2)
+		# self.socketio.on("controllerState3", self.on_controller_state3)
+		self.socketio.on("controllerState5", self.on_controller_state1)
 		self.socketio.on("turnTimesLeft", self.on_turn_times_left)
 		self.socketio.emit("join", "wiiu3dscontroller")
 
@@ -243,6 +316,10 @@ class Client(object):
 			cNum = 1
 			controller = controller2
 		elif(cNum == 3):
+			return
+			cNum = 1
+			controller = controller2
+		elif(cNum == 4):
 			return
 			cNum = 1
 			controller = controller2
@@ -330,18 +407,6 @@ class Client(object):
 	def on_controller_state1(*args):
 		client.on_controller_state(args[1], 0)
 
-	# player 2:
-	def on_controller_state2(*args):
-		client.on_controller_state(args[1], 1)
-	
-	# player 3:
-	def on_controller_state3(*args):
-		client.on_controller_state(args[1], 2)
-
-	# player 4:
-	def on_controller_state4(*args):
-		client.on_controller_state(args[1], 3)
-
 
 	def handleChat(self, username, message):
 		print(message)
@@ -351,6 +416,7 @@ class Client(object):
 	def decreaseQueue(self):
 
 		# handle queue from handlechat
+		pass
 
 
 	def loop(self):
