@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 import argparse
-import serial
+# import serial
 from time import sleep
 import pynput
 import pyautogui
-import win32api
-import win32con
 import random
 
 # for time delaying the input:
@@ -327,7 +325,11 @@ class Client(object):
 		controller.reset()
 
 		inputs = state.split()
-		cPlayer = client.currentPlayers[cNum]
+		cPlayer = ""
+		try:
+			cPlayer = client.currentPlayers[cNum]
+		except:
+			pass
 
 		btns = inputs[0]
 		LX = inputs[1]

@@ -63,15 +63,26 @@ prevX = 0
 prevY = 0
 
 controller1 = SwitchController()
-controller1.connect("COM3")
+controller2 = SwitchController()
+controller3 = SwitchController()
+controller4 = SwitchController()
 
-controller2 = None
 try:
-	controller2 = SwitchController()
+	controller1.connect("COM3")
+except:
+	print("controller1 error")
+
+try:
 	controller2.connect("COM6")
 except:
-	print("second controller error")
+	print("controller2 error")
 	pass
+try:
+	controller3.connect("COM9")
+except:
+	print("controller3 error")
+	pass
+
 
 twitchBot = TwitchBot()
 twitchBot.connect(HOST, PASS2, PORT, CHAN, NICK2)
@@ -132,7 +143,7 @@ def round_down(num, divisor):
 
 
 gotoList = ["snipperclips", "mk8", "human", "shovel", "octopath", "explosion", "jackbox4", "jackbox3", "fallout", "skyrim", "splatoon2", "celeste", "smo", "rocketleague", "pokemonquest", "wizard", "sonic", "arms", "kirby", "fortnite", "torquel", "botw"]
-validCommands = ["!unmod", "!mod", "!fixcontrollers", "!goto snipperclips", "!pluslist", "!unban", "!ban", "!removeplus", "!giveplus", "!goto human", "!goto shovel", "!goto octopath", "!goto explosion", "!goto jackbox4", "!goto jackbox3", "!commands", "!goto fallout", "!goto fortnite", "!goto torquel", "!goto pokemonquest", "!restart", "!restart1", "!restart2", "!restart3", "!restartscript", "!restartserver", "!help", "votenay", "voteyea", "!goto wizard", "!goto cave", "!goto sonic", "!goto skyrim", "!goto rocketleague", "!goto arms", "!goto celeste", "!goto mk8", "!goto splatoon2", "!goto isaac", "!goto mario", "!goto botw", "!goto kirby", "!goto smo", "!goto", "lockon", "hhsprint", "hsprint", "sprint", "!controls", "!goto", "home", "lstick", "rstick", "spin", "swim", "back flip", "ground pound", "groundpound", "gp", "bf", "cap bounce", "sdive", "sdive2", "hdive", "hdive2", "hdive3", "dive", "dive2", "dive3", "roll", "roll2", "backflip", "backflip2", "sssu", "sssd", "sssl", "sssr", "sb", "suu", "", "up", "down", "left", "right", "u", "d", "l", "r", "hup", "hdown", "hleft", "hright", "hhup", "hhdown", "hhleft", "hhright", "hu", "hd", "hl", "hr", "su", "sd", "sl", "sr", "sup", "sdown", "sleft", "sright", "ssu", "ssd", "ssl", "ssr", "ssup", "ssdown", "ssleft", "ssright", "look up", "look down", "look left", "look right", "lu", "ld", "ll", "lr", "hlu", "hld", "hll", "hlr", "slu", "sld", "sll", "slr", "dup", "ddown", "dleft", "dright", "du", "dd", "dl", "dr", "a", "b", "x", "y", "ha", "hb", "hx", "hy", "hhb", "hhhb", "l", "zl", "r", "zr", "plus", "minus", "long jump", "long jump2", "long jump3", "jump forward", "jump forward2", "jump back", "jump back2", "dive", "dive2"]
+validCommands = ["nay", "yea", "!enablechat", "!disablechat", "!enablegoto", "!disablegoto", "!unmod", "!mod", "!fixcontrollers", "!goto snipperclips", "!pluslist", "!unban", "!ban", "!removeplus", "!giveplus", "!goto human", "!goto shovel", "!goto octopath", "!goto explosion", "!goto jackbox4", "!goto jackbox3", "!commands", "!goto fallout", "!goto fortnite", "!goto torquel", "!goto pokemonquest", "!restart", "!restart1", "!restart2", "!restart3", "!restartscript", "!restartserver", "!help", "votenay", "voteyea", "!goto wizard", "!goto cave", "!goto sonic", "!goto skyrim", "!goto rocketleague", "!goto arms", "!goto celeste", "!goto mk8", "!goto splatoon2", "!goto isaac", "!goto mario", "!goto botw", "!goto kirby", "!goto smo", "!goto", "lockon", "hhsprint", "hsprint", "sprint", "!controls", "!goto", "home", "lstick", "rstick", "spin", "swim", "back flip", "ground pound", "groundpound", "gp", "bf", "cap bounce", "sdive", "sdive2", "hdive", "hdive2", "hdive3", "dive", "dive2", "dive3", "roll", "roll2", "backflip", "backflip2", "sssu", "sssd", "sssl", "sssr", "sb", "suu", "", "up", "down", "left", "right", "u", "d", "l", "r", "hup", "hdown", "hleft", "hright", "hhup", "hhdown", "hhleft", "hhright", "hu", "hd", "hl", "hr", "su", "sd", "sl", "sr", "sup", "sdown", "sleft", "sright", "ssu", "ssd", "ssl", "ssr", "ssup", "ssdown", "ssleft", "ssright", "look up", "look down", "look left", "look right", "lu", "ld", "ll", "lr", "hlu", "hld", "hll", "hlr", "slu", "sld", "sll", "slr", "dup", "ddown", "dleft", "dright", "du", "dd", "dl", "dr", "a", "b", "x", "y", "ha", "hb", "hx", "hy", "hhb", "hhhb", "l", "zl", "r", "zr", "plus", "minus", "long jump", "long jump2", "long jump3", "jump forward", "jump forward2", "jump back", "jump back2", "dive", "dive2"]
 pluslist = []
 modlist = ["ogcristofer", "stravos96", "yanchan230", "silvermagpi", "twitchplaysconsoles", "fosseisanerd", "tpnsbot"]
 adminlist = ["silvermagpi", "twitchplaysconsoles", "fosseisanerd"]
@@ -182,9 +193,9 @@ class Client(object):
 		self.yeaVotes = 0
 		self.nayVotes = 0
 		self.voting = False
+		self.chatEnabled = True
+		self.controllerEnabled = True
 		self.currentPlayers = []
-
-		self.laglessEnabled = True
 		self.currentGame = "none"
 
 		self.oldArgs2 = "800000000000000 128 128 128 128"
@@ -208,7 +219,7 @@ class Client(object):
 
 	def on_controller_state(*args):
 
-		if(not client.laglessEnabled):
+		if(not client.controllerEnabled):
 			return
 
 		state = args[1]
@@ -225,9 +236,7 @@ class Client(object):
 		elif(cNum == 1):
 			controller = controller2
 		elif(cNum == 2):
-			return
-			cNum = 1
-			controller = controller2
+			controller = controller3
 		elif(cNum == 3):
 			return
 			cNum = 1
@@ -236,7 +245,11 @@ class Client(object):
 		controller.reset()
 
 		inputs = state.split()
-		cPlayer = client.currentPlayers[cNum]
+		cPlayer = ""
+		try:
+			cPlayer = client.currentPlayers[cNum]
+		except:
+			pass
 
 		btns = inputs[0]
 		LX = inputs[1]
@@ -391,8 +404,9 @@ class Client(object):
 
 	def goto_game(self, imagefile, delay=50, nameofgame="Twitch Plays"):
 
-		# disable lagless while we do this:
-		self.laglessEnabled = False
+		# disable controls while we do this:
+		self.controllerEnabled = False
+		self.chatEnabled = False
 		# set voted players to none
 		del voted[:]
 
@@ -551,7 +565,7 @@ class Client(object):
 					send_and_reset(1.5, 1)
 					controller1.a = 1
 					send_and_reset(0.1)
-					self.laglessEnabled = True
+					self.controllerEnabled = True
 					return
 
 
@@ -635,7 +649,8 @@ class Client(object):
 		cv2.waitKey(1)
 
 
-		self.laglessEnabled = True
+		self.controllerEnabled = True
+		self.chatEnabled = True
 
 		return
 
@@ -664,6 +679,8 @@ class Client(object):
 	def goto_game_vote(self, imagefile, delay=50, nameofgame="Twitch Plays"):
 
 		if(self.voting == True):
+			msg = "The !goto command is disabled right now"
+			twitchBot.chat(msg)
 			return
 
 		self.yeaVotes = 0
@@ -679,7 +696,8 @@ class Client(object):
 
 
 	def handleChat(self, username, message):
-		print(message)
+		print(username + ": " + message)
+
 
 		commands = None
 		if ("," in message):
@@ -716,15 +734,19 @@ class Client(object):
 			if ("!restartscript" in cmd and username not in modlist):
 				valid = False
 
+			if ("!enablegoto" in cmd and username not in modlist):
+				valid = False
+			if ("!disablegoto" in cmd and username not in modlist):
+				valid = False
+
 			if ("lockon" in cmd):
 				self.lockon = not self.lockon
 
 			if(self.voting):
-				if(cmd == "voteyea" and username not in voted):
+				if((cmd == "voteyea" or cmd == "yea") and username not in voted):
 					voted.append(username)
 					self.yeaVotes += 1
-				if(cmd == "votenay" and username not in voted):
-					print("votenay'd")
+				if((cmd == "votenay" or cmd == "nay") and username not in voted):
 					voted.append(username)
 					self.nayVotes += 1
 
@@ -798,11 +820,11 @@ class Client(object):
 
 			if(cmd == "!restart2"):
 				twitchBot.chat("Restarting lagless2!")
-				self.socketio.emit("restart lagless2")
+				self.socketio.emit("restart2")
 
 			if(cmd == "!restart3"):
 				twitchBot.chat("Restarting lagless3!")
-				self.socketio.emit("restart lagless3")
+				self.socketio.emit("restart3")
 
 			if(cmd == "!restartserver"):
 				twitchBot.chat("Restarting the Server! maybe @fosse if you're using this!")
@@ -814,10 +836,28 @@ class Client(object):
 					pickle.dump([pluslist], f)
 				os.system("taskkill /f /im python.exe")
 
+			if (commands[0] == "!disablegoto" and username in modlist):
+				msg = "Disabling !goto"
+				twitchBot.chat(msg)
+				self.voting = True
+			if (commands[0] == "!enablegoto" and username in modlist):
+				msg = "Enabling !goto"
+				twitchBot.chat(msg)
+				self.voting = False
+
+			if (commands[0] == "!disablechat" and username in modlist):
+				msg = "Disabling Chat Commands"
+				twitchBot.chat(msg)
+				self.chatEnabled = False
+			if (commands[0] == "!enablechat" and username in modlist):
+				msg = "Enabling Chat Commands"
+				twitchBot.chat(msg)
+				self.chatEnabled = True
+
 			if(cmd == "!fixcontrollers"):
 				twitchBot.chat("Fixing controller order!")
 				# disable lagless while we do this:
-				self.laglessEnabled = False
+				self.controllerEnabled = False
 
 				# reset controller
 				controller1.reset()
@@ -850,10 +890,13 @@ class Client(object):
 				sleep(0.5)
 				controller1.a = 1
 				send_and_reset(0.1, 1)
-				sleep(3)
+				sleep(2)
 				controller2.a = 1
 				send_and_reset2(0.1, 1)
-				sleep(3)
+				sleep(2)
+				controller3.a = 1
+				send_and_reset3(0.1, 1)
+				sleep(2)
 				# controller3.a = 1
 				# send_and_reset3(0.1, 1)
 				# sleep(1)
@@ -879,7 +922,8 @@ class Client(object):
 
 
 				# re-enable lagless
-				self.laglessEnabled = True
+				self.controllerEnabled = True
+
 				
 
 		# goto commands:
@@ -936,6 +980,8 @@ class Client(object):
 			# if(cmd == "!goto mario"):
 			# 	self.goto_game_vote("icons/mario.png", 10)
 
+		if(not self.chatEnabled):
+			return
 
 		if(len(commands) > 20):
 			valid = False
