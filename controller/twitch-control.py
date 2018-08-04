@@ -77,10 +77,17 @@ try:
 except:
 	print("controller2 error")
 	pass
+
 try:
 	controller3.connect("COM9")
 except:
 	print("controller3 error")
+	pass
+
+try:
+	controller4.connect("COM12")
+except:
+	print("controller4 error")
 	pass
 
 
@@ -100,42 +107,24 @@ def accurateSleep(duration):
 		e = time.clock()
 		diffInMilliSeconds = (e - s)*1000
 
-def send_and_reset(duration=0.1, reset=1):
-	controller1.getOutput()
-	controller1.send(controller1.output)
-	sleep(duration)
-	if(reset):
-		controller1.reset()
-		controller1.getOutput()
-		controller1.send(controller1.output)
+def send_and_reset(duration=0.1, reset=1, cNum=0):
+	controller = None
+	if (cNum == 0):
+		controller = controller1
+	elif (cNum == 1):
+		controller = controller2
+	elif (cNum == 2):
+		controller = controller3
+	elif (cNum == 3):
+		controller = controller4
 
-# todo: combine
-def send_and_reset2(duration=0.1, reset=1):
-	controller2.getOutput()
-	controller2.send(controller2.output)
+	controller.getOutput()
+	controller.send(controller.output)
 	sleep(duration)
 	if(reset):
-		controller2.reset()
-		controller2.getOutput()
-		controller2.send(controller2.output)
-
-def send_and_reset3(duration=0.1, reset=1):
-	controller3.getOutput()
-	controller3.send(controller3.output)
-	sleep(duration)
-	if(reset):
-		controller3.reset()
-		controller3.getOutput()
-		controller3.send(controller3.output)
-
-def send_and_reset4(duration=0.1, reset=1):
-	controller4.getOutput()
-	controller4.send(controller4.output)
-	sleep(duration)
-	if(reset):
-		controller4.reset()
-		controller4.getOutput()
-		controller4.send(controller4.output)
+		controller.reset()
+		controller.getOutput()
+		controller.send(controller.output)
 
 def round_down(num, divisor):
     return num - (num%divisor)
@@ -143,11 +132,12 @@ def round_down(num, divisor):
 
 
 gotoList = ["snipperclips", "mk8", "human", "shovel", "octopath", "explosion", "jackbox4", "jackbox3", "fallout", "skyrim", "splatoon2", "celeste", "smo", "rocketleague", "pokemonquest", "wizard", "sonic", "arms", "kirby", "fortnite", "torquel", "botw"]
-validCommands = ["nay", "yea", "!enablechat", "!disablechat", "!enablegoto", "!disablegoto", "!unmod", "!mod", "!fixcontrollers", "!goto snipperclips", "!pluslist", "!unban", "!ban", "!removeplus", "!giveplus", "!goto human", "!goto shovel", "!goto octopath", "!goto explosion", "!goto jackbox4", "!goto jackbox3", "!commands", "!goto fallout", "!goto fortnite", "!goto torquel", "!goto pokemonquest", "!restart", "!restart1", "!restart2", "!restart3", "!restartscript", "!restartserver", "!help", "votenay", "voteyea", "!goto wizard", "!goto cave", "!goto sonic", "!goto skyrim", "!goto rocketleague", "!goto arms", "!goto celeste", "!goto mk8", "!goto splatoon2", "!goto isaac", "!goto mario", "!goto botw", "!goto kirby", "!goto smo", "!goto", "lockon", "hhsprint", "hsprint", "sprint", "!controls", "!goto", "home", "lstick", "rstick", "spin", "swim", "back flip", "ground pound", "groundpound", "gp", "bf", "cap bounce", "sdive", "sdive2", "hdive", "hdive2", "hdive3", "dive", "dive2", "dive3", "roll", "roll2", "backflip", "backflip2", "sssu", "sssd", "sssl", "sssr", "sb", "suu", "", "up", "down", "left", "right", "u", "d", "l", "r", "hup", "hdown", "hleft", "hright", "hhup", "hhdown", "hhleft", "hhright", "hu", "hd", "hl", "hr", "su", "sd", "sl", "sr", "sup", "sdown", "sleft", "sright", "ssu", "ssd", "ssl", "ssr", "ssup", "ssdown", "ssleft", "ssright", "look up", "look down", "look left", "look right", "lu", "ld", "ll", "lr", "hlu", "hld", "hll", "hlr", "slu", "sld", "sll", "slr", "dup", "ddown", "dleft", "dright", "du", "dd", "dl", "dr", "a", "b", "x", "y", "ha", "hb", "hx", "hy", "hhb", "hhhb", "l", "zl", "r", "zr", "plus", "minus", "long jump", "long jump2", "long jump3", "jump forward", "jump forward2", "jump back", "jump back2", "dive", "dive2"]
+validCommands = ["!forcerefresh", "nay", "yea", "!enablechat", "!disablechat", "!enablegoto", "!disablegoto", "!unmod", "!mod", "!fixcontrollers", "!goto snipperclips", "!pluslist", "!unban", "!ban", "!removeplus", "!giveplus", "!goto human", "!goto shovel", "!goto octopath", "!goto explosion", "!goto jackbox4", "!goto jackbox3", "!commands", "!goto fallout", "!goto fortnite", "!goto torquel", "!goto pokemonquest", "!restart", "!restart1", "!restart2", "!restart3", "!restartscript", "!restartserver", "!help", "votenay", "voteyea", "!goto wizard", "!goto cave", "!goto sonic", "!goto skyrim", "!goto rocketleague", "!goto arms", "!goto celeste", "!goto mk8", "!goto splatoon2", "!goto isaac", "!goto mario", "!goto botw", "!goto kirby", "!goto smo", "!goto", "lockon", "hhsprint", "hsprint", "sprint", "!controls", "!goto", "home", "lstick", "rstick", "spin", "swim", "back flip", "ground pound", "groundpound", "gp", "bf", "cap bounce", "sdive", "sdive2", "hdive", "hdive2", "hdive3", "dive", "dive2", "dive3", "roll", "roll2", "backflip", "backflip2", "sssu", "sssd", "sssl", "sssr", "sb", "suu", "", "up", "down", "left", "right", "u", "d", "l", "r", "hup", "hdown", "hleft", "hright", "hhup", "hhdown", "hhleft", "hhright", "hu", "hd", "hl", "hr", "su", "sd", "sl", "sr", "sup", "sdown", "sleft", "sright", "ssu", "ssd", "ssl", "ssr", "ssup", "ssdown", "ssleft", "ssright", "look up", "look down", "look left", "look right", "lu", "ld", "ll", "lr", "hlu", "hld", "hll", "hlr", "slu", "sld", "sll", "slr", "dup", "ddown", "dleft", "dright", "du", "dd", "dl", "dr", "a", "b", "x", "y", "ha", "hb", "hx", "hy", "hhb", "hhhb", "l", "zl", "r", "zr", "plus", "minus", "long jump", "long jump2", "long jump3", "jump forward", "jump forward2", "jump back", "jump back2", "dive", "dive2"]
 pluslist = []
 modlist = ["ogcristofer", "stravos96", "yanchan230", "silvermagpi", "twitchplaysconsoles", "fosseisanerd", "tpnsbot"]
 adminlist = ["silvermagpi", "twitchplaysconsoles", "fosseisanerd"]
 banlist = []
+sublist = []
 voted = []
 
 commandQueue = []
@@ -160,7 +150,10 @@ oldArgs = "800000000000000 128 128 128 128"
 if(os.path.exists("pluslist.pkl")):
     with open("pluslist.pkl", "rb") as f:
         pluslist = pickle.load(f)[0]
-
+# load ban list:
+if(os.path.exists("banlist.pkl")):
+    with open("banlist.pkl", "rb") as f:
+        banlist = pickle.load(f)[0]
 
 
 class Client(object):
@@ -174,6 +167,10 @@ class Client(object):
 		self.socketio.on("controllerState4", self.on_controller_state4)
 		self.socketio.on("turnTimesLeft", self.on_turn_times_left)
 		self.socketio.emit("join", "controller")
+		self.socketio.emit("banlist", banlist)
+		self.socketio.emit("modlist", modlist)
+		self.socketio.emit("pluslist", pluslist)
+		self.socketio.emit("sublist", sublist)
 
 		self.receive_events_thread = Thread(target=self._receive_events_thread)
 		self.receive_events_thread.daemon = True
@@ -221,6 +218,8 @@ class Client(object):
 
 		if(not client.controllerEnabled):
 			return
+
+		# if (client.currentPla)
 
 		state = args[1]
 		cNum = args[2]
@@ -315,14 +314,7 @@ class Client(object):
 
 		duration = 0.001
 		reset = 0
-		if(cNum == 0):
-			send_and_reset(duration, reset)
-		elif(cNum == 1):
-			send_and_reset2(duration, reset)
-		elif(cNum == 2):
-			send_and_reset3(duration, reset)
-		elif(cNum == 3):
-			send_and_reset4(duration, reset)
+		send_and_reset(duration, reset, cNum)
 
 
 	# player 1:
@@ -513,7 +505,7 @@ class Client(object):
 			hsv = cv2.cvtColor(img_np, cv2.COLOR_BGR2HSV)
 			iconLoc = self.findImage(frame, imagefile)
 
-			# try 1 more time:
+			# try again:
 			if iconLoc == None:
 
 				# move down and try again:
@@ -530,7 +522,6 @@ class Client(object):
 				controller1.LY = STICK_MIN
 				send_and_reset(0.1, 1)
 				sleep(0.5)
-
 
 				wDC = win32gui.GetWindowDC(hwnd)
 				myDC = win32ui.CreateDCFromHandle(wDC)
@@ -559,14 +550,58 @@ class Client(object):
 				hsv = cv2.cvtColor(img_np, cv2.COLOR_BGR2HSV)
 				iconLoc = self.findImage(frame, imagefile)
 
-				# give up if we still can't find it:
+				# try again:
 				if iconLoc == None:
+					# move down and try again:
+					# move down 3 times and up once:
+					controller1.LY = STICK_MAX
+					send_and_reset(0.1, 1)
+					sleep(0.5)
+					controller1.LY = STICK_MAX
+					send_and_reset(0.1, 1)
+					sleep(0.5)
+					controller1.LY = STICK_MAX
+					send_and_reset(0.1, 1)
+					sleep(0.5)
 					controller1.LY = STICK_MIN
-					send_and_reset(1.5, 1)
-					controller1.a = 1
-					send_and_reset(0.1)
-					self.controllerEnabled = True
-					return
+					send_and_reset(0.1, 1)
+					sleep(0.5)
+					
+					wDC = win32gui.GetWindowDC(hwnd)
+					myDC = win32ui.CreateDCFromHandle(wDC)
+					newDC = myDC.CreateCompatibleDC()
+					myBitMap = win32ui.CreateBitmap()
+					myBitMap.CreateCompatibleBitmap(myDC, SSWidth, SSHeight)
+					newDC.SelectObject(myBitMap)
+					newDC.BitBlt((0,0),(SSWidth, SSHeight) , myDC, (SSx1,SSy1), win32con.SRCCOPY)
+
+					bmpinfo = myBitMap.GetInfo()
+					bmpstr = myBitMap.GetBitmapBits(True)
+					img = Image.frombuffer(
+					    "RGB",
+					    (bmpinfo["bmWidth"], bmpinfo["bmHeight"]),
+					    bmpstr, "raw", "BGRX", 0, 1)
+
+					# Free Resources
+					myDC.DeleteDC()
+					newDC.DeleteDC()
+					win32gui.ReleaseDC(hwnd, wDC)
+					win32gui.DeleteObject(myBitMap.GetHandle())
+
+					#img = ImageGrab.grab(bbox=(x1, y1, x2, y2))#.crop(box) #x, y, w, h
+					img_np = np.array(img)
+					frame = cv2.cvtColor(img_np, cv2.COLOR_BGR2RGB)
+					hsv = cv2.cvtColor(img_np, cv2.COLOR_BGR2HSV)
+					iconLoc = self.findImage(frame, imagefile)
+
+					# give up if we still can't find it:
+					if iconLoc == None:
+						controller1.LY = STICK_MIN
+						send_and_reset(1.5, 1)
+						controller1.a = 1
+						send_and_reset(0.1)
+						self.controllerEnabled = True
+						return
 
 
 		print(iconLoc)
@@ -782,6 +817,10 @@ class Client(object):
 				twitchBot.chat(msg)
 				banlist.append(commands[1])
 				self.socketio.emit("banlist", banlist)
+
+				# write banlist to file:
+				with open("banlist.pkl", "wb") as f:
+					pickle.dump([banlist], f)
 				
 
 			if (commands[0] == "!unban" and username in modlist):
@@ -789,6 +828,10 @@ class Client(object):
 				twitchBot.chat(msg)
 				banlist.remove(commands[1])
 				self.socketio.emit("banlist", banlist)
+
+				# write banlist to file:
+				with open("banlist.pkl", "wb") as f:
+					pickle.dump([banlist], f)
 
 
 			# if (commands[0] == "!mod" and username in adminlist):
@@ -854,7 +897,11 @@ class Client(object):
 				twitchBot.chat(msg)
 				self.chatEnabled = True
 
-			if(cmd == "!fixcontrollers"):
+			if(cmd == "!forcerefresh" and username in modlist):
+				self.socketio.emit("forceRefresh")
+
+
+			if(cmd == "!fixcontrollers" and username in pluslist):
 				twitchBot.chat("Fixing controller order!")
 				# disable lagless while we do this:
 				self.controllerEnabled = False
