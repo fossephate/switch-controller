@@ -1,16 +1,8 @@
-#!/usr/bin/env python3
-import argparse
-import serial
-from time import sleep
-import pynput
-import pyautogui
-import win32api
-import win32con
 
-# for time delaying the input:
+# time
 from threading import Timer
 import time
-from math import sqrt
+from time import sleep
 
 # switch controller:
 from switchcontroller.switchcontroller import *

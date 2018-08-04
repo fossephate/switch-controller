@@ -1,24 +1,14 @@
-#!/usr/bin/env python3
-import argparse
-# import serial
-from time import sleep
-import pynput
-import pyautogui
-import random
 
-# for time delaying the input:
+# time
 from threading import Timer
 import time
-from math import sqrt
+from time import sleep
 
 # switch controller:
 from switchcontroller.switchcontroller import *
 
 # twitch:
 from twitchbot.twitchbot import *
-
-# for time delaying the input:
-from threading import Timer
 
 # for socketio
 from socketIO_client_nexus import SocketIO, LoggingNamespace, BaseNamespace
