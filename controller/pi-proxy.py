@@ -1,3 +1,4 @@
+#!/usr/bin/python
 
 # time
 from threading import Timer
@@ -5,10 +6,10 @@ import time
 from time import sleep
 
 # switch controller:
-from switchcontroller.switchcontroller import *
+# from switchcontroller.switchcontroller import *
 
 # twitch:
-from twitchbot.twitchbot import *
+# from twitchbot.twitchbot import *
 
 # socketio
 from socketIO_client_nexus import SocketIO, LoggingNamespace, BaseNamespace
@@ -75,7 +76,12 @@ class Client(object):
 			self.socketio.emit("join", "proxy")
 			self.start = time.clock()
 
+print("disabling proxy!")
+sudoPassword = "raspberry"
+command = "service squid stop"
+p = os.system("echo %s|sudo -S %s" % (sudoPassword, command))
+
 client = Client()
-# while True:
-# 	client.loop()
-# 	sleep(0.0001)
+while True:
+	client.loop()
+	sleep(0.0001)
