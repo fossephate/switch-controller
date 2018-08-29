@@ -85,119 +85,91 @@ def accurateSleep(duration):
 		e = time.clock()
 		diffInMilliSeconds = (e - s)*1000
 
-def send_and_reset(duration=0.1, reset=1):
-	# controller1.getOutput()
-	# controller1.send(controller1.output)
-	# sleep(duration)
-	# if(reset):
-	# 	controller1.reset()
-	# 	controller1.getOutput()
-	# 	controller1.send(controller1.output)
+def send_and_reset(duration=0.1, reset=1, cNum=0):
+
+	if(cNum == 0):
+		controller = controller1
+	elif(cNum == 1):
+		controller = controller2
+	elif(cNum == 2):
+		controller = controller3
+	elif(cNum == 3):
+		controller = controller4
 
 	sleep(duration)
 
-	if (controller1.dpad == 7):
-		controller1.up = 1
-		controller1.left = 1
-	elif (controller1.dpad == 1):
-		controller1.up = 1
-		controller1.right = 1
-	elif (controller1.dpad == 5):
-		controller1.down = 1
-		controller1.left = 1
-	elif (controller1.dpad == 3):
-		controller1.down = 1
-		controller1.right = 1
-	elif (controller1.dpad == 0):
-		controller1.up = 1
-	elif (controller1.dpad == 4):
-		controller1.down = 1
-	elif (controller1.dpad == 6):
-		controller1.left = 1
-	elif (controller1.dpad == 2):
-		controller1.right = 1
+	if (controller.dpad == 7):
+		controller.up = 1
+		controller.left = 1
+	elif (controller.dpad == 1):
+		controller.up = 1
+		controller.right = 1
+	elif (controller.dpad == 5):
+		controller.down = 1
+		controller.left = 1
+	elif (controller.dpad == 3):
+		controller.down = 1
+		controller.right = 1
+	elif (controller.dpad == 0):
+		controller.up = 1
+	elif (controller.dpad == 4):
+		controller.down = 1
+	elif (controller.dpad == 6):
+		controller.left = 1
+	elif (controller.dpad == 2):
+		controller.right = 1
 
 	vjoy.reset()
 	btns = []
 	btnNum = 0
 
-	if (controller1.up):
+	if (controller.up):
 		btns.append(1)
-	if (controller1.down):
+	if (controller.down):
 		btns.append(2)
-	if (controller1.left):
+	if (controller.left):
 		btns.append(3)
-	if (controller1.right):
+	if (controller.right):
 		btns.append(4)
-	if (controller1.lstick):
+	if (controller.lstick):
 		btns.append(5)
-	if (controller1.l):
+	if (controller.l):
 		btns.append(6)
-	if (controller1.zl):
+	if (controller.zl):
 		btns.append(7)
-	if (controller1.minus):
+	if (controller.minus):
 		btns.append(8)
-	if (controller1.capture):
+	if (controller.capture):
 		btns.append(9)
-	if (controller1.a):
+	if (controller.a):
 		btns.append(10)
-	if (controller1.b):
+	if (controller.b):
 		btns.append(11)
-	if (controller1.x):
+	if (controller.x):
 		btns.append(12)
-	if (controller1.y):
+	if (controller.y):
 		btns.append(13)
-	if (controller1.rstick):
+	if (controller.rstick):
 		btns.append(14)
-	if (controller1.r):
+	if (controller.r):
 		btns.append(15)
-	if (controller1.zr):
+	if (controller.zr):
 		btns.append(16)
-	if (controller1.plus):
+	if (controller.plus):
 		btns.append(17)
-	if (controller1.home):
+	if (controller.home):
 		btns.append(18)
 
 	for n in btns:
 		btnNum += 2**n
 
 	vjoy.data.lButtons = btnNum
-	vjoy.data.wAxisX = controller1.LX * 128
-	vjoy.data.wAxisY = controller1.LY * 128
-	vjoy.data.wAxisXRot = controller1.RX * 128
-	vjoy.data.wAxisYRot = controller1.RY * 128
+	vjoy.data.wAxisX = controller.LX * 128
+	vjoy.data.wAxisY = controller.LY * 128
+	vjoy.data.wAxisXRot = controller.RX * 128
+	vjoy.data.wAxisYRot = controller.RY * 128
 
 	vjoy.update()
-
-
-
-# todo: combine
-def send_and_reset2(duration=0.1, reset=1):
-	controller2.getOutput()
-	controller2.send(controller2.output)
-	sleep(duration)
-	if(reset):
-		controller2.reset()
-		controller2.getOutput()
-		controller2.send(controller2.output)
-
-def send_and_reset3(duration=0.1, reset=1):
-	controller3.getOutput()
-	controller3.send(controller3.output)
-	sleep(duration)
-	if(reset):
-		controller3.reset()
-		controller3.getOutput()
-		controller3.send(controller3.output)
-
-def send_and_reset4(duration=0.1, reset=1):
-	controller4.getOutput()
-	controller4.send(controller4.output)
-	sleep(duration)
-	if(reset):
-		controller4.reset()
-		controller4.getOutput()
-		controller4.send(controller4.output)
 
 def round_down(num, divisor):
     return num - (num%divisor)
@@ -235,7 +207,7 @@ class Client(object):
 		# self.socketio.on("controllerState3", self.on_controller_state3)
 		self.socketio.on("controllerState5", self.on_controller_state1)
 		self.socketio.on("turnTimesLeft", self.on_turn_times_left)
-		self.socketio.emit("join", "wiiu3dscontroller")
+		self.socketio.emit("joinSecure", {"room": "controller", "password": ROOM_SECRET})
 
 		self.receive_events_thread = Thread(target=self._receive_events_thread)
 		self.receive_events_thread.daemon = True
@@ -255,14 +227,15 @@ class Client(object):
 		self.yeaVotes = 0
 		self.nayVotes = 0
 		self.voting = False
+		self.gotoUsed = False
+		self.gotoLeft = False
+		self.chatEnabled = True
+		self.controllerEnabled = True
 		self.currentPlayers = []
-
-		self.laglessEnabled = True
 		self.currentGame = "none"
 
+
 		self.oldArgs2 = "800000000000000 128 128 128 128"
-
-
 
 
 	def _receive_events_thread(self):
@@ -283,7 +256,7 @@ class Client(object):
 
 	def on_controller_state(*args):
 
-		if(not client.laglessEnabled):
+		if(not client.controllerEnabled):
 			return
 
 		state = args[1]
@@ -297,20 +270,8 @@ class Client(object):
 
 		if(cNum == 0):
 			controller = controller1
-		elif(cNum == 1):
-			controller = controller2
-		elif(cNum == 2):
+		else:
 			return
-			cNum = 1
-			controller = controller2
-		elif(cNum == 3):
-			return
-			cNum = 1
-			controller = controller2
-		elif(cNum == 4):
-			return
-			cNum = 1
-			controller = controller2
 
 		controller.reset()
 
@@ -385,14 +346,7 @@ class Client(object):
 
 		duration = 0.001
 		reset = 0
-		if(cNum == 0):
-			send_and_reset(duration, reset)
-		elif(cNum == 1):
-			send_and_reset2(duration, reset)
-		elif(cNum == 2):
-			send_and_reset3(duration, reset)
-		elif(cNum == 3):
-			send_and_reset4(duration, reset)
+		send_and_reset(duration, reset, cNum)
 
 
 	# player 1:

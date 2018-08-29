@@ -10,6 +10,9 @@ from switchcontroller.switchcontroller import *
 # twitch:
 from twitchbot.twitchbot import *
 
+# get sub list:
+from twitchbot.twitchsubs import *
+
 # socketio
 from socketIO_client_nexus import SocketIO, LoggingNamespace, BaseNamespace
 import logging
@@ -111,8 +114,9 @@ def send_and_reset(duration=0.1, reset=1, cNum=0):
 
 	controller.getOutput()
 	controller.send(controller.output)
-	accurateSleep(duration)
-	if(reset):
+	# accurateSleep(duration)
+	sleep(duration)
+	if (reset):
 		controller.reset()
 		controller.getOutput()
 		controller.send(controller.output)
@@ -122,11 +126,10 @@ def round_down(num, divisor):
 
 
 
-gotoList = ["snipperclips", "mk8", "human", "shovel", "octopath", "explosion", "jackbox4", "jackbox3", "fallout", "skyrim", "splatoon2", "celeste", "smo", "rocketleague", "pokemonquest", "wizard", "sonic", "arms", "kirby", "fortnite", "torquel", "botw"]
-validCommands = ["!setforfeitlength", "!setturnlength", "!banlist", "!disableinternet", "!enableinternet", "!forcerefresh", "nay", "yea", "!enablechat", "!disablechat", "!enablegoto", "!disablegoto", "!unmod", "!mod", "!fixcontrollers", "!goto snipperclips", "!pluslist", "!unban", "!ban", "!removeplus", "!giveplus", "!goto human", "!goto shovel", "!goto octopath", "!goto explosion", "!goto jackbox4", "!goto jackbox3", "!commands", "!goto fallout", "!goto fortnite", "!goto torquel", "!goto pokemonquest", "!restart", "!restart1", "!restart2", "!restart3", "!restartscript", "!restartserver", "!help", "votenay", "voteyea", "!goto wizard", "!goto cave", "!goto sonic", "!goto skyrim", "!goto rocketleague", "!goto arms", "!goto celeste", "!goto mk8", "!goto splatoon2", "!goto isaac", "!goto mario", "!goto botw", "!goto kirby", "!goto smo", "!goto", "lockon", "hhsprint", "hsprint", "sprint", "!controls", "!goto", "home", "lstick", "rstick", "spin", "swim", "back flip", "ground pound", "groundpound", "gp", "bf", "cap bounce", "sdive", "sdive2", "hdive", "hdive2", "hdive3", "dive", "dive2", "dive3", "roll", "roll2", "backflip", "backflip2", "sssu", "sssd", "sssl", "sssr", "sb", "suu", "", "up", "down", "left", "right", "u", "d", "l", "r", "hup", "hdown", "hleft", "hright", "hhup", "hhdown", "hhleft", "hhright", "hu", "hd", "hl", "hr", "su", "sd", "sl", "sr", "sup", "sdown", "sleft", "sright", "ssu", "ssd", "ssl", "ssr", "ssup", "ssdown", "ssleft", "ssright", "look up", "look down", "look left", "look right", "lu", "ld", "ll", "lr", "hlu", "hld", "hll", "hlr", "slu", "sld", "sll", "slr", "dup", "ddown", "dleft", "dright", "du", "dd", "dl", "dr", "a", "b", "x", "y", "ha", "hb", "hx", "hy", "hhb", "hhhb", "l", "zl", "r", "zr", "plus", "minus", "long jump", "long jump2", "long jump3", "jump forward", "jump forward2", "jump back", "jump back2", "dive", "dive2"]
+gameList = ["hollow", "paladins", "snipperclips", "mk8", "human", "shovel", "octopath", "explosion", "jackbox4", "jackbox3", "fallout", "skyrim", "splatoon2", "celeste", "smo", "rocketleague", "pokemonquest", "wizard", "sonic", "arms", "kirby", "fortnite", "torquel", "botw"]
+validCommands = ["!status", "!internetstatus", "!rainbow", "!setgame", "!forcegoto", "!sublist", "!4p", "!3p", "!2p", "!1p", "!modlist", "!lock", "!egg", "!rr", "!discord", "!games", "!setforfeitlength", "!setturnlength", "!banlist", "!disableinternet", "!enableinternet", "!forcerefresh", "nay", "yea", "!enablechat", "!disablechat", "!enablegoto", "!disablegoto", "!unmod", "!mod", "!fixcontrollers", "!goto snipperclips", "!pluslist", "!unban", "!ban", "!removeplus", "!giveplus", "!goto human", "!goto shovel", "!goto octopath", "!goto explosion", "!goto jackbox4", "!goto jackbox3", "!commands", "!goto fallout", "!goto fortnite", "!goto torquel", "!goto pokemonquest", "!restart", "!restart1", "!restart2", "!restart3", "!restartscript", "!restartserver", "!help", "votenay", "voteyea", "!goto wizard", "!goto cave", "!goto sonic", "!goto skyrim", "!goto rocketleague", "!goto arms", "!goto celeste", "!goto mk8", "!goto splatoon2", "!goto isaac", "!goto mario", "!goto botw", "!goto kirby", "!goto smo", "!goto", "lockon", "hhsprint", "hsprint", "sprint", "!controls", "!goto", "home", "lstick", "rstick", "spin", "swim", "back flip", "ground pound", "groundpound", "gp", "bf", "cap bounce", "sdive", "sdive2", "hdive", "hdive2", "hdive3", "dive", "dive2", "dive3", "roll", "roll2", "backflip", "backflip2", "sssu", "sssd", "sssl", "sssr", "sb", "suu", "", "up", "down", "left", "right", "u", "d", "l", "r", "hup", "hdown", "hleft", "hright", "hhup", "hhdown", "hhleft", "hhright", "hu", "hd", "hl", "hr", "su", "sd", "sl", "sr", "sup", "sdown", "sleft", "sright", "ssu", "ssd", "ssl", "ssr", "ssup", "ssdown", "ssleft", "ssright", "look up", "look down", "look left", "look right", "lu", "ld", "ll", "lr", "hlu", "hld", "hll", "hlr", "slu", "sld", "sll", "slr", "dup", "ddown", "dleft", "dright", "du", "dd", "dl", "dr", "a", "b", "x", "y", "ha", "hb", "hx", "hy", "hhb", "hhhb", "l", "zl", "r", "zr", "plus", "minus", "long jump", "long jump2", "long jump3", "jump forward", "jump forward2", "jump back", "jump back2", "dive", "dive2"]
 pluslist = []
-modlist = ["alua2020", "ogcristofer", "stravos96", "yanchan230", "silvermagpi", "twitchplaysconsoles", "fosseisanerd", "tpnsbot"]
-adminlist = ["silvermagpi", "twitchplaysconsoles", "fosseisanerd"]
+modlist = ["beanjr_yt", "alua2020", "ogcristofer", "stravos96", "yanchan230", "silvermagpi", "twitchplaysconsoles", "fosseisanerd", "tpnsbot"]
 banlist = []
 sublist = []
 voted = []
@@ -139,13 +142,17 @@ oldArgs = "800000000000000 128 128 128 128"
 
 
 # load plus list:
-if(os.path.exists("pluslist.pkl")):
+if (os.path.exists("pluslist.pkl")):
     with open("pluslist.pkl", "rb") as f:
         pluslist = pickle.load(f)[0]
 # load ban list:
-if(os.path.exists("banlist.pkl")):
+if (os.path.exists("banlist.pkl")):
     with open("banlist.pkl", "rb") as f:
         banlist = pickle.load(f)[0]
+
+# get sub list:
+sublist = getSubList()
+print(sublist)
 
 
 class Client(object):
@@ -158,6 +165,7 @@ class Client(object):
 		self.socketio.on("controllerState3", self.on_controller_state3)
 		self.socketio.on("controllerState4", self.on_controller_state4)
 		self.socketio.on("turnTimesLeft", self.on_turn_times_left)
+		self.socketio.on("internetStatus", self.on_internet_status)
 		self.socketio.emit("joinSecure", {"room": "controller", "password": ROOM_SECRET})
 		self.socketio.emit("banlist", banlist)
 		self.socketio.emit("modlist", modlist)
@@ -183,6 +191,7 @@ class Client(object):
 		self.nayVotes = 0
 		self.voting = False
 		self.gotoUsed = False
+		self.gotoLeft = False
 		self.chatEnabled = True
 		self.controllerEnabled = True
 		self.currentPlayers = []
@@ -210,7 +219,7 @@ class Client(object):
 
 	def on_controller_state(*args):
 
-		if(not client.controllerEnabled):
+		if (not client.controllerEnabled):
 			return
 
 		# if (client.currentPla)
@@ -227,13 +236,13 @@ class Client(object):
 
 		controller = None
 
-		if(cNum == 0):
+		if (cNum == 0):
 			controller = controller1
-		elif(cNum == 1):
+		elif (cNum == 1):
 			controller = controller2
-		elif(cNum == 2):
+		elif (cNum == 2):
 			controller = controller3
-		elif(cNum == 3):
+		elif (cNum == 3):
 			controller = controller4
 
 		controller.reset()
@@ -316,8 +325,7 @@ class Client(object):
 		duration = 0.001
 		reset = 0
 		send_and_reset(duration, reset, cNum)
-
-
+	
 	# player 1:
 	def on_controller_state1(*args):
 		client.on_controller_state(args[1], 0)
@@ -334,8 +342,15 @@ class Client(object):
 	def on_controller_state4(*args):
 		client.on_controller_state(args[1], 3)
 
-	def findImage(self, frame, imagefile):
+	def on_internet_status(*args):
+		msg = ""
+		if (args[1]):
+			msg = "The internet is on right now!"
+		else:
+			msg = "The internet is off right now!"
+		twitchBot.chat(msg)
 
+	def findImage(self, frame, imagefile):
 
 		img_rgb = frame# where we're looking for the icon
 		img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
@@ -397,14 +412,41 @@ class Client(object):
 
 	def goto_game(self, imagefile, delay=50, nameofgame="Twitch Plays"):
 
-		# update the current game
-		self.currentGame = nameofgame
-
 		# disable controls while we do this:
 		self.controllerEnabled = False
 		self.chatEnabled = False
-		# set voted players to none
-		del voted[:]
+
+		# if (self.currentGame == "The Legend of Zelda: Breath of the Wild"):
+		# 	controller1.reset()
+		# 	controller1.plus = 1
+		# 	send_and_reset(0.1, 1)
+		# 	controller1.r = 1
+		# 	send_and_reset(0.1, 1)
+		# 	controller1.r = 1
+		# 	send_and_reset(0.1, 1)
+
+		# if (self.currentGame == "Super Mario Odyssey"):
+		# 	controller1.reset()
+		# 	controller1.plus = 1
+		# 	send_and_reset(0.1, 1)
+		# 	controller1.LY = STICK_MAX
+		# 	send_and_reset(0.1, 1)
+		# 	sleep(0.5)
+		# 	controller1.LY = STICK_MAX
+		# 	send_and_reset(0.1, 1)
+		# 	sleep(0.5)
+		# 	controller1.LY = STICK_MAX
+		# 	send_and_reset(0.1, 1)
+		# 	sleep(0.5)
+		# 	controller1.LY = STICK_MAX
+		# 	send_and_reset(0.1, 1)
+		# 	sleep(0.5)
+		# 	controller1.a = 1
+		# 	send_and_reset(0.1, 1)
+		# 	sleep(8)
+
+		# update the current game
+		self.currentGame = nameofgame
 
 		# get to game selection screen:
 		controller1.reset()
@@ -434,53 +476,25 @@ class Client(object):
 		hwnd = win32gui.FindWindow(None, "OBS")
 		# hwnd = win32gui.GetDesktopWindow()#for screenshot of entire screen
 
-		wDC = win32gui.GetWindowDC(hwnd)
-		myDC = win32ui.CreateDCFromHandle(wDC)
-		newDC = myDC.CreateCompatibleDC()
-		myBitMap = win32ui.CreateBitmap()
-		myBitMap.CreateCompatibleBitmap(myDC, SSWidth, SSHeight)
-		newDC.SelectObject(myBitMap)
-		newDC.BitBlt((0,0),(SSWidth, SSHeight) , myDC, (SSx1,SSy1), win32con.SRCCOPY)
+		iconLoc = None
+		counter = 0
+		while (iconLoc == None and counter < 5):
 
-		bmpinfo = myBitMap.GetInfo()
-		bmpstr = myBitMap.GetBitmapBits(True)
-		img = Image.frombuffer(
-		    "RGB",
-		    (bmpinfo["bmWidth"], bmpinfo["bmHeight"]),
-		    bmpstr, "raw", "BGRX", 0, 1)
-
-		# Free Resources
-		myDC.DeleteDC()
-		newDC.DeleteDC()
-		win32gui.ReleaseDC(hwnd, wDC)
-		win32gui.DeleteObject(myBitMap.GetHandle())
-
-		#img = ImageGrab.grab(bbox=(x1, y1, x2, y2))#.crop(box) #x, y, w, h
-		img_np = np.array(img)
-		frame = cv2.cvtColor(img_np, cv2.COLOR_BGR2RGB)
-		hsv = cv2.cvtColor(img_np, cv2.COLOR_BGR2HSV)
-
-		iconLoc = self.findImage(frame, imagefile)
-		# cursorLoc = self.findImage(frame, "icons/selectbar.png")
-
-
-		if iconLoc == None:
-
-			# move down and try again:
-			# move down 3 times and up once:
-			controller1.LY = STICK_MAX
-			send_and_reset(0.1, 1)
-			sleep(0.5)
-			controller1.LY = STICK_MAX
-			send_and_reset(0.1, 1)
-			sleep(0.5)
-			controller1.LY = STICK_MAX
-			send_and_reset(0.1, 1)
-			sleep(0.5)
-			controller1.LY = STICK_MIN
-			send_and_reset(0.1, 1)
-			sleep(0.5)
-
+			if (counter > 0):
+				# move down and try again:
+				# move down 3 times and up once:
+				controller1.LY = STICK_MAX
+				send_and_reset(0.1, 1)
+				sleep(0.5)
+				controller1.LY = STICK_MAX
+				send_and_reset(0.1, 1)
+				sleep(0.5)
+				controller1.LY = STICK_MAX
+				send_and_reset(0.1, 1)
+				sleep(0.5)
+				controller1.LY = STICK_MIN
+				send_and_reset(0.1, 1)
+				sleep(0.5)
 
 			wDC = win32gui.GetWindowDC(hwnd)
 			myDC = win32ui.CreateDCFromHandle(wDC)
@@ -507,105 +521,24 @@ class Client(object):
 			img_np = np.array(img)
 			frame = cv2.cvtColor(img_np, cv2.COLOR_BGR2RGB)
 			hsv = cv2.cvtColor(img_np, cv2.COLOR_BGR2HSV)
+
 			iconLoc = self.findImage(frame, imagefile)
+			# cursorLoc = self.findImage(frame, "icons/selectbar.png")
 
-			# try again:
-			if iconLoc == None:
+			if (iconLoc != None):
+				break
 
-				# move down and try again:
-				# move down 3 times and up once:
-				controller1.LY = STICK_MAX
-				send_and_reset(0.1, 1)
-				sleep(0.5)
-				controller1.LY = STICK_MAX
-				send_and_reset(0.1, 1)
-				sleep(0.5)
-				controller1.LY = STICK_MAX
-				send_and_reset(0.1, 1)
-				sleep(0.5)
-				controller1.LY = STICK_MIN
-				send_and_reset(0.1, 1)
-				sleep(0.5)
+			counter += 1
 
-				wDC = win32gui.GetWindowDC(hwnd)
-				myDC = win32ui.CreateDCFromHandle(wDC)
-				newDC = myDC.CreateCompatibleDC()
-				myBitMap = win32ui.CreateBitmap()
-				myBitMap.CreateCompatibleBitmap(myDC, SSWidth, SSHeight)
-				newDC.SelectObject(myBitMap)
-				newDC.BitBlt((0,0),(SSWidth, SSHeight) , myDC, (SSx1,SSy1), win32con.SRCCOPY)
 
-				bmpinfo = myBitMap.GetInfo()
-				bmpstr = myBitMap.GetBitmapBits(True)
-				img = Image.frombuffer(
-				    "RGB",
-				    (bmpinfo["bmWidth"], bmpinfo["bmHeight"]),
-				    bmpstr, "raw", "BGRX", 0, 1)
-
-				# Free Resources
-				myDC.DeleteDC()
-				newDC.DeleteDC()
-				win32gui.ReleaseDC(hwnd, wDC)
-				win32gui.DeleteObject(myBitMap.GetHandle())
-
-				#img = ImageGrab.grab(bbox=(x1, y1, x2, y2))#.crop(box) #x, y, w, h
-				img_np = np.array(img)
-				frame = cv2.cvtColor(img_np, cv2.COLOR_BGR2RGB)
-				hsv = cv2.cvtColor(img_np, cv2.COLOR_BGR2HSV)
-				iconLoc = self.findImage(frame, imagefile)
-
-				# try again:
-				if iconLoc == None:
-					# move down and try again:
-					# move down 3 times and up once:
-					controller1.LY = STICK_MAX
-					send_and_reset(0.1, 1)
-					sleep(0.5)
-					controller1.LY = STICK_MAX
-					send_and_reset(0.1, 1)
-					sleep(0.5)
-					controller1.LY = STICK_MAX
-					send_and_reset(0.1, 1)
-					sleep(0.5)
-					controller1.LY = STICK_MIN
-					send_and_reset(0.1, 1)
-					sleep(0.5)
-					
-					wDC = win32gui.GetWindowDC(hwnd)
-					myDC = win32ui.CreateDCFromHandle(wDC)
-					newDC = myDC.CreateCompatibleDC()
-					myBitMap = win32ui.CreateBitmap()
-					myBitMap.CreateCompatibleBitmap(myDC, SSWidth, SSHeight)
-					newDC.SelectObject(myBitMap)
-					newDC.BitBlt((0,0),(SSWidth, SSHeight) , myDC, (SSx1,SSy1), win32con.SRCCOPY)
-
-					bmpinfo = myBitMap.GetInfo()
-					bmpstr = myBitMap.GetBitmapBits(True)
-					img = Image.frombuffer(
-					    "RGB",
-					    (bmpinfo["bmWidth"], bmpinfo["bmHeight"]),
-					    bmpstr, "raw", "BGRX", 0, 1)
-
-					# Free Resources
-					myDC.DeleteDC()
-					newDC.DeleteDC()
-					win32gui.ReleaseDC(hwnd, wDC)
-					win32gui.DeleteObject(myBitMap.GetHandle())
-
-					#img = ImageGrab.grab(bbox=(x1, y1, x2, y2))#.crop(box) #x, y, w, h
-					img_np = np.array(img)
-					frame = cv2.cvtColor(img_np, cv2.COLOR_BGR2RGB)
-					hsv = cv2.cvtColor(img_np, cv2.COLOR_BGR2HSV)
-					iconLoc = self.findImage(frame, imagefile)
-
-					# give up if we still can't find it:
-					if iconLoc == None:
-						controller1.LY = STICK_MIN
-						send_and_reset(1.5, 1)
-						controller1.a = 1
-						send_and_reset(0.1)
-						self.controllerEnabled = True
-						return
+		# give up if we still can't find it:
+		if iconLoc == None:
+			controller1.LY = STICK_MIN
+			send_and_reset(1.5, 1)
+			controller1.a = 1
+			send_and_reset(0.1)
+			self.controllerEnabled = True
+			return
 
 
 		print(iconLoc)
@@ -700,11 +633,13 @@ class Client(object):
 		leaving = False
 		timeGotoisDisabled = 0
 
-		if(self.yeaVotes > self.nayVotes):
+		if (self.yeaVotes > self.nayVotes):
+			self.gotoLeft = True
 			msg = msg + " We will be LEAVING"
 			leaving = True
 			timeGotoisDisabled = 8*60
 		else:
+			self.gotoLeft = False
 			msg = msg + " We will be STAYING"
 			timeGotoisDisabled = 2*60
 
@@ -718,8 +653,9 @@ class Client(object):
 
 		del voted[:]
 
-		if(leaving):
+		if (leaving):
 			self.goto_game(imagefile, delay, nameofgame)
+		return
 
 	def reenable_goto(self):
 		self.gotoUsed = False
@@ -727,13 +663,17 @@ class Client(object):
 
 	def goto_game_vote(self, imagefile, delay=50, nameofgame="Twitch Plays"):
 
-		if(self.voting == True):
+		if (self.voting == True):
 			msg = "The !goto command is disabled right now"
 			twitchBot.chat(msg)
 			return
 
-		if(self.gotoUsed == True):
-			msg = "The !goto command was used in the last 8 minutes, please wait before trying to change the game again"
+		if (self.gotoUsed == True):
+			msg = ""
+			if (self.gotoLeft == True):
+				msg = "The !goto command was used in the last 8 minutes, please wait before trying to change the game again"
+			else:
+				msg = "The !goto command was used in the last 2 minutes, please wait before trying to change the game again"
 			twitchBot.chat(msg)
 			return
 
@@ -761,19 +701,6 @@ class Client(object):
 
 		cmd = "none"
 
-		if(commands[0] == "!controls" or commands[0] == "!help"):
-			msg = "goto https://twitchplaysnintendoswitch.com or look at the description for the chat controls,\
-			 you can also type \"!goto [game]\" (without brackets) to switch games. use !goto for a list of games! use !commands for a list of commands!"
-			twitchBot.chat(msg)
-
-		if(len(commands) == 1 and commands[0] == "!goto"):
-			msg = "use \"!goto [game]\" (without brackets) to switch games! list: smo, botw, fortnite, fallout, kirby, wizard, splatoon2, skyrim, sonic, celeste, torquel, pokemonquest, shovel, human, octopath, jackbox3, jackbox4, mk8, explosion, rocketleague, arms"
-			twitchBot.chat(msg)
-
-		if(len(commands) == 1 and commands[0] == "!commands"):
-			msg = "(mods only): \"!restartscript\", \"!restartserver\" \"!giveplus [user]\", \"!ban [user]\", \"!unban [user]\", \"!removeplus [user]\", \"!disablechat\", \"!enablechat\", \"!disablegoto\", \"!enablegoto\", \"!setturnlength [lengthInMS]\", \"!setforfeitlength [lengthInMS]\" (plus only): \"!disableinternet\", \"!enableinternet\", \"!fixcontrollers\" (anyone): \"!restart1\", \"!restart2\", \"!restart3\", \"!pluslist\", \"!banlist\", \"!goto [game]\""
-			twitchBot.chat(msg)
-
 		valid = True
 		for cmd in commands:
 			if (cmd not in validCommands and "+" not in cmd):
@@ -796,11 +723,11 @@ class Client(object):
 			if ("lockon" in cmd):
 				self.lockon = not self.lockon
 
-			if(self.voting):
-				if((cmd == "voteyea" or cmd == "yea") and username not in voted):
+			if (self.voting):
+				if ((cmd == "voteyea" or cmd == "yea") and username not in voted):
 					voted.append(username)
 					self.yeaVotes += 1
-				if((cmd == "votenay" or cmd == "nay") and username not in voted):
+				if ((cmd == "votenay" or cmd == "nay") and username not in voted):
 					voted.append(username)
 					self.nayVotes += 1
 
@@ -862,6 +789,17 @@ class Client(object):
 				twitchBot.chat(msg)
 				self.socketio.emit("setForfeitLength", commands[1])
 
+			if (commands[0] == "!rr" and username in pluslist):
+				self.socketio.emit("rickroll", commands[1])
+
+			if (commands[0] == "!rainbow" and username in pluslist):
+				self.socketio.emit("rainbow", commands[1])
+
+			# if (commands[0] == "!game" and username in modlist):
+			# 	self.currentGame = commands[1]
+			# 	msg = "Setting game to: " + commands[1]
+			# 	twitchBot.chat(msg)
+
 
 			# if (commands[0] == "!mod" and username in adminlist):
 			# 	msg = "Modding: " + commands[1]
@@ -879,9 +817,48 @@ class Client(object):
 
 			cmd = commands[0]
 
+
+			if (cmd == "!controls" or cmd == "!help"):
+				msg = "goto https://twitchplaysnintendoswitch.com or look at the description for the chat controls,\
+				 you can also type \"!goto [game]\" (without brackets) to switch games. use !goto for a list of games! use !commands for a list of commands!"
+				twitchBot.chat(msg)
+
+			if (cmd == "!goto" or cmd == "!games"):
+				msg = "use \"!goto [game]\" (without brackets) to switch games! list: "
+				for game in gameList:
+					msg += game + ", "
+				msg[:-4]
+				twitchBot.chat(msg)
+
+			if (cmd == "!status" or cmd == "!internetstatus"):
+				msg = "Checking internet status!"
+				twitchBot.chat(msg)
+				self.socketio.emit("getInternetStatus")
+
+			if (cmd == "!commands"):
+				msg = "(mods only): \"!restartscript\", \"!restartserver\" \"!giveplus [user]\", \"!ban [user]\", \"!unban [user]\", \"!removeplus [user]\", \
+				\"!disablechat\", \"!enablechat\", \"!disablegoto\", \"!enablegoto\", \"!setturnlength [lengthInMS]\", \"!setforfeitlength [lengthInMS]\" (plus only): \
+				\"!disableinternet\", \"!enableinternet\", \"!fixcontrollers\", \"!rr [user]\", \"!rainbow [user]\" (anyone): \"!restart1\", \"!restart2\", \"!restart3\", \
+				\"!banlist\", \"!pluslist\", \"!sublist\", \"!modlist\", \"!discord\", \"!site\", \"!goto [game]\""
+				twitchBot.chat(msg)
+
+			if (cmd == "!discord"):
+				msg = "Discord invite link: https://discord.gg/ARTbddH"
+				twitchBot.chat(msg)
+
+			if (cmd == "!site"):
+				msg = "https://twitchplaysnintendoswitch.com"
+				twitchBot.chat(msg)
+
 			if (cmd == "!pluslist"):
 				msg = "plus list: "
 				for user in pluslist:
+					msg += user + ","
+				twitchBot.chat(msg)
+
+			if (cmd == "!modlist"):
+				msg = "mod list: "
+				for user in modlist:
 					msg += user + ","
 				twitchBot.chat(msg)
 
@@ -891,61 +868,118 @@ class Client(object):
 					msg += user + ","
 				twitchBot.chat(msg)
 
-			if(cmd == "!restart1" or cmd == "!restart"):
+			if (cmd == "!sublist"):
+				msg = "sub list: "
+				for user in sublist:
+					msg += user + ","
+				twitchBot.chat(msg)
+
+			if (cmd == "!restart1" or cmd == "!restart"):
 				# self.socketio.emit("restart")
 				twitchBot.chat("Restarting lagless1!")
 				os.system("taskkill /f /im streamr.exe")
 
-			if(cmd == "!restart2"):
+			if (cmd == "!restart2"):
 				twitchBot.chat("Restarting lagless2!")
 				self.socketio.emit("restart2")
 
-			if(cmd == "!restart3"):
+			if (cmd == "!restart3"):
 				twitchBot.chat("Restarting lagless3!")
 				self.socketio.emit("restart3")
 
-			if(cmd == "!restartserver"):
+			if (cmd == "!restartserver"):
 				twitchBot.chat("Restarting the server! maybe @fosse if you're using this!")
 				self.socketio.emit("restart server")
 
-			if(cmd == "!restartscript"):
+			if (cmd == "!restartscript"):
 				twitchBot.chat("Restarting the python script!")
 				with open("pluslist.pkl", "wb") as f:
 					pickle.dump([pluslist], f)
 				os.system("taskkill /f /im python.exe")
 
-			if (commands[0] == "!disablegoto" and username in modlist):
+			if (cmd == "!disablegoto" and username in modlist):
 				msg = "Disabling !goto"
 				twitchBot.chat(msg)
 				self.voting = True
-			if (commands[0] == "!enablegoto" and username in modlist):
+			if (cmd == "!enablegoto" and username in modlist):
 				msg = "Enabling !goto"
 				twitchBot.chat(msg)
 				self.voting = False
 
-			if (commands[0] == "!disablechat" and username in modlist):
+			if (cmd == "!disablechat" and username in modlist):
 				msg = "Disabling chat commands!"
 				twitchBot.chat(msg)
 				self.chatEnabled = False
-			if (commands[0] == "!enablechat" and username in modlist):
+			if (cmd == "!enablechat" and username in modlist):
 				msg = "Enabling chat commands!"
 				twitchBot.chat(msg)
 				self.chatEnabled = True
 
-			if(cmd == "!forcerefresh" and username in modlist):
+			if (cmd == "!lock" and username in pluslist):
+				msg = "locking!"
+				twitchBot.chat(msg)
+				self.voting = True
+				self.chatEnabled = False
+				self.socketio.emit("lock")
+
+			if (cmd == "!unlock" and username in modlist):
+				msg = "Unlocking!"
+				twitchBot.chat(msg)
+				self.voting = False
+				self.chatEnabled = True
+				self.socketio.emit("unlock")
+
+			if (cmd == "!1p" and username in modlist):
+				msg = "Changing to 1 Player Mode!"
+				twitchBot.chat(msg)
+				self.socketio.emit("setMaxPlayers", 1)
+
+			if (cmd == "!2p" and username in modlist):
+				msg = "Changing to 2 Player Mode!"
+				twitchBot.chat(msg)
+				self.socketio.emit("setMaxPlayers", 2)
+
+			if (cmd == "!3p" and username in modlist):
+				msg = "Changing to 3 Player Mode!"
+				twitchBot.chat(msg)
+				self.socketio.emit("setMaxPlayers", 3)
+
+			if (cmd == "!4p" and username in modlist):
+				msg = "Changing to 4 Player Mode!"
+				twitchBot.chat(msg)
+				self.socketio.emit("setMaxPlayers", 4)
+
+			if (cmd == "!5p" and username in modlist):
+				msg = "Changing to 5 Player Mode!"
+				twitchBot.chat(msg)
+				self.socketio.emit("setMaxPlayers", 5)
+
+			if (cmd == "!forcerefresh" and username in modlist):
 				self.socketio.emit("forceRefresh")
 
-			if(cmd == "!disableinternet" and username in pluslist):
+			if (cmd == "!disableinternet" and username in pluslist):
 				msg = "Disabling internet accesss!"
 				twitchBot.chat(msg)
 				self.socketio.emit("disableInternet")
-			if(cmd == "!enableinternet" and username in pluslist):
+			if (cmd == "!enableinternet" and username in pluslist):
 				msg = "Enabling internet access!"
 				twitchBot.chat(msg)
 				self.socketio.emit("enableInternet")
 
+			if (commands[0] == "!egg"):
+				# msg = "Rickrolling!: " + commands[1]
+				# twitchBot.chat(msg)
+				self.socketio.emit("rickroll", username)
 
-			if(cmd == "!fixcontrollers" and username in pluslist):
+			if (commands[0] == "!rr"):
+				self.socketio.emit("rickroll", username)
+
+
+			if (commands[0] == "!rainbow"):
+				self.socketio.emit("rainbow", username)
+
+
+			if (cmd == "!fixcontrollers" and username in pluslist):
 				twitchBot.chat("Fixing controller order!")
 				# disable lagless while we do this:
 				self.controllerEnabled = False
@@ -1023,63 +1057,94 @@ class Client(object):
 				
 
 		# goto commands:
-		if (len(commands) == 2 and commands[0] == "!goto"):
+		if (len(commands) == 2 and (commands[0] == "!goto" or (commands[0] == "!forcegoto" and username in modlist) or (commands[0] == "!setgame" and username in modlist))):
 			cmd = commands[1]
-			if(cmd == "smo"):
-				self.goto_game_vote("icons/smo.png", 30, "Super Mario Odyssey")
-			if(cmd == "botw"):
-				self.goto_game_vote("icons/botw.png", 20, "The Legend of Zelda: Breath of the Wild")
-			if(cmd == "celeste"):
-				self.goto_game_vote("icons/celeste.png", 10, "Celeste")
-			if(cmd == "kirby"):
-				self.goto_game_vote("icons/kirby.png", 10)
-			if(cmd == "splatoon2"):
-				self.goto_game_vote("icons/splatoon2.png", 10, "Splatoon 2")
-			if(cmd == "sonic"):
-				self.goto_game_vote("icons/sonic.png", 10, "Sonic Mania")
-			if(cmd == "mk8"):
-				self.goto_game_vote("icons/mk8.png", 10, "Mario Kart 8")
-			if(cmd == "arms"):
-				self.goto_game_vote("icons/arms.png", 10)
-			if(cmd == "skyrim"):
-				self.goto_game_vote("icons/skyrim.png", 40, "The Elder Scrolls V: Skyrim")
-			if(cmd == "rocketleague"):
-				self.goto_game_vote("icons/rocketleague.png", 10, "Rocket League")
-			if(cmd == "wizard"):
-				self.goto_game_vote("icons/wizard.png", 10, "Wizard of Legend")
-			if(cmd == "pokemonquest"):
-				self.goto_game_vote("icons/pokemonquest.png", 10, "Pokemon Quest")
-			if(cmd == "torquel"):
-				self.goto_game_vote("icons/torquel.png", 10)
-			if(cmd == "fallout"):
-				self.goto_game_vote("icons/fallout.png", 10)
-			if(cmd == "fortnite"):
-				self.goto_game_vote("icons/fortnite2.png", 10, "Fortnite")
-			if(cmd == "jackbox3"):
-				self.goto_game_vote("icons/jackbox3.png", 10)
-			if(cmd == "jackbox4"):
-				self.goto_game_vote("icons/jackbox4.png", 10)
-			if(cmd == "shovel"):
-				self.goto_game_vote("icons/shovel.png", 10)
-			if(cmd == "octopath"):
-				self.goto_game_vote("icons/octopathprologuedemo.png", 10)
-			if(cmd == "explosion"):
-				self.goto_game_vote("icons/explosion.png", 10)
-			if(cmd == "human"):
-				self.goto_game_vote("icons/human.png", 10)
-			if(cmd == "snipperclips"):
-				self.goto_game_vote("icons/snipperclips.png", 10)
-			# if(cmd == "!goto cave"):
-			# 	self.goto_game("icons/cave.png", 10)
-			# if(cmd == "!goto isaac"):
-			# 	self.goto_game("icons/isaac.png", 10)
-			# if(cmd == "!goto mario"):
-			# 	self.goto_game_vote("icons/mario.png", 10)
 
-		if(not self.chatEnabled):
+			goto = None
+			waitTime = 0
+			imageLoc = ""
+			nameofgame = ""
+
+			if (cmd == "smo"):
+				imageLoc, waitTime, nameofgame = "icons/smo.png", 30, "Super Mario Odyssey"
+			if (cmd == "botw"):
+				imageLoc, waitTime, nameofgame = "icons/botw.png", 20, "The Legend of Zelda: Breath of the Wild"
+			if (cmd == "celeste"):
+				imageLoc, waitTime, nameofgame = "icons/celeste.png", 10, "Celeste"
+			if (cmd == "kirby"):
+				imageLoc, waitTime, nameofgame = "icons/kirby.png", 10, "Kirby: Star Allies"
+			if (cmd == "splatoon2"):
+				imageLoc, waitTime, nameofgame = "icons/splatoon2.png", 10, "Splatoon 2"
+			if (cmd == "sonic"):
+				imageLoc, waitTime, nameofgame = "icons/sonic.png", 10, "Sonic Mania"
+			if (cmd == "mk8"):
+				imageLoc, waitTime, nameofgame = "icons/mk8.png", 10, "Mario Kart 8"
+			if (cmd == "arms"):
+				imageLoc, waitTime, nameofgame = "icons/arms.png", 10, "Arms"
+			if (cmd == "skyrim"):
+				imageLoc, waitTime, nameofgame = "icons/skyrim.png", 40, "The Elder Scrolls V: Skyrim"
+			if (cmd == "rocketleague"):
+				imageLoc, waitTime, nameofgame = "icons/rocketleague.png", 10, "Rocket League"
+			if (cmd == "wizard"):
+				imageLoc, waitTime, nameofgame = "icons/wizard.png", 10, "Wizard of Legend"
+			if (cmd == "pokemonquest"):
+				imageLoc, waitTime, nameofgame = "icons/pokemonquest.png", 10, "Pokemon Quest"
+			if (cmd == "torquel"):
+				imageLoc, waitTime, nameofgame = "icons/torquel.png", 10, "TorqueL"
+			if (cmd == "fallout"):
+				imageLoc, waitTime, nameofgame = "icons/fallout.png", 10, "Fallout Shelter"
+			if (cmd == "fortnite"):
+				imageLoc, waitTime, nameofgame = "icons/fortnite2.png", 10, "Fortnite"
+			if (cmd == "jackbox3"):
+				imageLoc, waitTime, nameofgame = "icons/jackbox3.png", 10, "The Jackbox Party Pack 3"
+			if (cmd == "jackbox4"):
+				imageLoc, waitTime, nameofgame = "icons/jackbox4.png", 10, "The Jackbox Party Pack 4"
+			if (cmd == "shovel"):
+				imageLoc, waitTime, nameofgame = "icons/shovel.png", 10, "Shovel Knight"
+			if (cmd == "octopath"):
+				imageLoc, waitTime, nameofgame = "icons/octopathprologuedemo.png", 10, "Octopath Traveler"
+			if (cmd == "explosion"):
+				imageLoc, waitTime, nameofgame = "icons/explosion.png", 10, "Graceful Explosion Machine"
+			if (cmd == "human"):
+				imageLoc, waitTime, nameofgame = "icons/human.png", 10, "Human: Fall Flat"
+			if (cmd == "snipperclips"):
+				imageLoc, waitTime, nameofgame = "icons/snipperclips.png", 10, "Snipperclips: Cut It Out, Together!"
+			if (cmd == "paladins"):
+				imageLoc, waitTime, nameofgame = "icons/paladins.png", 10, "Paladins"
+			if (cmd == "hollow"):
+				imageLoc, waitTime, nameofgame = "icons/hollow.png", 10, "Hollow Knight"
+			# if (cmd == "!goto cave"):
+			# 	imageLoc, waitTime, nameofgame = "icons/cave.png", 10, "Cave Story"
+			# if (cmd == "!goto isaac"):
+			# 	imageLoc, waitTime, nameofgame = "icons/isaac.png", 10, "The Binding of Isaac: Afterbirth"
+			# if (cmd == "!goto mario"):
+			# 	imageLoc, waitTime, nameofgame = "icons/mario.png", 10, "Twitch Plays"
+
+
+			if (self.currentGame == nameofgame):
+				msg = "We're already playing this game!"
+				twitchBot.chat(msg)
+				return
+
+			if (commands[0] == "!setgame"):
+				self.currentGame = nameofgame
+				msg = "!game " + nameofgame
+				twitchBot.chat(msg)
+				return
+
+
+
+			if (commands[0] == "!forcegoto"):
+				goto = self.goto_game
+			else:
+				goto = self.goto_game_vote
+
+			goto(imageLoc, waitTime, nameofgame)
+
+		if (not self.chatEnabled):
 			return
 
-		if(len(commands) > 20):
+		if (len(commands) > 20):
 			valid = False
 
 		if (not valid):
@@ -1096,333 +1161,333 @@ class Client(object):
 
 		self.end = time.clock()
 		diffInMilliSeconds = (self.end - self.start)*1000
-		if(diffInMilliSeconds > 8.33333):
+		if (diffInMilliSeconds > 8.33333):
 			self.start = time.clock()
 			#controller1.send(controller1.output)
 
-			if(len(commandQueue) > 0):
+			if (len(commandQueue) > 0):
 				nextCommands.append(commandQueue[0])
 				del commandQueue[0]
 
 			duration = 0
 			reset = 1
 
-			if(self.lockon == True):
+			if (self.lockon == True):
 				controller1.zl = 1
 				reset = 0
 
-			if(len(nextCommands) > 0):
+			if (len(nextCommands) > 0):
 				# print(nextCommands)
 				cmd = nextCommands[-1]
 				del nextCommands[-1]
 
-				if(cmd == "sssleft" or cmd == "sssl"):
+				if (cmd == "sssleft" or cmd == "sssl"):
 					controller1.LX = STICK_MIN
 					duration = 0.01
 					reset = 1
-				if(cmd == "sssright" or cmd == "sssr"):
+				if (cmd == "sssright" or cmd == "sssr"):
 					controller1.LX = STICK_MAX
 					duration = 0.01
 					reset = 1
-				if(cmd == "sssup" or cmd == "sssu"):
+				if (cmd == "sssup" or cmd == "sssu"):
 					controller1.LY = STICK_MIN
 					duration = 0.01
 					reset = 1
-				if(cmd == "sssdown" or cmd == "sssd"):
+				if (cmd == "sssdown" or cmd == "sssd"):
 					controller1.LY = STICK_MAX
 					duration = 0.01
 					reset = 1
 
-				if(cmd == "ssleft" or cmd == "ssl"):
+				if (cmd == "ssleft" or cmd == "ssl"):
 					controller1.LX = STICK_MIN
 					duration = 0.1
 					reset = 1
-				if(cmd == "ssright" or cmd == "ssr"):
+				if (cmd == "ssright" or cmd == "ssr"):
 					controller1.LX = STICK_MAX
 					duration = 0.1
 					reset = 1
-				if(cmd == "ssup" or cmd == "ssu"):
+				if (cmd == "ssup" or cmd == "ssu"):
 					controller1.LY = STICK_MIN
 					duration = 0.1
 					reset = 1
-				if(cmd == "ssdown" or cmd == "ssd"):
+				if (cmd == "ssdown" or cmd == "ssd"):
 					controller1.LY = STICK_MAX
 					duration = 0.1
 					reset = 1
 
-				if(cmd == "sleft" or cmd == "sl"):
+				if (cmd == "sleft" or cmd == "sl"):
 					controller1.LX = STICK_MIN
 					duration = 0.3
 					reset = 1
-				if(cmd == "sright" or cmd == "sr"):
+				if (cmd == "sright" or cmd == "sr"):
 					controller1.LX = STICK_MAX
 					duration = 0.3
 					reset = 1
-				if(cmd == "sup" or cmd == "su"):
+				if (cmd == "sup" or cmd == "su"):
 					controller1.LY = STICK_MIN
 					duration = 0.3
 					reset = 1
-				if(cmd == "sdown" or cmd == "sd"):
+				if (cmd == "sdown" or cmd == "sd"):
 					controller1.LY = STICK_MAX
 					duration = 0.3
 					reset = 1
 
-				if(cmd == "left" or cmd == "l"):
-				# if(cmd == "left"):
+				if (cmd == "left" or cmd == "l"):
+				# if (cmd == "left"):
 					controller1.LX = STICK_MIN
 					duration = 0.6
 					reset = 1
-				if(cmd == "right" or cmd == "r"):
-				# if(cmd == "right"):
+				if (cmd == "right" or cmd == "r"):
+				# if (cmd == "right"):
 					controller1.LX = STICK_MAX
 					duration = 0.6
 					reset = 1
-				if(cmd == "up" or cmd == "u"):
+				if (cmd == "up" or cmd == "u"):
 					controller1.LY = STICK_MIN
 					duration = 0.6
 					reset = 1
-				if(cmd == "down" or cmd == "d"):
+				if (cmd == "down" or cmd == "d"):
 					controller1.LY = STICK_MAX
 					duration = 0.6
 					reset = 1
 
-				if(cmd == "hleft" or cmd == "hl"):
+				if (cmd == "hleft" or cmd == "hl"):
 					controller1.LX = STICK_MIN
 					duration = 1.5
 					reset = 1
-				if(cmd == "hright" or cmd == "hr"):
+				if (cmd == "hright" or cmd == "hr"):
 					controller1.LX = STICK_MAX
 					duration = 1.5
 					reset = 1
-				if(cmd == "hup" or cmd == "hu"):
+				if (cmd == "hup" or cmd == "hu"):
 					controller1.LY = STICK_MIN
 					duration = 1.5
 					reset = 1
-				if(cmd == "hdown" or cmd == "hd"):
+				if (cmd == "hdown" or cmd == "hd"):
 					controller1.LY = STICK_MAX
 					duration = 1.5
 					reset = 1
 
-				if(cmd == "hhleft"):
+				if (cmd == "hhleft"):
 					controller1.LX = STICK_MIN
 					duration = 4.0
 					reset = 1
-				if(cmd == "hhright"):
+				if (cmd == "hhright"):
 					controller1.LX = STICK_MAX
 					duration = 4.0
 					reset = 1
-				if(cmd == "hhup"):
+				if (cmd == "hhup"):
 					controller1.LY = STICK_MIN
 					duration = 4.0
 					reset = 1
-				if(cmd == "hhdown"):
+				if (cmd == "hhdown"):
 					controller1.LY = STICK_MAX
 					duration = 4.0
 					reset = 1
 
 				
-				if(cmd == "dleft" or cmd == "dl"):
+				if (cmd == "dleft" or cmd == "dl"):
 					controller1.dpad = DPAD_LEFT
 					duration = 0.3
 					reset = 1
-				if(cmd == "dright" or cmd == "dr"):
+				if (cmd == "dright" or cmd == "dr"):
 					controller1.dpad = DPAD_RIGHT
 					duration = 0.3
 					reset = 1
-				if(cmd == "dup" or cmd == "du"):
+				if (cmd == "dup" or cmd == "du"):
 					controller1.dpad = DPAD_UP
 					duration = 0.3
 					reset = 1
-				if(cmd == "ddown" or cmd == "dd"):
+				if (cmd == "ddown" or cmd == "dd"):
 					controller1.dpad = DPAD_DOWN
 					duration = 0.3
 					reset = 1
 
 
 
-				if(cmd == "slook left" or cmd == "sll"):
+				if (cmd == "slook left" or cmd == "sll"):
 					controller1.RX = STICK_MIN
 					duration = 0.1
 					reset = 1
-				if(cmd == "slook right" or cmd == "slr"):
+				if (cmd == "slook right" or cmd == "slr"):
 					controller1.RX = STICK_MAX
 					duration = 0.1
 					reset = 1
-				if(cmd == "slook up" or cmd == "slu"):
+				if (cmd == "slook up" or cmd == "slu"):
 					controller1.RY = STICK_MIN
 					duration = 0.1
 					reset = 1
-				if(cmd == "slook down" or cmd == "sld"):
+				if (cmd == "slook down" or cmd == "sld"):
 					controller1.RY = STICK_MAX
 					duration = 0.1
 					reset = 1
 
-				if(cmd == "look left" or cmd == "ll"):
+				if (cmd == "look left" or cmd == "ll"):
 					controller1.RX = STICK_MIN
 					duration = 0.3
 					reset = 1
-				if(cmd == "look right" or cmd == "lr"):
+				if (cmd == "look right" or cmd == "lr"):
 					controller1.RX = STICK_MAX
 					duration = 0.3
 					reset = 1
-				if(cmd == "look up" or cmd == "lu"):
+				if (cmd == "look up" or cmd == "lu"):
 					controller1.RY = STICK_MIN
 					duration = 0.3
 					reset = 1
-				if(cmd == "look down" or cmd == "ld"):
+				if (cmd == "look down" or cmd == "ld"):
 					controller1.RY = STICK_MAX
 					duration = 0.3
 					reset = 1
 
-				if(cmd == "hlook left" or cmd == "hll"):
+				if (cmd == "hlook left" or cmd == "hll"):
 					controller1.RX = STICK_MIN
 					duration = 0.6
 					reset = 1
-				if(cmd == "hlook right" or cmd == "hlr"):
+				if (cmd == "hlook right" or cmd == "hlr"):
 					controller1.RX = STICK_MAX
 					duration = 0.6
 					reset = 1
-				if(cmd == "hlook up" or cmd == "hlu"):
+				if (cmd == "hlook up" or cmd == "hlu"):
 					controller1.RY = STICK_MIN
 					duration = 0.6
 					reset = 1
-				if(cmd == "hlook down" or cmd == "hld"):
+				if (cmd == "hlook down" or cmd == "hld"):
 					controller1.RY = STICK_MAX
 					duration = 0.6
 					reset = 1
 				
-				if(cmd == "a"):
+				if (cmd == "a"):
 					controller1.a = 1
 					duration = 0.3
 					reset = 1
-				if(cmd == "ha"):
+				if (cmd == "ha"):
 					controller1.a = 1
 					duration = 0.5
 					reset = 1
-				if(cmd == "sb"):
+				if (cmd == "sb"):
 					controller1.b = 1
 					duration = 0.1
 					reset = 1
-				if(cmd == "b"):
+				if (cmd == "b"):
 					controller1.b = 1
 					duration = 0.4
 					reset = 1
-				if(cmd == "hb"):
+				if (cmd == "hb"):
 					controller1.b = 1
 					duration = 0.5
 					reset = 1
-				if(cmd == "hhb"):
+				if (cmd == "hhb"):
 					controller1.b = 1
 					duration = 0.8
 					reset = 1
-				if(cmd == "hhhb"):
+				if (cmd == "hhhb"):
 					controller1.b = 1
 					duration = 1.8
 					reset = 1
-				if(cmd == "x"):
+				if (cmd == "x"):
 					controller1.x = 1
 					duration = 0.3
 					reset = 1
-				if(cmd == "hx"):
+				if (cmd == "hx"):
 					controller1.x = 1
 					duration = 0.5
 					reset = 1
-				if(cmd == "y"):
+				if (cmd == "y"):
 					controller1.y = 1
 					duration = 0.3
 					reset = 1
-				if(cmd == "hy"):
+				if (cmd == "hy"):
 					controller1.y = 1
 					duration = 0.7
 					reset = 1
-				if(cmd == "lstick"):
+				if (cmd == "lstick"):
 					controller1.lstick = 1
 					duration = 0.1
 					reset = 1
-				if(cmd == "rstick"):
+				if (cmd == "rstick"):
 					controller1.rstick = 1
 					duration = 0.1
 					reset = 1
-				if(cmd == "l"):
+				if (cmd == "l"):
 					controller1.l = 1
 					duration = 0.1
 					reset = 1
-				if(cmd == "r"):
+				if (cmd == "r"):
 					controller1.r = 1
 					duration = 0.1
 					reset = 1
-				if(cmd == "hr"):
+				if (cmd == "hr"):
 					controller1.r = 1
 					duration = 1
 					reset = 1
-				if(cmd == "zl"):
+				if (cmd == "zl"):
 					controller1.zl = 1
 					duration = 0.1
 					reset = 1
-				if(cmd == "zr"):
+				if (cmd == "zr"):
 					controller1.zr = 1
 					duration = 0.1
 					reset = 1
-				if(cmd == "minus"):
+				if (cmd == "minus"):
 					controller1.minus = 1
 					duration = 0.1
 					reset = 1
-				if(cmd == "plus"):
+				if (cmd == "plus"):
 					controller1.plus = 1
 					duration = 0.1
 					reset = 1
-				if(cmd == "home"):
+				if (cmd == "home"):
 					controller1.home = 1
 					duration = 0.1
 					reset = 1
 
-				if(cmd == "long jump"):
+				if (cmd == "long jump"):
 					controller1.LY = STICK_MIN
 					duration = 0.6
 					nextCommands.insert(0, "long jump2")
 					reset = 0
-				if(cmd == "long jump2"):
+				if (cmd == "long jump2"):
 					controller1.LY = STICK_MIN
 					controller1.zl = 1
 					duration = 0.01
 					nextCommands.insert(0, "long jump3")
 					reset = 0
-				if(cmd == "long jump3"):
+				if (cmd == "long jump3"):
 					controller1.LY = STICK_MIN
 					controller1.b = 1
 					duration = 0.1
 					nextCommands.insert(0, "long jump4")
 					reset = 0
-				if(cmd == "long jump4"):
+				if (cmd == "long jump4"):
 					controller1.LY = STICK_MIN
 					controller1.b = 1
 					controller1.zl = 0
 					duration = 1
 					reset = 1
 
-				if(cmd == "jump forward"):
+				if (cmd == "jump forward"):
 					controller1.LY = STICK_MIN
 					duration = 0.3
 					nextCommands.insert(0, "jump forward2")
 					reset = 0
-				if(cmd == "jump forward2"):
+				if (cmd == "jump forward2"):
 					controller1.LY = STICK_MIN
 					controller1.b = 1
 					duration = 0.4
 					reset = 1
 
-				if(cmd == "jump back"):
+				if (cmd == "jump back"):
 					controller1.LY = STICK_MAX
 					duration = 0.3
 					nextCommands.insert(0, "jump forward2")
 					reset = 0
-				if(cmd == "jump back2"):
+				if (cmd == "jump back2"):
 					controller1.LY = STICK_MAX
 					controller1.b = 1
 					duration = 0.4
 					reset = 1
 
-				if(cmd == "cap bounce"):
+				if (cmd == "cap bounce"):
 					# b, y, sdive, hy, y, sdive
 					nextCommands.insert(0, "b")
 					nextCommands.insert(0, "y")
@@ -1431,7 +1496,7 @@ class Client(object):
 					nextCommands.insert(0, "y")
 					nextCommands.insert(0, "sdive")
 
-				if(cmd == "swim"):
+				if (cmd == "swim"):
 					# b, b, b, b
 					nextCommands.insert(0, "b")
 					nextCommands.insert(0, "b")
@@ -1439,89 +1504,89 @@ class Client(object):
 					nextCommands.insert(0, "b")
 
 
-				if(cmd == "sdive"):
+				if (cmd == "sdive"):
 					controller1.zl = 1
 					duration = 0.1
 					nextCommands.insert(0, "sdive2")
 					reset = 0
-				if(cmd == "sdive2"):
+				if (cmd == "sdive2"):
 					controller1.y = 1
 					duration = 0.1
 					reset = 1
 
-				if(cmd == "dive"):
+				if (cmd == "dive"):
 					controller1.b = 1
 					duration = 0.1
 					nextCommands.insert(0, "dive2")
 					reset = 0
-				if(cmd == "dive2"):
+				if (cmd == "dive2"):
 					controller1.zl = 1
 					duration = 0.01
 					nextCommands.insert(0, "dive3")
 					reset = 0
-				if(cmd == "dive3"):
+				if (cmd == "dive3"):
 					controller1.y = 1
 					duration = 0.1
 					reset = 1
 
-				if(cmd == "hdive"):
+				if (cmd == "hdive"):
 					controller1.b = 1
 					duration = 0.2
 					nextCommands.insert(0, "hdive2")
 					reset = 0
-				if(cmd == "hdive2"):
+				if (cmd == "hdive2"):
 					controller1.zl = 1
 					duration = 0.01
 					nextCommands.insert(0, "hdive3")
 					reset = 0
-				if(cmd == "hdive3"):
+				if (cmd == "hdive3"):
 					controller1.y = 1
 					duration = 0.1
 					reset = 1
 
-				if(cmd == "roll"):
+				if (cmd == "roll"):
 					controller1.zl = 1
 					duration = 0.01
 					nextCommands.insert(0, "roll2")
 					reset = 0
-				if(cmd == "roll2"):
+				if (cmd == "roll2"):
 					controller1.y = 1
 					duration = 0.1
 					reset = 1
 
-				if(cmd == "backflip" or cmd == "bf" or cmd == "back flip"):
+				if (cmd == "backflip" or cmd == "bf" or cmd == "back flip"):
 					controller1.zl = 1
 					duration = 0.01
 					nextCommands.insert(0, "backflip2")
 					reset = 0
-				if(cmd == "backflip2"):
+				if (cmd == "backflip2"):
 					controller1.b = 1
 					duration = 0.1
 					reset = 1
 
-				if(cmd == "ground pound" or cmd == "gp" or cmd == "groundpound"):
+				if (cmd == "ground pound" or cmd == "gp" or cmd == "groundpound"):
 					controller1.b = 1
 					duration = 0.01
 					nextCommands.insert(0, "ground pound2")
 					reset = 0
-				if(cmd == "ground pound2"):
+				if (cmd == "ground pound2"):
 					controller1.zl = 1
 					duration = 0.1
 					reset = 1
 
 
 
-				if(cmd == "sprint"):
+				if (cmd == "sprint"):
 					controller1.LY = STICK_MIN
 					controller1.b = 1
 					duration = 0.6
 					reset = 1
-				if(cmd == "hsprint"):
+				if (cmd == "hsprint"):
 					controller1.LY = STICK_MIN
 					controller1.b = 1
 					duration = 1.5
 					reset = 1
-				if(cmd == "hhsprint"):
+				if (cmd == "hhsprint"):
 					controller1.LY = STICK_MIN
 					controller1.b = 1
 					duration = 3
@@ -1532,97 +1597,97 @@ class Client(object):
 
 				d = 0.001
 
-				if(cmd == "spin"):
+				if (cmd == "spin"):
 					controller1.LX = STICK_CENTER
 					controller1.LY = STICK_MIN
 					duration = d
 					nextCommands.insert(0, "spin2")
 					reset = 0
-				if(cmd == "spin2"):
+				if (cmd == "spin2"):
 					controller1.LX = STICK_MAX
 					controller1.LY = STICK_MIN
 					duration = d
 					nextCommands.insert(0, "spin3")
 					reset = 0
-				if(cmd == "spin3"):
+				if (cmd == "spin3"):
 					controller1.LX = STICK_MAX
 					controller1.LY = STICK_CENTER
 					duration = d
 					nextCommands.insert(0, "spin4")
 					reset = 0
-				if(cmd == "spin4"):
+				if (cmd == "spin4"):
 					controller1.LX = STICK_CENTER
 					controller1.LY = STICK_MAX
 					duration = d
 					nextCommands.insert(0, "spin5")
 					reset = 0
-				if(cmd == "spin5"):
+				if (cmd == "spin5"):
 					controller1.LX = STICK_MIN
 					controller1.LY = STICK_MAX
 					duration = d
 					nextCommands.insert(0, "spin6")
 					reset = 0
-				if(cmd == "spin6"):
+				if (cmd == "spin6"):
 					controller1.LX = STICK_MIN
 					controller1.LY = STICK_CENTER
 					duration = d
 					nextCommands.insert(0, "spin7")
 					reset = 0
-				if(cmd == "spin7"):
+				if (cmd == "spin7"):
 					controller1.LX = STICK_MIN
 					controller1.LY = STICK_MIN
 					duration = d
 					nextCommands.insert(0, "spin8")
 					reset = 0
-				if(cmd == "spin8"):
+				if (cmd == "spin8"):
 					controller1.LX = STICK_CENTER
 					controller1.LY = STICK_MIN
 					duration = d
 					nextCommands.insert(0, "spin9")
 					reset = 0
-				if(cmd == "spin9"):
+				if (cmd == "spin9"):
 					controller1.LX = STICK_CENTER
 					controller1.LY = STICK_MIN
 					duration = d
 					nextCommands.insert(0, "spin10")
 					reset = 0
-				if(cmd == "spin10"):
+				if (cmd == "spin10"):
 					controller1.LX = STICK_MAX
 					controller1.LY = STICK_MIN
 					duration = d
 					nextCommands.insert(0, "spin11")
 					reset = 0
-				if(cmd == "spin11"):
+				if (cmd == "spin11"):
 					controller1.LX = STICK_MAX
 					controller1.LY = STICK_CENTER
 					duration = d
 					nextCommands.insert(0, "spin12")
 					reset = 0
-				if(cmd == "spin12"):
+				if (cmd == "spin12"):
 					controller1.LX = STICK_CENTER
 					controller1.LY = STICK_MAX
 					duration = d
 					nextCommands.insert(0, "spin13")
 					reset = 0
-				if(cmd == "spin13"):
+				if (cmd == "spin13"):
 					controller1.LX = STICK_MIN
 					controller1.LY = STICK_MAX
 					duration = d
 					nextCommands.insert(0, "spin14")
 					reset = 0
-				if(cmd == "spin14"):
+				if (cmd == "spin14"):
 					controller1.LX = STICK_MIN
 					controller1.LY = STICK_CENTER
 					duration = d
 					nextCommands.insert(0, "spin15")
 					reset = 0
-				if(cmd == "spin15"):
+				if (cmd == "spin15"):
 					controller1.LX = STICK_MIN
 					controller1.LY = STICK_MIN
 					duration = d
 					nextCommands.insert(0, "spin16")
 					reset = 0
-				if(cmd == "spin16"):
+				if (cmd == "spin16"):
 					controller1.LX = STICK_CENTER
 					controller1.LY = STICK_MIN
 					duration = d
@@ -1630,67 +1695,67 @@ class Client(object):
 					reset = 1
 
 
-				if("+" in cmd):
+				if ("+" in cmd):
 					btns = [x.strip() for x in cmd.split("+")]
 
 					for btn in btns:
 						duration = 0.3
 						reset = 1
 
-						if("s" in btn):
+						if ("s" in btn):
 							duration = 0.01
-						if("h" in btn):
+						if ("h" in btn):
 							duration = 0.6
-						if("hh" in btn):
+						if ("hh" in btn):
 							duration = 1.5
-						if("hhh" in btn):
+						if ("hhh" in btn):
 							duration = 5
 
 						btn = btn.replace("s","")
 						btn = btn.replace("h","")
 
-						if(btn == "left"):
+						if (btn == "left"):
 							controller1.LX = STICK_MIN
-						if(btn == "rigt"):
+						if (btn == "rigt"):
 							controller1.LX = STICK_MAX
-						if(btn == "up"):
+						if (btn == "up"):
 							controller1.LY = STICK_MIN
-						if(btn == "down"):
+						if (btn == "down"):
 							controller1.LY = STICK_MAX
-						if(btn == "dleft"):
+						if (btn == "dleft"):
 							controller1.dpad = DPAD_LEFT
-						if(btn == "drigt"):
+						if (btn == "drigt"):
 							controller1.dpad = DPAD_RIGHT
-						if(btn == "dup"):
+						if (btn == "dup"):
 							controller1.dpad = DPAD_UP
-						if(btn == "ddown"):
+						if (btn == "ddown"):
 							controller1.dpad = DPAD_DOWN
 						
-						if(btn == "look left"):
+						if (btn == "look left"):
 							controller1.RX = STICK_MIN
-						if(btn == "look rigt"):
+						if (btn == "look rigt"):
 							controller1.RX = STICK_MAX
-						if(btn == "look up"):
+						if (btn == "look up"):
 							controller1.RY = STICK_MIN
-						if(btn == "look down"):
+						if (btn == "look down"):
 							controller1.RY = STICK_MAX
-						if(btn == "a"):
+						if (btn == "a"):
 							controller1.a = 1
-						if(btn == "b"):
+						if (btn == "b"):
 							controller1.b = 1
-						if(btn == "x"):
+						if (btn == "x"):
 							controller1.x = 1
-						if(btn == "y"):
+						if (btn == "y"):
 							controller1.y = 1
-						if(btn == "l"):
+						if (btn == "l"):
 							controller1.l = 1
-						if(btn == "r"):
+						if (btn == "r"):
 							controller1.r = 1
-						if(btn == "zl"):
+						if (btn == "zl"):
 							controller1.zl = 1
-						if(btn == "zr"):
+						if (btn == "zr"):
 							controller1.zr = 1
-						if(btn == "minus"):
+						if (btn == "minus"):
 							controller1.minus = 1
 				send_and_reset(duration, reset)
 
@@ -1702,7 +1767,7 @@ class Client(object):
 
 		self.botend = time.clock()
 		diffInMilliSeconds = (self.botend - self.botstart)*1000
-		if(diffInMilliSeconds > 1000*60*5):
+		if (diffInMilliSeconds > 1000*60*5):
 			self.botstart = time.clock()
 
 			self.socketio.emit("joinSecure", {"room": "controller", "password": ROOM_SECRET})
@@ -1717,7 +1782,7 @@ class Client(object):
 
 		self.controllerEnd = time.clock()
 		diffInMilliSeconds2 = (self.controllerEnd - self.controllerStart)*1000
-		if(diffInMilliSeconds2 > 6000):
+		if (diffInMilliSeconds2 > 6000):
 			self.controllerStart = time.clock()
 
 			self.socketio.emit("joinSecure", {"room": "controller", "password": ROOM_SECRET})
@@ -1734,7 +1799,7 @@ class Client(object):
 
 
 		response = twitchBot.stayConnected()
-		if(response != "none"):
+		if (response != "none"):
 			# prevent crash
 			try:
 				username = re.search(r"\w+", response).group(0) # return the entire match
