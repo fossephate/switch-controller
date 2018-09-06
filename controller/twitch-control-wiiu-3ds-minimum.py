@@ -77,12 +77,12 @@ def delayed_reset(delay=0.1):
 
 
 def accurateSleep(duration):
-	s = time.clock()
-	e = time.clock()
+	s = time.process_time()
+	e = time.process_time()
 	diffInMilliSeconds = 0
 
 	while (diffInMilliSeconds < duration):
-		e = time.clock()
+		e = time.process_time()
 		diffInMilliSeconds = (e - s)*1000
 
 def send_and_reset(duration=0.1, reset=1, cNum=0):
@@ -213,14 +213,14 @@ class Client(object):
 		self.receive_events_thread.daemon = True
 		self.receive_events_thread.start()
 
-		self.start = time.clock()
-		self.end = time.clock()
+		self.start = time.process_time()
+		self.end = time.process_time()
 		
-		self.botstart = time.clock()
-		self.botend = time.clock()
+		self.botstart = time.process_time()
+		self.botend = time.process_time()
 
-		self.controllerStart = time.clock()
-		self.controllerEnd = time.clock()
+		self.controllerStart = time.process_time()
+		self.controllerEnd = time.process_time()
 
 		self.lockon = False
 
@@ -370,21 +370,21 @@ class Client(object):
 		# control switch here:
 
 		# every 5 minutes:
-		self.botend = time.clock()
+		self.botend = time.process_time()
 		diffInMilliSeconds = (self.botend - self.botstart)*1000
 		if(diffInMilliSeconds > 1000*60*5):
 			self.socketio.emit("join", "wiiu3dscontroller")
-			self.botstart = time.clock()
+			self.botstart = time.process_time()
 			# msg = "Join the discord server! https://discord.gg/ARTbddH\
 			# hate the stream delay? go here! https://twitchplaysnintendoswitch.com"
 			# twitchBot.chat(msg)
 
 		# every 6 seconds, probably doesn't need to do this so often:
-		self.controllerEnd = time.clock()
+		self.controllerEnd = time.process_time()
 		diffInMilliSeconds2 = (self.controllerEnd - self.controllerStart)*1000
 		if(diffInMilliSeconds2 > 6000):
 			self.socketio.emit("join", "wiiu3dscontroller")
-			self.controllerStart = time.clock()
+			self.controllerStart = time.process_time()
 
 
 		response = twitchBot.stayConnected()

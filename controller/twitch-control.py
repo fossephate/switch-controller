@@ -1,6 +1,7 @@
 
 # time
 from threading import Timer
+import threading
 import time
 from time import sleep
 
@@ -49,6 +50,9 @@ import numpy as np
 # save info
 import pickle
 
+# random
+import random
+
 
 screenWidth, screenHeight = pyautogui.size()
 x = screenWidth/2
@@ -93,12 +97,12 @@ def delayed_reset(delay=0.1):
 
 
 def accurateSleep(duration):
-	s = time.clock()
-	e = time.clock()
+	s = time.time()
+	e = time.time()
 	diffInMilliSeconds = 0
 
 	while (diffInMilliSeconds < duration):
-		e = time.clock()
+		e = time.time()
 		diffInMilliSeconds = (e - s)*1000
 
 def send_and_reset(duration=0.1, reset=1, cNum=0):
@@ -122,14 +126,17 @@ def send_and_reset(duration=0.1, reset=1, cNum=0):
 		controller.send(controller.output)
 
 def round_down(num, divisor):
-    return num - (num % divisor)
+	return num - (num % divisor)
 
 
 
-gameList = ["hollow", "paladins", "snipperclips", "mk8", "human", "shovel", "octopath", "explosion", "jackbox4", "jackbox3", "fallout", "skyrim", "splatoon2", "celeste", "smo", "rocketleague", "pokemonquest", "wizard", "sonic", "arms", "kirby", "fortnite", "torquel", "botw"]
-validCommands = ["!status", "!internetstatus", "!rainbow", "!setgame", "!forcegoto", "!sublist", "!4p", "!3p", "!2p", "!1p", "!modlist", "!lock", "!egg", "!rr", "!discord", "!games", "!setforfeitlength", "!setturnlength", "!banlist", "!disableinternet", "!enableinternet", "!forcerefresh", "nay", "yea", "!enablechat", "!disablechat", "!enablegoto", "!disablegoto", "!unmod", "!mod", "!fixcontrollers", "!goto snipperclips", "!pluslist", "!unban", "!ban", "!removeplus", "!giveplus", "!goto human", "!goto shovel", "!goto octopath", "!goto explosion", "!goto jackbox4", "!goto jackbox3", "!commands", "!goto fallout", "!goto fortnite", "!goto torquel", "!goto pokemonquest", "!restart", "!restart1", "!restart2", "!restart3", "!restartscript", "!restartserver", "!help", "votenay", "voteyea", "!goto wizard", "!goto cave", "!goto sonic", "!goto skyrim", "!goto rocketleague", "!goto arms", "!goto celeste", "!goto mk8", "!goto splatoon2", "!goto isaac", "!goto mario", "!goto botw", "!goto kirby", "!goto smo", "!goto", "lockon", "hhsprint", "hsprint", "sprint", "!controls", "!goto", "home", "lstick", "rstick", "spin", "swim", "back flip", "ground pound", "groundpound", "gp", "bf", "cap bounce", "sdive", "sdive2", "hdive", "hdive2", "hdive3", "dive", "dive2", "dive3", "roll", "roll2", "backflip", "backflip2", "sssu", "sssd", "sssl", "sssr", "sb", "suu", "", "up", "down", "left", "right", "u", "d", "l", "r", "hup", "hdown", "hleft", "hright", "hhup", "hhdown", "hhleft", "hhright", "hu", "hd", "hl", "hr", "su", "sd", "sl", "sr", "sup", "sdown", "sleft", "sright", "ssu", "ssd", "ssl", "ssr", "ssup", "ssdown", "ssleft", "ssright", "look up", "look down", "look left", "look right", "lu", "ld", "ll", "lr", "hlu", "hld", "hll", "hlr", "slu", "sld", "sll", "slr", "dup", "ddown", "dleft", "dright", "du", "dd", "dl", "dr", "a", "b", "x", "y", "ha", "hb", "hx", "hy", "hhb", "hhhb", "l", "zl", "r", "zr", "plus", "minus", "long jump", "long jump2", "long jump3", "jump forward", "jump forward2", "jump back", "jump back2", "dive", "dive2"]
+gameList = ["mta", "hollow", "paladins", "snipperclips", "mk8", "human", "shovel", "octopath", "explosion", "jackbox4", "jackbox3", "fallout", "skyrim", "splatoon2", "celeste", "smo", "rocketleague", "pokemonquest", "wizard", "sonic", "arms", "kirby", "fortnite", "torquel", "botw"]
+# plusCommands = []
+# modCommands = []
+# anyCommands = []
+validCommands = ["!source", "!playing", "!randomgame", "!status", "!internetstatus", "!rainbow", "!setgame", "!forcegoto", "!sublist", "!4p", "!3p", "!2p", "!1p", "!modlist", "!lock", "!egg", "!rr", "!discord", "!games", "!setforfeitlength", "!setturnlength", "!banlist", "!disableinternet", "!enableinternet", "!forcerefresh", "nay", "yea", "!enablechat", "!disablechat", "!enablegoto", "!disablegoto", "!unmod", "!mod", "!fixcontrollers", "!goto snipperclips", "!pluslist", "!unban", "!ban", "!removeplus", "!giveplus", "!goto human", "!goto shovel", "!goto octopath", "!goto explosion", "!goto jackbox4", "!goto jackbox3", "!commands", "!goto fallout", "!goto fortnite", "!goto torquel", "!goto pokemonquest", "!restart", "!restart1", "!restart2", "!restart3", "!restartscript", "!restartserver", "!help", "votenay", "voteyea", "!goto wizard", "!goto cave", "!goto sonic", "!goto skyrim", "!goto rocketleague", "!goto arms", "!goto celeste", "!goto mk8", "!goto splatoon2", "!goto isaac", "!goto mario", "!goto botw", "!goto kirby", "!goto smo", "!goto", "hhsprint", "hsprint", "sprint", "!controls", "!goto", "home", "lstick", "rstick", "spin", "swim", "back flip", "ground pound", "groundpound", "gp", "bf", "cap bounce", "sdive", "sdive2", "hdive", "hdive2", "hdive3", "dive", "dive2", "dive3", "roll", "roll2", "backflip", "backflip2", "sssu", "sssd", "sssl", "sssr", "sb", "suu", "", "up", "down", "left", "right", "u", "d", "l", "r", "hup", "hdown", "hleft", "hright", "hhup", "hhdown", "hhleft", "hhright", "hu", "hd", "hl", "hr", "su", "sd", "sl", "sr", "sup", "sdown", "sleft", "sright", "ssu", "ssd", "ssl", "ssr", "ssup", "ssdown", "ssleft", "ssright", "look up", "look down", "look left", "look right", "lu", "ld", "ll", "lr", "hlu", "hld", "hll", "hlr", "slu", "sld", "sll", "slr", "dup", "ddown", "dleft", "dright", "du", "dd", "dl", "dr", "a", "b", "x", "y", "ha", "hb", "hx", "hy", "hhb", "hhhb", "l", "zl", "r", "zr", "plus", "minus", "long jump", "long jump2", "long jump3", "jump forward", "jump forward2", "jump back", "jump back2", "dive", "dive2"]
 pluslist = []
-modlist = ["beanjr_yt", "alua2020", "ogcristofer", "stravos96", "yanchan230", "silvermagpi", "twitchplaysconsoles", "fosseisanerd", "tpnsbot"]
+modlist = ["beanjr_yt", "alua2020", "ogcristofer", "stravos96", "splatax", "silvermagpi", "twitchplaysconsoles", "fosseisanerd", "tpnsbot"]
 banlist = []
 sublist = []
 voted = []
@@ -137,18 +144,17 @@ singlePlayerGames = ["The Legend of Zelda: Breath of the Wild"]
 
 commandQueue = []
 nextCommands = []
-#lockon = False
 oldArgs = "800000000000000 128 128 128 128"
 
 
 # load plus list:
 if (os.path.exists("pluslist.pkl")):
-    with open("pluslist.pkl", "rb") as f:
-        pluslist = pickle.load(f)[0]
+	with open("pluslist.pkl", "rb") as f:
+		pluslist = pickle.load(f)[0]
 # load ban list:
 if (os.path.exists("banlist.pkl")):
-    with open("banlist.pkl", "rb") as f:
-        banlist = pickle.load(f)[0]
+	with open("banlist.pkl", "rb") as f:
+		banlist = pickle.load(f)[0]
 
 # get sub list:
 sublist = getSubList()
@@ -176,16 +182,14 @@ class Client(object):
 		self.receive_events_thread.daemon = True
 		self.receive_events_thread.start()
 
-		self.start = time.clock()
-		self.end = time.clock()
+		self.start = time.time()
+		self.end = time.time()
 		
-		self.botstart = time.clock()
-		self.botend = time.clock()
+		self.botstart = time.time()
+		self.botend = time.time()
 
-		self.controllerStart = time.clock()
-		self.controllerEnd = time.clock()
-
-		self.lockon = False
+		self.controllerStart = time.time()
+		self.controllerEnd = time.time()
 
 		self.yeaVotes = 0
 		self.nayVotes = 0
@@ -230,7 +234,7 @@ class Client(object):
 		if (cNum > 0 and client.currentGame in singlePlayerGames):
 			return
 
-		print("controller state" + str(cNum) + ":", state)
+		print("controller state " + str(cNum) + ":", state)
 
 		client.oldArgs2 = state
 
@@ -325,7 +329,7 @@ class Client(object):
 		duration = 0.001
 		reset = 0
 		send_and_reset(duration, reset, cNum)
-	
+
 	# player 1:
 	def on_controller_state1(*args):
 		client.on_controller_state(args[1], 0)
@@ -350,7 +354,7 @@ class Client(object):
 			msg = "The internet is off right now!"
 		twitchBot.chat(msg)
 
-	def findImage(self, frame, imagefile):
+	def findImage(self, frame, imagefile, threshold=0.6):
 
 		img_rgb = frame# where we're looking for the icon
 		img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
@@ -361,7 +365,107 @@ class Client(object):
 		iconLocationY = -1
 
 		res = cv2.matchTemplate(img_gray,template,cv2.TM_CCOEFF_NORMED)
-		threshold = 0.6
+		# threshold = 0.6
+		loc = np.where(res >= threshold)
+		location = None
+		# for pt in zip(*loc[::-1]):
+		for pt in zip(*[loc[-1], loc[-2]]):
+			# min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+			# pt = max_loc
+			cv2.rectangle(img_rgb, pt, (pt[0] + w, pt[1] + h), (0,0,255), 2)
+			iconLocationX = pt[0] + (w/2)
+			iconLocationX = pt[1] + (h/2)
+			cv2.circle(img_rgb, (int(iconLocationX), int(iconLocationY)), int(2), (0, 255, 255), 2)
+			# print(pt)
+			location = [pt[0], pt[1]]
+		
+		# cv2.imshow("icon match", img_rgb)
+		# cv2.waitKey(10)
+
+		return location
+
+
+		# img = cv2.imread("messi5.jpg",0)
+		# img = frame
+		# img2 = img.copy()
+		# template = cv2.imread("icons/SMO.png", 0)
+		# w, h = template.shape[::-1]
+
+
+		# # All the 6 methods for comparison in a list
+		# img = img2.copy()
+		# method = eval("cv2.TM_CCOEFF_NORMED")
+		# # Apply template Matching
+		# res = cv2.matchTemplate(img,template,cv2.TM_CCOEFF_NORMED)
+		# min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+		# # If the method is TM_SQDIFF or TM_SQDIFF_NORMED, take minimum
+		# if method in [cv2.TM_SQDIFF, cv2.TM_SQDIFF_NORMED]:
+		#     top_left = min_loc
+		# else:
+		#     top_left = max_loc
+		# bottom_right = (top_left[0] + w, top_left[1] + h)
+		# cv2.rectangle(img, top_left, bottom_right, 255, 2)
+		# plt.subplot(121),plt.imshow(res,cmap = "gray")
+		# plt.title("Matching Result"), plt.xticks([]), plt.yticks([])
+		# plt.subplot(122),plt.imshow(img,cmap = "gray")
+		# plt.title("Detected Point"), plt.xticks([]), plt.yticks([])
+		# plt.suptitle(meth)
+		# plt.show()
+
+
+	def findImage2(self, imagefile, x1, y1, width, height, windowName, threshold=0.6):
+
+
+		SSx1 = x1;
+		SSy1 = y1;
+		SSWidth = width
+		SSHeight = height
+
+		#get window position and info
+		hwnd = win32gui.FindWindow(None, windowName)
+
+
+		wDC = win32gui.GetWindowDC(hwnd)
+		myDC = win32ui.CreateDCFromHandle(wDC)
+		newDC = myDC.CreateCompatibleDC()
+		myBitMap = win32ui.CreateBitmap()
+		myBitMap.CreateCompatibleBitmap(myDC, SSWidth, SSHeight)
+		newDC.SelectObject(myBitMap)
+		newDC.BitBlt((0, 0), (SSWidth, SSHeight) , myDC, (SSx1,SSy1), win32con.SRCCOPY)
+
+		bmpinfo = myBitMap.GetInfo()
+		bmpstr = myBitMap.GetBitmapBits(True)
+		img = Image.frombuffer(
+			"RGB",
+			(bmpinfo["bmWidth"], bmpinfo["bmHeight"]),
+			bmpstr, "raw", "BGRX", 0, 1)
+
+		# Free Resources
+		myDC.DeleteDC()
+		newDC.DeleteDC()
+		win32gui.ReleaseDC(hwnd, wDC)
+		win32gui.DeleteObject(myBitMap.GetHandle())
+
+		#img = ImageGrab.grab(bbox=(x1, y1, x2, y2))#.crop(box) #x, y, w, h
+		img_np = np.array(img)
+		frame = cv2.cvtColor(img_np, cv2.COLOR_BGR2RGB)
+		hsv = cv2.cvtColor(img_np, cv2.COLOR_BGR2HSV)
+
+
+
+
+
+
+		img_rgb = frame# where we're looking for the icon
+		img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
+		template = cv2.imread(imagefile, 0)
+		w, h = template.shape[::-1]
+
+		iconLocationX = -1
+		iconLocationY = -1
+
+		res = cv2.matchTemplate(img_gray,template,cv2.TM_CCOEFF_NORMED)
+		# threshold = 0.6
 		loc = np.where(res >= threshold)
 		location = None
 		# for pt in zip(*loc[::-1]):
@@ -502,14 +606,14 @@ class Client(object):
 			myBitMap = win32ui.CreateBitmap()
 			myBitMap.CreateCompatibleBitmap(myDC, SSWidth, SSHeight)
 			newDC.SelectObject(myBitMap)
-			newDC.BitBlt((0,0),(SSWidth, SSHeight) , myDC, (SSx1,SSy1), win32con.SRCCOPY)
+			newDC.BitBlt((0, 0), (SSWidth, SSHeight) , myDC, (SSx1,SSy1), win32con.SRCCOPY)
 
 			bmpinfo = myBitMap.GetInfo()
 			bmpstr = myBitMap.GetBitmapBits(True)
 			img = Image.frombuffer(
-			    "RGB",
-			    (bmpinfo["bmWidth"], bmpinfo["bmHeight"]),
-			    bmpstr, "raw", "BGRX", 0, 1)
+				"RGB",
+				(bmpinfo["bmWidth"], bmpinfo["bmHeight"]),
+				bmpstr, "raw", "BGRX", 0, 1)
 
 			# Free Resources
 			myDC.DeleteDC()
@@ -692,7 +796,6 @@ class Client(object):
 	def handleChat(self, username, message):
 		print(username + ": " + message)
 
-
 		commands = None
 		if ("," in message):
 			commands = [x.strip() for x in message.split(",")]
@@ -710,19 +813,6 @@ class Client(object):
 			if ("home" in cmd and username not in modlist):
 				valid = False
 
-			if ("!restartserver" in cmd and username not in modlist):
-				valid = False
-			if ("!restartscript" in cmd and username not in modlist):
-				valid = False
-
-			if ("!enablegoto" in cmd and username not in modlist):
-				valid = False
-			if ("!disablegoto" in cmd and username not in modlist):
-				valid = False
-
-			if ("lockon" in cmd):
-				self.lockon = not self.lockon
-
 			if (self.voting):
 				if ((cmd == "voteyea" or cmd == "yea") and username not in voted):
 					voted.append(username)
@@ -730,6 +820,276 @@ class Client(object):
 				if ((cmd == "votenay" or cmd == "nay") and username not in voted):
 					voted.append(username)
 					self.nayVotes += 1
+
+
+
+		if len(commands) == 1:
+
+			cmd = commands[0]
+
+
+			if (cmd == "!controls" or cmd == "!help"):
+				msg = "goto https://twitchplaysnintendoswitch.com or look at the description for the chat controls,\
+				 you can also type \"!goto [game]\" (without brackets) to switch games. use !goto for a list of games! use !commands for a list of commands!"
+				twitchBot.chat(msg)
+
+			if (cmd == "!goto" or cmd == "!games"):
+				msg = "use \"!goto [game]\" (without brackets) to switch games! list: "
+				for game in gameList:
+					msg += game + ", "
+				msg = msg[:-2]
+				twitchBot.chat(msg)
+
+			if (cmd == "!status" or cmd == "!internetstatus"):
+				# msg = "Checking internet status!"
+				# twitchBot.chat(msg)
+				self.socketio.emit("getInternetStatus")
+
+			if (cmd == "!commands"):
+				msg1 = "(mods only): \"!restartscript\", \"!restartserver\" \"!giveplus [user]\", \"!ban [user]\", \"!unban [user]\", \"!removeplus [user]\", \
+				\"!disablechat\", \"!enablechat\", \"!disablegoto\", \"!enablegoto\", \"!setturnlength [lengthInMS]\", \"!setforfeitlength [lengthInMS]\""
+				msg2 = "(plus only): \"!disableinternet\", \"!enableinternet\", \"!fixcontrollers\", \"!rr [user]\", \"!rainbow [user]\""
+				msg3 = "(anyone): \"!restart1\", \"!restart2\", \"!restart3\", \"!banlist\", \"!pluslist\", \"!sublist\", \"!modlist\", \"!discord\", \"!site\", \"!source\", \"!internetstatus\", \"!randomgame\", \"!playing\", \"!goto [game]\""
+				twitchBot.chat(msg1)
+				twitchBot.chat(msg2)
+				twitchBot.chat(msg3)
+
+			if (cmd == "!discord"):
+				msg = "Discord invite link: https://discord.gg/ARTbddH/"
+				twitchBot.chat(msg)
+
+			if (cmd == "!site"):
+				msg = "https://twitchplaysnintendoswitch.com"
+				twitchBot.chat(msg)
+
+			if (cmd == "!source"):
+				msg = "https://github.com/mfosse/twitchplays/ https://github.com/mfosse/switch-controller/ https://github.com/mfosse/streamr/"
+				twitchBot.chat(msg)
+
+			if (cmd == "!pluslist"):
+				msg = "plus list: "
+				for user in pluslist:
+					msg += user + ", "
+				msg = msg[:-2]
+				twitchBot.chat(msg)
+
+			if (cmd == "!modlist"):
+				msg = "mod list: "
+				for user in modlist:
+					msg += user + ", "
+				msg = msg[:-2]
+				twitchBot.chat(msg)
+
+			if (cmd == "!banlist"):
+				msg = "ban list: "
+				for user in banlist:
+					msg += user + ", "
+				msg = msg[:-2]
+				twitchBot.chat(msg)
+
+			if (cmd == "!sublist"):
+				msg = "sub list: "
+				for user in sublist:
+					msg += user + ", "
+				msg = msg[:-2]
+				twitchBot.chat(msg)
+
+			if (cmd == "!restart1" or cmd == "!restart"):
+				# self.socketio.emit("restart")
+				twitchBot.chat("Restarting lagless1!")
+				os.system("taskkill /f /im streamr.exe")
+
+			if (cmd == "!restart2"):
+				twitchBot.chat("Restarting lagless2!")
+				self.socketio.emit("restart2")
+
+			if (cmd == "!restart3"):
+				twitchBot.chat("Restarting lagless3!")
+				self.socketio.emit("restart3")
+
+			if (cmd == "!restartserver" and username in modlist):
+				twitchBot.chat("Restarting the server! maybe @fosse if you're using this!")
+				self.socketio.emit("restart server")
+
+			if (cmd == "!restartscript" and username in modlist):
+				twitchBot.chat("Restarting the python script!")
+				with open("pluslist.pkl", "wb") as f:
+					pickle.dump([pluslist], f)
+				os.system("taskkill /f /im python.exe")
+
+			if (cmd == "!disablegoto" and username in modlist):
+				msg = "Disabling !goto"
+				twitchBot.chat(msg)
+				self.voting = True
+			if (cmd == "!enablegoto" and username in modlist):
+				msg = "Enabling !goto"
+				twitchBot.chat(msg)
+				self.voting = False
+
+			if (cmd == "!disablechat" and username in modlist):
+				msg = "Disabling chat commands!"
+				twitchBot.chat(msg)
+				self.chatEnabled = False
+			if (cmd == "!enablechat" and username in modlist):
+				msg = "Enabling chat commands!"
+				twitchBot.chat(msg)
+				self.chatEnabled = True
+
+			if (cmd == "!lock" and username in pluslist):
+				msg = "locking!"
+				twitchBot.chat(msg)
+				self.voting = True
+				self.chatEnabled = False
+				self.socketio.emit("lock")
+
+			if (cmd == "!unlock" and username in modlist):
+				msg = "Unlocking!"
+				twitchBot.chat(msg)
+				self.voting = False
+				self.chatEnabled = True
+				self.socketio.emit("unlock")
+
+			if (cmd == "!1p" and username in modlist):
+				msg = "Changing to 1 Player Mode!"
+				twitchBot.chat(msg)
+				self.socketio.emit("setMaxPlayers", 1)
+
+			if (cmd == "!2p" and username in modlist):
+				msg = "Changing to 2 Player Mode!"
+				twitchBot.chat(msg)
+				self.socketio.emit("setMaxPlayers", 2)
+
+			if (cmd == "!3p" and username in modlist):
+				msg = "Changing to 3 Player Mode!"
+				twitchBot.chat(msg)
+				self.socketio.emit("setMaxPlayers", 3)
+
+			if (cmd == "!4p" and username in modlist):
+				msg = "Changing to 4 Player Mode!"
+				twitchBot.chat(msg)
+				self.socketio.emit("setMaxPlayers", 4)
+
+			if (cmd == "!5p" and username in modlist):
+				msg = "Changing to 5 Player Mode!"
+				twitchBot.chat(msg)
+				self.socketio.emit("setMaxPlayers", 5)
+
+			if (cmd == "!forcerefresh" and username in modlist):
+				self.socketio.emit("forceRefresh")
+
+			if (cmd == "!disableinternet" and username in pluslist):
+				msg = "Disabling internet accesss!"
+				twitchBot.chat(msg)
+				self.socketio.emit("disableInternet")
+			if (cmd == "!enableinternet" and username in pluslist):
+				msg = "Enabling internet access!"
+				twitchBot.chat(msg)
+				self.socketio.emit("enableInternet")
+
+			if (cmd == "!egg"):
+				# msg = "Rickrolling!: " + commands[1]
+				# twitchBot.chat(msg)
+				self.socketio.emit("rickroll", username)
+
+			if (cmd == "!rr"):
+				self.socketio.emit("rickroll", username)
+
+
+			if (cmd == "!rainbow"):
+				self.socketio.emit("rainbow", username)
+
+			# if (cmd == "!randomgame"):
+			# 	auto_goto()
+
+			if (cmd == "!playing"):
+				msg = "The current player(s) are: "
+				count = 0
+				for player in self.currentPlayers:
+					if (player != None):
+						count += 1
+						msg += player + ", "
+				msg = msg[:-2]
+				if (count == 0):
+					msg = "No one is playing right now."
+
+				twitchBot.chat(msg)
+
+
+			if (cmd == "!fixcontrollers" and username in pluslist):
+				twitchBot.chat("Fixing controller order!")
+				# disable lagless while we do this:
+				self.controllerEnabled = False
+				self.chatEnabled = False
+
+				# reset controller
+				controller1.reset()
+				# go home
+				controller1.home = 1
+				send_and_reset(0.1, 1)
+				sleep(2)
+
+				# navigate to re-pair section
+				controller1.LY = STICK_MAX
+				send_and_reset(0.1, 1)
+				controller1.LX = STICK_MAX
+				send_and_reset(0.1, 1)
+				sleep(0.5)
+				controller1.LX = STICK_MAX
+				send_and_reset(0.1, 1)
+				sleep(0.5)
+				controller1.LX = STICK_MAX
+				send_and_reset(0.1, 1)
+				sleep(0.5)
+				controller1.a = 1
+				send_and_reset(0.1, 1)
+				sleep(0.5)
+
+				sleep(3)
+
+				# press a on all controllers, in the correct order
+				controller1.a = 1
+				send_and_reset(0.1, 1)
+				sleep(0.5)
+				controller1.a = 1
+				send_and_reset(0.1, 1, 0)
+				sleep(2)
+				controller2.a = 1
+				send_and_reset(0.1, 1, 1)
+				sleep(2)
+				controller3.a = 1
+				send_and_reset(0.1, 1, 2)
+				sleep(2)
+				controller4.a = 1
+				send_and_reset(0.1, 1, 3)
+				sleep(2)
+				# controller3.a = 1
+				# send_and_reset3(0.1, 1)
+				# sleep(1)
+				# controller4.a = 1
+				# send_and_reset4(0.1, 1)
+
+				# go back to the game
+				controller1.a = 1
+				send_and_reset(0.1, 1)
+				controller1.a = 1
+				send_and_reset(0.1, 1)
+				sleep(2)
+				controller1.b = 1
+				send_and_reset(0.1, 1)
+				sleep(1)
+				controller1.LY = STICK_MIN
+				send_and_reset(0.1, 1)
+				sleep(2)
+				controller1.LX = STICK_MIN
+				send_and_reset(1, 1)
+				controller1.a = 1
+				send_and_reset(0.1, 1)
+
+
+				# re-enable lagless
+				self.controllerEnabled = True
+				self.chatEnabled = True
+
 
 		if len(commands) == 2:
 
@@ -813,333 +1173,96 @@ class Client(object):
 			# 	modlist.remove(commands[1])
 			# 	self.socketio.emit("banlist", banlist)
 
-		if len(commands) == 1:
 
-			cmd = commands[0]
+			# goto commands:
+			if (commands[0] == "!goto" or (commands[0] == "!forcegoto" and username in modlist) or (commands[0] == "!setgame" and username in modlist)):
+				cmd = commands[1]
 
+				goto = None
+				waitTime = 0
+				imageLoc = ""
+				nameofgame = ""
 
-			if (cmd == "!controls" or cmd == "!help"):
-				msg = "goto https://twitchplaysnintendoswitch.com or look at the description for the chat controls,\
-				 you can also type \"!goto [game]\" (without brackets) to switch games. use !goto for a list of games! use !commands for a list of commands!"
-				twitchBot.chat(msg)
+				if (cmd not in gameList):
+					return
 
-			if (cmd == "!goto" or cmd == "!games"):
-				msg = "use \"!goto [game]\" (without brackets) to switch games! list: "
-				for game in gameList:
-					msg += game + ", "
-				msg[:-4]
-				twitchBot.chat(msg)
-
-			if (cmd == "!status" or cmd == "!internetstatus"):
-				msg = "Checking internet status!"
-				twitchBot.chat(msg)
-				self.socketio.emit("getInternetStatus")
-
-			if (cmd == "!commands"):
-				msg = "(mods only): \"!restartscript\", \"!restartserver\" \"!giveplus [user]\", \"!ban [user]\", \"!unban [user]\", \"!removeplus [user]\", \
-				\"!disablechat\", \"!enablechat\", \"!disablegoto\", \"!enablegoto\", \"!setturnlength [lengthInMS]\", \"!setforfeitlength [lengthInMS]\" (plus only): \
-				\"!disableinternet\", \"!enableinternet\", \"!fixcontrollers\", \"!rr [user]\", \"!rainbow [user]\" (anyone): \"!restart1\", \"!restart2\", \"!restart3\", \
-				\"!banlist\", \"!pluslist\", \"!sublist\", \"!modlist\", \"!discord\", \"!site\", \"!goto [game]\""
-				twitchBot.chat(msg)
-
-			if (cmd == "!discord"):
-				msg = "Discord invite link: https://discord.gg/ARTbddH"
-				twitchBot.chat(msg)
-
-			if (cmd == "!site"):
-				msg = "https://twitchplaysnintendoswitch.com"
-				twitchBot.chat(msg)
-
-			if (cmd == "!pluslist"):
-				msg = "plus list: "
-				for user in pluslist:
-					msg += user + ","
-				twitchBot.chat(msg)
-
-			if (cmd == "!modlist"):
-				msg = "mod list: "
-				for user in modlist:
-					msg += user + ","
-				twitchBot.chat(msg)
-
-			if (cmd == "!banlist"):
-				msg = "ban list: "
-				for user in banlist:
-					msg += user + ","
-				twitchBot.chat(msg)
-
-			if (cmd == "!sublist"):
-				msg = "sub list: "
-				for user in sublist:
-					msg += user + ","
-				twitchBot.chat(msg)
-
-			if (cmd == "!restart1" or cmd == "!restart"):
-				# self.socketio.emit("restart")
-				twitchBot.chat("Restarting lagless1!")
-				os.system("taskkill /f /im streamr.exe")
-
-			if (cmd == "!restart2"):
-				twitchBot.chat("Restarting lagless2!")
-				self.socketio.emit("restart2")
-
-			if (cmd == "!restart3"):
-				twitchBot.chat("Restarting lagless3!")
-				self.socketio.emit("restart3")
-
-			if (cmd == "!restartserver"):
-				twitchBot.chat("Restarting the server! maybe @fosse if you're using this!")
-				self.socketio.emit("restart server")
-
-			if (cmd == "!restartscript"):
-				twitchBot.chat("Restarting the python script!")
-				with open("pluslist.pkl", "wb") as f:
-					pickle.dump([pluslist], f)
-				os.system("taskkill /f /im python.exe")
-
-			if (cmd == "!disablegoto" and username in modlist):
-				msg = "Disabling !goto"
-				twitchBot.chat(msg)
-				self.voting = True
-			if (cmd == "!enablegoto" and username in modlist):
-				msg = "Enabling !goto"
-				twitchBot.chat(msg)
-				self.voting = False
-
-			if (cmd == "!disablechat" and username in modlist):
-				msg = "Disabling chat commands!"
-				twitchBot.chat(msg)
-				self.chatEnabled = False
-			if (cmd == "!enablechat" and username in modlist):
-				msg = "Enabling chat commands!"
-				twitchBot.chat(msg)
-				self.chatEnabled = True
-
-			if (cmd == "!lock" and username in pluslist):
-				msg = "locking!"
-				twitchBot.chat(msg)
-				self.voting = True
-				self.chatEnabled = False
-				self.socketio.emit("lock")
-
-			if (cmd == "!unlock" and username in modlist):
-				msg = "Unlocking!"
-				twitchBot.chat(msg)
-				self.voting = False
-				self.chatEnabled = True
-				self.socketio.emit("unlock")
-
-			if (cmd == "!1p" and username in modlist):
-				msg = "Changing to 1 Player Mode!"
-				twitchBot.chat(msg)
-				self.socketio.emit("setMaxPlayers", 1)
-
-			if (cmd == "!2p" and username in modlist):
-				msg = "Changing to 2 Player Mode!"
-				twitchBot.chat(msg)
-				self.socketio.emit("setMaxPlayers", 2)
-
-			if (cmd == "!3p" and username in modlist):
-				msg = "Changing to 3 Player Mode!"
-				twitchBot.chat(msg)
-				self.socketio.emit("setMaxPlayers", 3)
-
-			if (cmd == "!4p" and username in modlist):
-				msg = "Changing to 4 Player Mode!"
-				twitchBot.chat(msg)
-				self.socketio.emit("setMaxPlayers", 4)
-
-			if (cmd == "!5p" and username in modlist):
-				msg = "Changing to 5 Player Mode!"
-				twitchBot.chat(msg)
-				self.socketio.emit("setMaxPlayers", 5)
-
-			if (cmd == "!forcerefresh" and username in modlist):
-				self.socketio.emit("forceRefresh")
-
-			if (cmd == "!disableinternet" and username in pluslist):
-				msg = "Disabling internet accesss!"
-				twitchBot.chat(msg)
-				self.socketio.emit("disableInternet")
-			if (cmd == "!enableinternet" and username in pluslist):
-				msg = "Enabling internet access!"
-				twitchBot.chat(msg)
-				self.socketio.emit("enableInternet")
-
-			if (commands[0] == "!egg"):
-				# msg = "Rickrolling!: " + commands[1]
-				# twitchBot.chat(msg)
-				self.socketio.emit("rickroll", username)
-
-			if (commands[0] == "!rr"):
-				self.socketio.emit("rickroll", username)
+				if (cmd == "smo"):
+					imageLoc, waitTime, nameofgame = "icons/smo.png", 30, "Super Mario Odyssey"
+				if (cmd == "botw"):
+					imageLoc, waitTime, nameofgame = "icons/botw.png", 20, "The Legend of Zelda: Breath of the Wild"
+				if (cmd == "celeste"):
+					imageLoc, waitTime, nameofgame = "icons/celeste.png", 10, "Celeste"
+				if (cmd == "kirby"):
+					imageLoc, waitTime, nameofgame = "icons/kirby.png", 10, "Kirby: Star Allies"
+				if (cmd == "splatoon2"):
+					imageLoc, waitTime, nameofgame = "icons/splatoon2.png", 10, "Splatoon 2"
+				if (cmd == "sonic"):
+					imageLoc, waitTime, nameofgame = "icons/sonic.png", 10, "Sonic Mania"
+				if (cmd == "mk8"):
+					imageLoc, waitTime, nameofgame = "icons/mk8.png", 10, "Mario Kart 8"
+				if (cmd == "arms"):
+					imageLoc, waitTime, nameofgame = "icons/arms.png", 10, "Arms"
+				if (cmd == "skyrim"):
+					imageLoc, waitTime, nameofgame = "icons/skyrim.png", 40, "The Elder Scrolls V: Skyrim"
+				if (cmd == "rocketleague"):
+					imageLoc, waitTime, nameofgame = "icons/rocketleague.png", 10, "Rocket League"
+				if (cmd == "wizard"):
+					imageLoc, waitTime, nameofgame = "icons/wizard.png", 10, "Wizard of Legend"
+				if (cmd == "pokemonquest"):
+					imageLoc, waitTime, nameofgame = "icons/pokemonquest.png", 10, "Pokemon Quest"
+				if (cmd == "torquel"):
+					imageLoc, waitTime, nameofgame = "icons/torquel.png", 10, "TorqueL"
+				if (cmd == "fallout"):
+					imageLoc, waitTime, nameofgame = "icons/fallout.png", 10, "Fallout Shelter"
+				if (cmd == "fortnite"):
+					imageLoc, waitTime, nameofgame = "icons/fortnite2.png", 10, "Fortnite"
+				if (cmd == "jackbox3"):
+					imageLoc, waitTime, nameofgame = "icons/jackbox3.png", 10, "The Jackbox Party Pack 3"
+				if (cmd == "jackbox4"):
+					imageLoc, waitTime, nameofgame = "icons/jackbox4.png", 10, "The Jackbox Party Pack 4"
+				if (cmd == "shovel"):
+					imageLoc, waitTime, nameofgame = "icons/shovel.png", 10, "Shovel Knight"
+				if (cmd == "octopath"):
+					imageLoc, waitTime, nameofgame = "icons/octopathprologuedemo.png", 10, "Octopath Traveler"
+				if (cmd == "explosion"):
+					imageLoc, waitTime, nameofgame = "icons/explosion.png", 10, "Graceful Explosion Machine"
+				if (cmd == "human"):
+					imageLoc, waitTime, nameofgame = "icons/human.png", 10, "Human: Fall Flat"
+				if (cmd == "snipperclips"):
+					imageLoc, waitTime, nameofgame = "icons/snipperclips.png", 10, "Snipperclips: Cut It Out, Together!"
+				if (cmd == "paladins"):
+					imageLoc, waitTime, nameofgame = "icons/paladins.png", 10, "Paladins"
+				if (cmd == "hollow"):
+					imageLoc, waitTime, nameofgame = "icons/hollow.png", 10, "Hollow Knight"
+				if (cmd == "mta"):
+					imageLoc, waitTime, nameofgame = "icons/mta.png", 10, "Mario Tennis Aces"
+				# if (cmd == "!goto cave"):
+				# 	imageLoc, waitTime, nameofgame = "icons/cave.png", 10, "Cave Story"
+				# if (cmd == "!goto isaac"):
+				# 	imageLoc, waitTime, nameofgame = "icons/isaac.png", 10, "The Binding of Isaac: Afterbirth"
+				# if (cmd == "!goto mario"):
+				# 	imageLoc, waitTime, nameofgame = "icons/mario.png", 10, "Twitch Plays"
 
 
-			if (commands[0] == "!rainbow"):
-				self.socketio.emit("rainbow", username)
+				if (self.currentGame == nameofgame):
+					msg = "We're already playing this game!"
+					twitchBot.chat(msg)
+					return
 
-
-			if (cmd == "!fixcontrollers" and username in pluslist):
-				twitchBot.chat("Fixing controller order!")
-				# disable lagless while we do this:
-				self.controllerEnabled = False
-				self.chatEnabled = False
-
-				# reset controller
-				controller1.reset()
-				# go home
-				controller1.home = 1
-				send_and_reset(0.1, 1)
-				sleep(2)
-
-				# navigate to re-pair section
-				controller1.LY = STICK_MAX
-				send_and_reset(0.1, 1)
-				controller1.LX = STICK_MAX
-				send_and_reset(0.1, 1)
-				sleep(0.5)
-				controller1.LX = STICK_MAX
-				send_and_reset(0.1, 1)
-				sleep(0.5)
-				controller1.LX = STICK_MAX
-				send_and_reset(0.1, 1)
-				sleep(0.5)
-				controller1.a = 1
-				send_and_reset(0.1, 1)
-				sleep(0.5)
-
-				sleep(3)
-
-				# press a on all controllers, in the correct order
-				controller1.a = 1
-				send_and_reset(0.1, 1)
-				sleep(0.5)
-				controller1.a = 1
-				send_and_reset(0.1, 1, 0)
-				sleep(2)
-				controller2.a = 1
-				send_and_reset(0.1, 1, 1)
-				sleep(2)
-				controller3.a = 1
-				send_and_reset(0.1, 1, 2)
-				sleep(2)
-				controller4.a = 1
-				send_and_reset(0.1, 1, 3)
-				sleep(2)
-				# controller3.a = 1
-				# send_and_reset3(0.1, 1)
-				# sleep(1)
-				# controller4.a = 1
-				# send_and_reset4(0.1, 1)
-
-				# go back to the game
-				controller1.a = 1
-				send_and_reset(0.1, 1)
-				controller1.a = 1
-				send_and_reset(0.1, 1)
-				sleep(2)
-				controller1.b = 1
-				send_and_reset(0.1, 1)
-				sleep(1)
-				controller1.LY = STICK_MIN
-				send_and_reset(0.1, 1)
-				sleep(2)
-				controller1.LX = STICK_MIN
-				send_and_reset(1, 1)
-				controller1.a = 1
-				send_and_reset(0.1, 1)
-
-
-				# re-enable lagless
-				self.controllerEnabled = True
-				self.chatEnabled = True
-
-				
-
-		# goto commands:
-		if (len(commands) == 2 and (commands[0] == "!goto" or (commands[0] == "!forcegoto" and username in modlist) or (commands[0] == "!setgame" and username in modlist))):
-			cmd = commands[1]
-
-			goto = None
-			waitTime = 0
-			imageLoc = ""
-			nameofgame = ""
-
-			if (cmd == "smo"):
-				imageLoc, waitTime, nameofgame = "icons/smo.png", 30, "Super Mario Odyssey"
-			if (cmd == "botw"):
-				imageLoc, waitTime, nameofgame = "icons/botw.png", 20, "The Legend of Zelda: Breath of the Wild"
-			if (cmd == "celeste"):
-				imageLoc, waitTime, nameofgame = "icons/celeste.png", 10, "Celeste"
-			if (cmd == "kirby"):
-				imageLoc, waitTime, nameofgame = "icons/kirby.png", 10, "Kirby: Star Allies"
-			if (cmd == "splatoon2"):
-				imageLoc, waitTime, nameofgame = "icons/splatoon2.png", 10, "Splatoon 2"
-			if (cmd == "sonic"):
-				imageLoc, waitTime, nameofgame = "icons/sonic.png", 10, "Sonic Mania"
-			if (cmd == "mk8"):
-				imageLoc, waitTime, nameofgame = "icons/mk8.png", 10, "Mario Kart 8"
-			if (cmd == "arms"):
-				imageLoc, waitTime, nameofgame = "icons/arms.png", 10, "Arms"
-			if (cmd == "skyrim"):
-				imageLoc, waitTime, nameofgame = "icons/skyrim.png", 40, "The Elder Scrolls V: Skyrim"
-			if (cmd == "rocketleague"):
-				imageLoc, waitTime, nameofgame = "icons/rocketleague.png", 10, "Rocket League"
-			if (cmd == "wizard"):
-				imageLoc, waitTime, nameofgame = "icons/wizard.png", 10, "Wizard of Legend"
-			if (cmd == "pokemonquest"):
-				imageLoc, waitTime, nameofgame = "icons/pokemonquest.png", 10, "Pokemon Quest"
-			if (cmd == "torquel"):
-				imageLoc, waitTime, nameofgame = "icons/torquel.png", 10, "TorqueL"
-			if (cmd == "fallout"):
-				imageLoc, waitTime, nameofgame = "icons/fallout.png", 10, "Fallout Shelter"
-			if (cmd == "fortnite"):
-				imageLoc, waitTime, nameofgame = "icons/fortnite2.png", 10, "Fortnite"
-			if (cmd == "jackbox3"):
-				imageLoc, waitTime, nameofgame = "icons/jackbox3.png", 10, "The Jackbox Party Pack 3"
-			if (cmd == "jackbox4"):
-				imageLoc, waitTime, nameofgame = "icons/jackbox4.png", 10, "The Jackbox Party Pack 4"
-			if (cmd == "shovel"):
-				imageLoc, waitTime, nameofgame = "icons/shovel.png", 10, "Shovel Knight"
-			if (cmd == "octopath"):
-				imageLoc, waitTime, nameofgame = "icons/octopathprologuedemo.png", 10, "Octopath Traveler"
-			if (cmd == "explosion"):
-				imageLoc, waitTime, nameofgame = "icons/explosion.png", 10, "Graceful Explosion Machine"
-			if (cmd == "human"):
-				imageLoc, waitTime, nameofgame = "icons/human.png", 10, "Human: Fall Flat"
-			if (cmd == "snipperclips"):
-				imageLoc, waitTime, nameofgame = "icons/snipperclips.png", 10, "Snipperclips: Cut It Out, Together!"
-			if (cmd == "paladins"):
-				imageLoc, waitTime, nameofgame = "icons/paladins.png", 10, "Paladins"
-			if (cmd == "hollow"):
-				imageLoc, waitTime, nameofgame = "icons/hollow.png", 10, "Hollow Knight"
-			# if (cmd == "!goto cave"):
-			# 	imageLoc, waitTime, nameofgame = "icons/cave.png", 10, "Cave Story"
-			# if (cmd == "!goto isaac"):
-			# 	imageLoc, waitTime, nameofgame = "icons/isaac.png", 10, "The Binding of Isaac: Afterbirth"
-			# if (cmd == "!goto mario"):
-			# 	imageLoc, waitTime, nameofgame = "icons/mario.png", 10, "Twitch Plays"
-
-
-			if (self.currentGame == nameofgame):
-				msg = "We're already playing this game!"
-				twitchBot.chat(msg)
-				return
-
-			if (commands[0] == "!setgame"):
-				self.currentGame = nameofgame
-				msg = "!game " + nameofgame
-				twitchBot.chat(msg)
-				return
+				if (commands[0] == "!setgame"):
+					self.currentGame = nameofgame
+					msg = "!game " + nameofgame
+					twitchBot.chat(msg)
+					return
 
 
 
-			if (commands[0] == "!forcegoto"):
-				goto = self.goto_game
-			else:
-				goto = self.goto_game_vote
+				if (commands[0] == "!forcegoto"):
+					goto = self.goto_game
+				else:
+					goto = self.goto_game_vote
 
-			goto(imageLoc, waitTime, nameofgame)
+				goto(imageLoc, waitTime, nameofgame)
 
 		if (not self.chatEnabled):
 			return
@@ -1159,10 +1282,10 @@ class Client(object):
 
 		#sleep(0.0001)
 
-		self.end = time.clock()
+		self.end = time.time()
 		diffInMilliSeconds = (self.end - self.start)*1000
 		if (diffInMilliSeconds > 8.33333):
-			self.start = time.clock()
+			self.start = time.time()
 			#controller1.send(controller1.output)
 
 			if (len(commandQueue) > 0):
@@ -1171,10 +1294,6 @@ class Client(object):
 
 			duration = 0
 			reset = 1
-
-			if (self.lockon == True):
-				controller1.zl = 1
-				reset = 0
 
 			if (len(nextCommands) > 0):
 				# print(nextCommands)
@@ -1765,10 +1884,10 @@ class Client(object):
 
 		# control switch here:
 
-		self.botend = time.clock()
+		self.botend = time.time()
 		diffInMilliSeconds = (self.botend - self.botstart)*1000
 		if (diffInMilliSeconds > 1000*60*5):
-			self.botstart = time.clock()
+			self.botstart = time.time()
 
 			self.socketio.emit("joinSecure", {"room": "controller", "password": ROOM_SECRET})
 			self.socketio.emit("banlist", banlist)
@@ -1776,14 +1895,14 @@ class Client(object):
 			self.socketio.emit("pluslist", pluslist)
 			self.socketio.emit("sublist", sublist)
 			
-			msg = "Join the discord server! https://discord.gg/ARTbddH\
+			msg = "Type \"!help\" for help! Join the discord server! https://discord.gg/ARTbddH/\
 			hate the stream delay? go here! https://twitchplaysnintendoswitch.com"
 			twitchBot.chat(msg)
 
-		self.controllerEnd = time.clock()
+		self.controllerEnd = time.time()
 		diffInMilliSeconds2 = (self.controllerEnd - self.controllerStart)*1000
 		if (diffInMilliSeconds2 > 6000):
-			self.controllerStart = time.clock()
+			self.controllerStart = time.time()
 
 			self.socketio.emit("joinSecure", {"room": "controller", "password": ROOM_SECRET})
 			self.socketio.emit("banlist", banlist)
@@ -1812,6 +1931,103 @@ class Client(object):
 				pass
 
 		self.decreaseQueue()
+
+# https://stackoverflow.com/questions/2697039/python-equivalent-of-setinterval
+# class ThreadJob(threading.Thread):
+# 	def __init__(self,callback,event,interval):
+# 		'''runs the callback function after interval seconds
+
+# 		:param callback:  callback function to invoke
+# 		:param event: external event for controlling the update operation
+# 		:param interval: time in seconds after which are required to fire the callback
+# 		:type callback: function
+# 		:type interval: int
+# 		'''
+# 		self.callback = callback
+# 		self.event = event
+# 		self.interval = interval
+# 		super(ThreadJob,self).__init__()
+
+# 	def run(self):
+# 		while not self.event.wait(self.interval):
+# 			self.callback()
+
+# event = threading.Event()
+
+# k = ThreadJob(auto_goto, event, 10)
+# k.start()
+
+# def set_interval(func, sec):
+# 	def func_wrapper():
+# 		set_interval(func, sec)
+# 		func()
+# 	t = threading.Timer(sec, func_wrapper)
+# 	t.start()
+# 	return t
+
+# set_interval(auto_goto, 50)
+
+interval = 60*60
+
+def auto_goto():
+	if (len(client.currentPlayers) == 0):
+		game = random.choice(gameList)
+		msg = "!goto " + game
+		twitchBot.chat(msg)
+		sleep(1)
+		msg = "yea"
+		twitchBot.chat(msg)
+		try:
+			autoGotoTimer.cancel()
+		except:
+			pass
+
+		msg = "!disableinternet"
+		twitchBot.chat(msg)
+
+	autoGotoTimer = Timer(interval, auto_goto)
+	autoGotoTimer.start()
+
+autoGotoTimer = Timer(interval, auto_goto)
+autoGotoTimer.start()
+
+
+
+
+lockInterval = 1
+
+def emergency_lock():
+
+	x1 = 319 - 1920;# left monitor
+	y1 = 61 + 360;
+	width = 1280
+	height = 720
+	windowName = "OBS"
+	iconLoc = client.findImage2("icons/screenshots/settingspage.png", x1, y1, width, height, windowName, 0.6)
+
+	if (iconLoc != None):
+		if (client.voting == False or client.chatEnabled == True):
+			msg = "Emergency Locking!"
+			twitchBot.chat(msg)
+			client.voting = True
+			client.chatEnabled = False
+			client.socketio.emit("lock")
+
+		if (client.currentPlayers[0] not in modlist):
+			controller1.b = 1
+			send_and_reset(0.1)
+			controller1.b = 1
+			send_and_reset(0.1)
+			controller1.b = 1
+			send_and_reset(0.1)
+			controller1.b = 1
+			send_and_reset(0.1)
+
+	lockTimer = Timer(lockInterval, emergency_lock)
+	lockTimer.start()
+
+lockTimer = Timer(lockInterval, emergency_lock)
+lockTimer.start()
 
 client = Client()
 while True:

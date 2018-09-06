@@ -34,7 +34,7 @@ controller.connect("COM6")
 twitchBot = TwitchBot()
 twitchBot.connect(HOST, PASS2, PORT, CHAN, NICK2)
 
-start = time.clock()
+start = time.process_time()
 
 def delayed_reset(delay=0.1):
 	Timer(delay, controller.reset).start()
@@ -42,14 +42,14 @@ def delayed_reset(delay=0.1):
 
 
 def accurateSleep(duration):
-	s = time.clock()
-	e = time.clock()
+	s = time.process_time()
+	e = time.process_time()
 
 	diffInSeconds = 0
 	diffInMilliSeconds = 0
 
 	while (diffInMilliSeconds < duration):
-		e = time.clock()
+		e = time.process_time()
 		diffInSeconds = e - s
 		diffInMilliSeconds = diffInSeconds*1000
 		#sleep(0.0000001)

@@ -51,8 +51,8 @@ class Client(object):
 		self.receive_events_thread.daemon = True
 		self.receive_events_thread.start()
 
-		self.start = time.clock()
-		self.end = time.clock()
+		self.start = time.process_time()
+		self.end = time.process_time()
 
 		self.status = False
 
@@ -88,11 +88,11 @@ class Client(object):
 		self.socketio.emit("internetStatus", client.status)
 
 	def loop(self):
-		self.end = time.clock()
+		self.end = time.process_time()
 		diffInMilliSeconds = (self.end - self.start)*1000
 		if (diffInMilliSeconds > 1000*60*5):
 			self.socketio.emit("join", "proxy")
-			self.start = time.clock()
+			self.start = time.process_time()
 
 
 print("disabling proxy!")
@@ -102,5 +102,8 @@ p = os.system("echo %s|sudo -S %s" % (sudoPassword, command))
 
 client = Client()
 while True:
-	client.loop()
-	sleep(0.0001)
+	try:
+		client.loop()
+		sleep(0.0001)
+	except:
+		os.system("killall python3")

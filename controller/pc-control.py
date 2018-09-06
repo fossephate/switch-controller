@@ -24,7 +24,7 @@ prevY = 0
 controller = SwitchController()
 controller.connect("COM6")
 
-start = time.clock()
+start = time.process_time()
 
 
 while True:
@@ -119,10 +119,10 @@ while True:
 
 	controller.getOutput()
 
-	end = time.clock()
+	end = time.process_time()
 	diffInSeconds = end - start
 	diffInMilliSeconds = diffInSeconds*1000
 
 	if(diffInMilliSeconds > 80):
-		start = time.clock()
+		start = time.process_time()
 		controller.send(controller.output)

@@ -9,5 +9,4 @@ https://www.adafruit.com/product/3309
 
 
 ## Credit and Thanks
-* Thanks to @wchill for his work
 * Thanks to https://github.com/ebith/Switch-Fightstick
