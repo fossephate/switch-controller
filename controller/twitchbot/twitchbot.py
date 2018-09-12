@@ -1,8 +1,13 @@
 import socket
 from time import sleep
 import re
-from .config import *
 import requests
+
+# config
+try:
+	from .config import *
+except:
+	from config import *
 
 CHAT_MSG=re.compile(r"^:\w+!\w+@\w+\.tmi\.twitch\.tv PRIVMSG #\w+ :")
 
@@ -16,7 +21,7 @@ class TwitchBot():
 		self.HOST = ""
 		self.PORT = 0
 
-	def chat(self, msg):
+	def send_message(self, msg):
 		"""
 		Send a chat message to the server.
 		Keyword arguments:
@@ -39,7 +44,7 @@ class TwitchBot():
 		sock -- the socket over which to send the ban command
 		user -- the user to be banned
 		"""
-		chat(self.sock, ".ban {}".format(user))
+		send_message(self.sock, ".ban {}".format(user))
 
 	def timeout(self, user, secs=600):
 		"""
@@ -49,7 +54,7 @@ class TwitchBot():
 		user -- the user to be timed out
 		secs -- the length of the timeout in seconds (default 600)
 		"""
-		chat(self.sock, ".timeout {}".format(user, secs))
+		send_message(self.sock, ".timeout {}".format(user, secs))
 
 	def connect(self, HOST, PASS, PORT, CHANNEL, NICK):
 		self.HOST = HOST

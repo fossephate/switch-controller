@@ -10,3 +10,6 @@
 *.eep
 config.py
 config2.py
+client_secrets.json
+client_secrets*.json
+oauth*.json
