@@ -232,6 +232,7 @@ class Client(object):
 		self.controllerEnabled = True
 		self.emergencySystemEnabled = True
 		self.chatRelayEnabled = False
+		self.controlQueues = [[], [], [], [], []]
 		self.currentPlayers = []
 		self.currentGame = "none"
 
@@ -247,10 +248,12 @@ class Client(object):
 		nextCommands.append(args)
 
 	def on_turn_times_left(*args):
-		try:
-			client.currentPlayers = args[1]["usernames"]
-		except:
-			pass
+		# try:
+		# 	client.currentPlayers = args[1]["usernames"]
+		# except:
+		# 	pass
+
+		pass
 
 	def on_controller_state(*args):
 
@@ -1006,7 +1009,7 @@ class Client(object):
 				self.chatEnabled = True
 
 			if (cmd == "!lock" and username in pluslist):
-				msg = "locking!"
+				msg = "Locking!"
 				send_message(msg, "both")
 				self.voting = True
 				self.chatEnabled = False

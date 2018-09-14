@@ -44,7 +44,7 @@ class Credentials:
         flow = client.flow_from_clientsecrets(
             "client_secrets.json",
             scope="https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/youtube https://www.googleapis.com/auth/youtube.force-ssl",
-            redirect_uri="https://twitchplaysnintendoswitch.com/8110/youtube/callback/")
+            redirect_uri="https://twitchplaysnintendoswitch.com/8110/auth/youtube/callback/")
 
         auth_uri = flow.step1_get_authorize_url()
         # print(auth_uri)
