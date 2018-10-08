@@ -41,13 +41,12 @@ class YouTubeBot:
 		if msg["snippet"]["type"] != "textMessageEvent":
 			print("non text message event")
 			return
-
-		# print(msg)
+		
 		# print(msg["authorDetails"])
 		username = msg["authorDetails"]["displayName"]
 		message = msg["snippet"]["displayMessage"]
-		# print("<" + username + "> " + message)
-		self.messages.append({"username": username, "message": message})
+		channelID = msg["authorDetails"]["channelId"]
+		self.messages.append({"channelID": channelID, "username": username, "message": message})
 
 	def main(self):
 		nextPageToken = ""

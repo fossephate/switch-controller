@@ -12,7 +12,7 @@ except:
 CHAT_MSG=re.compile(r"^:\w+!\w+@\w+\.tmi\.twitch\.tv PRIVMSG #\w+ :")
 
 class TwitchBot():
-	
+
 	def __init__(self):
 		self.sock = socket.socket()
 		self.CHAN = ""
@@ -32,7 +32,7 @@ class TwitchBot():
 		# full_msg = "PRIVMSG #{} :{}".format(CHAN, msg)
 
 		full_msg = "PRIVMSG " + self.CHAN + " :" + msg + "\r\n"
-		
+
 		msg_encoded = full_msg.encode("utf-8")
 		self.sock.send(msg_encoded)
 

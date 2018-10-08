@@ -52,7 +52,7 @@ class SwitchController():
 		self.zr		= 0
 		self.plus	= 0
 		self.home 	= 0
-		
+
 		self.LX = STICK_CENTER
 		self.LY = STICK_CENTER
 		self.RX = STICK_CENTER
@@ -94,6 +94,10 @@ class SwitchController():
 		self.output = ""
 
 		self.output += str(self.dpad)
+		# self.output += '1' if (self.up) else '0'
+		# self.output += '1' if (self.down) else '0'
+		# self.output += '1' if (self.left) else '0'
+		# self.output += '1' if (self.right) else '0'
 		self.output += '1' if (self.lstick) else '0'
 		self.output += '1' if (self.l) else '0'
 		self.output += '1' if (self.zl) else '0'
