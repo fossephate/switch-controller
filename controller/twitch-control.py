@@ -912,7 +912,7 @@ class Client(object):
 				send_message(msg3, source)
 
 			if (cmd == "!discord"):
-				msg = "Discord invite link: https://discord.gg/ARTbddH/"
+				msg = "Discord invite link: https://discord.io/tpns/"
 				send_message(msg, source)
 
 			if (cmd == "!site"):
@@ -1979,7 +1979,7 @@ class Client(object):
 			self.socketio.emit("pluslist", pluslist)
 			self.socketio.emit("sublist", sublist)
 
-			msg = "Type \"!help\" for help! Join the discord server! https://discord.gg/ARTbddH/\
+			msg = "Type \"!help\" for help! Join the discord server! https://discord.io/tpns/\
 			hate the stream delay? go here! https://twitchplaysnintendoswitch.com"
 			send_message(msg, "both")
 
