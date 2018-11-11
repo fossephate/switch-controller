@@ -94,25 +94,25 @@ class SwitchController():
 		self.output = ""
 
 		self.output += str(self.dpad)
-		# self.output += '1' if (self.up) else '0'
-		# self.output += '1' if (self.down) else '0'
-		# self.output += '1' if (self.left) else '0'
-		# self.output += '1' if (self.right) else '0'
-		self.output += '1' if (self.lstick) else '0'
-		self.output += '1' if (self.l) else '0'
-		self.output += '1' if (self.zl) else '0'
-		self.output += '1' if (self.minus) else '0'
-		self.output += '1' if (self.capture) else '0'
+		# self.output += "1" if (self.up) else "0"
+		# self.output += "1" if (self.down) else "0"
+		# self.output += "1" if (self.left) else "0"
+		# self.output += "1" if (self.right) else "0"
+		self.output += "1" if (self.lstick) else "0"
+		self.output += "1" if (self.l) else "0"
+		self.output += "1" if (self.zl) else "0"
+		self.output += "1" if (self.minus) else "0"
+		self.output += "1" if (self.capture) else "0"
 
-		self.output += '1' if (self.a) else '0'
-		self.output += '1' if (self.b) else '0'
-		self.output += '1' if (self.x) else '0'
-		self.output += '1' if (self.y) else '0'
-		self.output += '1' if (self.rstick) else '0'
-		self.output += '1' if (self.r) else '0'
-		self.output += '1' if (self.zr) else '0'
-		self.output += '1' if (self.plus) else '0'
-		self.output += '1' if (self.home) else '0'
+		self.output += "1" if (self.a) else "0"
+		self.output += "1" if (self.b) else "0"
+		self.output += "1" if (self.x) else "0"
+		self.output += "1" if (self.y) else "0"
+		self.output += "1" if (self.rstick) else "0"
+		self.output += "1" if (self.r) else "0"
+		self.output += "1" if (self.zr) else "0"
+		self.output += "1" if (self.plus) else "0"
+		self.output += "1" if (self.home) else "0"
 
 		self.output += " " + str(self.LX)
 		self.output += " " + str(self.LY)
@@ -121,10 +121,9 @@ class SwitchController():
 
 	def send(self, msg):
 		try:
-			self.ser.write(f'{msg}\r\n'.encode('utf-8'));
+			self.ser.write(f'{msg}\r\n'.encode("utf-8"));
 		except:
 			print("some write error")
-			pass
 
 
 	def connect(self, port):

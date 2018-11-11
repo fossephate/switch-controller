@@ -8,6 +8,7 @@ import asyncio
 
 # switch controller:
 from switchcontroller.switchcontroller import *
+from switchcontroller.switchcontroller2 import *
 
 # twitch:
 from twitchbot.twitchbot import *
@@ -77,13 +78,14 @@ y = screenHeight/2
 prevX = 0
 prevY = 0
 
-controller1 = SwitchController()
+controller1 = SwitchController2()
 controller2 = SwitchController()
 controller3 = SwitchController()
 controller4 = SwitchController()
 
 try:
-	controller1.connect("COM3")
+	# controller1.connect("COM3")
+	controller1.connect(1)
 except:
 	print("controller1 error")
 
@@ -91,19 +93,16 @@ try:
 	controller2.connect("COM6")
 except:
 	print("controller2 error")
-	pass
 
 try:
 	controller3.connect("COM9")
 except:
 	print("controller3 error")
-	pass
 
 try:
 	controller4.connect("COM10")
 except:
 	print("controller4 error")
-	pass
 
 # twitch bot:
 twitchBot = TwitchBot()
@@ -140,39 +139,67 @@ def send_and_reset(duration=0.1, reset=1, cNum=0):
 	elif (cNum == 3):
 		controller = controller4
 
-	controller.getOutput()
-	controller.send(controller.output)
-	# accurateSleep(duration)
-	sleep(duration)
-	if (reset):
-		controller.reset()
+	try:
 		controller.getOutput()
 		controller.send(controller.output)
+		if (cNum == 0):
+			controller.send(controller.output)
+		# accurateSleep(duration)
+		sleep(duration)
+		if (reset):
+			controller.reset()
+			controller.getOutput()
+			controller.send(controller.output)
+	except:
+		print("controller send error")
 
 def round_down(num, divisor):
 	return num - (num % divisor)
 
 
-def send_message(msg, destination="Twitch"):
-	if (destination == "Twitch" or destination == "both"):
+def send_message(msg, destination="twitch"):
+	if (destination == "twitch" or destination == "both"):
 		try:
-			twitchBot.send_message(msg)
+			if (len(msg) > 300):
+				# split into 2 parts:
+				firstpart, secondpart = msg[:len(msg)//2], msg[len(msg)//2:]
+				send_message(firstpart, "twitch")
+				send_message(secondpart, "twitch")
+			else:
+				twitchBot.send_message(msg)
 		except:
 			print("Twitch send_message error")
-	if (destination == "YouTube" or destination == "both"):
+	if (destination == "youtube" or destination == "both"):
 		try:
-			youtubeBot.send_message(msg)
+			if (len(msg) > 199):
+				# split into 2 parts:
+				firstpart, secondpart = msg[:len(msg)//2], msg[len(msg)//2:]
+				send_message(firstpart, "youtube")
+				send_message(secondpart, "youtube")
+			else:
+				youtubeBot.send_message(msg)
 		except:
 			print("Youtube send_message error")
+	if (destination == "site" or destination == "both"):
+		try:
+			if (len(msg) > 400):
+				# split into 2 parts:
+				firstpart, secondpart = msg[:len(msg)//2], msg[len(msg)//2:]
+				send_message(firstpart, "site")
+				send_message(secondpart, "site")
+			else:
+				client.socketio.emit("botMessage", msg)
+		except:
+			print("site send_message error")
 
 
 
 
-gameList = ["nes", "mta", "hollow", "paladins", "snipperclips", "mk8", "human", "shovel", "octopath", "explosion", "jackbox4", "jackbox3", "fallout", "skyrim", "splatoon2", "celeste", "smo", "rocketleague", "pokemonquest", "wizard", "sonic", "arms", "kirby", "fortnite", "torquel", "botw"]
+gameList = ["brawlhalla", "nes", "mta", "hollow", "paladins", "snipperclips", "mk8", "human", "shovel", "octopath", "explosion", "jackbox4", "jackbox3", "fallout", "skyrim", "splatoon2", "celeste", "smo", "rocketleague", "pokemonquest", "wizard", "sonic", "arms", "kirby", "fortnite", "torquel", "botw"]
 # plusCommands = []
 # modCommands = []
 # anyCommands = []
-validCommands = ["!friendcode", "!fc", "!goto nes", "!expired", "!gamelist", "!source", "!playing", "!randomgame", "!status", "!rainbow", "!setgame", "!forcegoto", "!sublist", "!4p", "!3p", "!2p", "!1p", "!modlist", "!lock", "!egg", "!rr", "!discord", "!games", "!setforfeitlength", "!setturnlength", "!banlist", "!disableinternet", "!enableinternet", "!forcerefresh", "nay", "yea", "!enablechat", "!disablechat", "!enablegoto", "!disablegoto", "!unmod", "!mod", "!fixcontrollers", "!goto snipperclips", "!pluslist", "!unban", "!ban", "!removeplus", "!giveplus", "!goto human", "!goto shovel", "!goto octopath", "!goto explosion", "!goto jackbox4", "!goto jackbox3", "!commands", "!goto fallout", "!goto fortnite", "!goto torquel", "!goto pokemonquest", "!restart", "!restart1", "!restart2", "!restart3", "!restartscript", "!restartserver", "!help", "votenay", "voteyea", "!goto wizard", "!goto cave", "!goto sonic", "!goto skyrim", "!goto rocketleague", "!goto arms", "!goto celeste", "!goto mk8", "!goto splatoon2", "!goto isaac", "!goto mario", "!goto botw", "!goto kirby", "!goto smo", "!goto", "hhsprint", "hsprint", "sprint", "!controls", "!goto", "home", "lstick", "rstick", "spin", "swim", "back flip", "ground pound", "groundpound", "gp", "bf", "cap bounce", "sdive", "sdive2", "hdive", "hdive2", "hdive3", "dive", "dive2", "dive3", "roll", "roll2", "backflip", "backflip2", "sssu", "sssd", "sssl", "sssr", "sb", "suu", "", "up", "down", "left", "right", "u", "d", "l", "r", "hup", "hdown", "hleft", "hright", "hhup", "hhdown", "hhleft", "hhright", "hu", "hd", "hl", "hr", "su", "sd", "sl", "sr", "sup", "sdown", "sleft", "sright", "ssu", "ssd", "ssl", "ssr", "ssup", "ssdown", "ssleft", "ssright", "look up", "look down", "look left", "look right", "lu", "ld", "ll", "lr", "hlu", "hld", "hll", "hlr", "slu", "sld", "sll", "slr", "dup", "ddown", "dleft", "dright", "du", "dd", "dl", "dr", "a", "b", "x", "y", "ha", "hb", "hx", "hy", "hhb", "hhhb", "l", "zl", "r", "zr", "plus", "minus", "long jump", "long jump2", "long jump3", "jump forward", "jump forward2", "jump back", "jump back2", "dive", "dive2"]
+validCommands = ["!disablegyro", "!enablegyro", "!unlockqueues", "!lockqueues", "!friendcode", "!fc", "!goto nes", "!expired", "!gamelist", "!source", "!playing", "!randomgame", "!status", "!rainbow", "!setgame", "!forcegoto", "!sublist", "!4p", "!3p", "!2p", "!1p", "!modlist", "!lock", "!egg", "!rr", "!discord", "!games", "!setforfeitlength", "!setturnlength", "!banlist", "!disableinternet", "!enableinternet", "!forcerefresh", "nay", "yea", "!enablechat", "!disablechat", "!enablegoto", "!disablegoto", "!unmod", "!mod", "!fixcontrollers", "!goto snipperclips", "!pluslist", "!unban", "!ban", "!removeplus", "!giveplus", "!goto human", "!goto shovel", "!goto octopath", "!goto explosion", "!goto jackbox4", "!goto jackbox3", "!commands", "!goto fallout", "!goto fortnite", "!goto torquel", "!goto pokemonquest", "!restart", "!restart1", "!restart2", "!restart3", "!restartscript", "!restartserver", "!help", "votenay", "voteyea", "!goto wizard", "!goto cave", "!goto sonic", "!goto skyrim", "!goto rocketleague", "!goto arms", "!goto celeste", "!goto mk8", "!goto splatoon2", "!goto isaac", "!goto mario", "!goto botw", "!goto kirby", "!goto smo", "!goto", "hhsprint", "hsprint", "sprint", "!controls", "!goto", "home", "lstick", "rstick", "spin", "swim", "back flip", "ground pound", "groundpound", "gp", "bf", "cap bounce", "sdive", "sdive2", "hdive", "hdive2", "hdive3", "dive", "dive2", "dive3", "roll", "roll2", "backflip", "backflip2", "sssu", "sssd", "sssl", "sssr", "sb", "suu", "", "up", "down", "left", "right", "u", "d", "l", "r", "hup", "hdown", "hleft", "hright", "hhup", "hhdown", "hhleft", "hhright", "hu", "hd", "hl", "hr", "su", "sd", "sl", "sr", "sup", "sdown", "sleft", "sright", "ssu", "ssd", "ssl", "ssr", "ssup", "ssdown", "ssleft", "ssright", "look up", "look down", "look left", "look right", "lu", "ld", "ll", "lr", "hlu", "hld", "hll", "hlr", "slu", "sld", "sll", "slr", "dup", "ddown", "dleft", "dright", "du", "dd", "dl", "dr", "a", "b", "x", "y", "ha", "hb", "hx", "hy", "hhb", "hhhb", "l", "zl", "r", "zr", "plus", "minus", "long jump", "long jump2", "long jump3", "jump forward", "jump forward2", "jump back", "jump back2", "dive", "dive2"]
 pluslist = []
 modlist = ["harmjan387", "beanjr_yt", "alua2020", "ogcristofer", "stravos96", "splatax", "silvermagpi", "twitchplaysconsoles", "fosseisanerd", "tpnsbot"]
 banlist = []
@@ -194,7 +221,11 @@ if (os.path.exists("banlist.pkl")):
 		banlist = pickle.load(f)[0]
 
 # get sub list:
-sublist = getSubList()
+sublist = None
+try:
+	sublist = getSubList()
+except:
+	sublist = []
 
 class Client(object):
 
@@ -206,7 +237,7 @@ class Client(object):
 		self.socketio.on("controllerState3", self.on_controller_state3)
 		self.socketio.on("controllerState4", self.on_controller_state4)
 		self.socketio.on("turnTimesLeft", self.on_turn_times_left)
-		self.socketio.on("internetStatus", self.on_internet_status)
+		self.socketio.on("chatMessage", self.on_chat_message)
 		self.socketio.on("afk", self.on_afk)
 		self.socketio.on("lock", self.on_lock)
 		self.socketio.on("unlock", self.on_unlock)
@@ -243,9 +274,6 @@ class Client(object):
 		self.currentPlayers = []
 		self.currentGame = "none"
 
-		self.twitchToUniqueID = {}
-		self.youtubeToUniqueID = {}
-
 
 
 	def _receive_events_thread(self):
@@ -253,7 +281,7 @@ class Client(object):
 
 	def on_event(self, event):
 		#print(event)
-		pass
+		return
 
 	def on_controller_command(*args):
 		nextCommands.append(args)
@@ -264,7 +292,7 @@ class Client(object):
 		except:
 			pass
 
-		pass
+		return
 
 	def on_controller_state(*args):
 
@@ -300,11 +328,11 @@ class Client(object):
 			pass
 
 		# if (state == "800000000000000 128 128 128 128"):
-		if (state == "000000000000000000 128 128 128 128"):
-			controller.reset()
-			controller.getOutput()
-			controller.send(controller.output)
-			return
+		# if (state == "000000000000000000 128 128 128 128"):
+		# 	controller.reset()
+		# 	controller.getOutput()
+		# 	controller.send(controller.output)
+		# 	return
 
 		btns = inputs[0]
 		LX = inputs[1]
@@ -312,38 +340,10 @@ class Client(object):
 		RX = inputs[3]
 		RY = inputs[4]
 
-
-
-		# if ()
-		# controller.dpad = int(btns[0])
-		controller.dpad = int(8)
-	# // if (dpad == "7") {
-	# // 	btns.push("upButton");
-	# // 	btns.push("leftButton");
-	# // } else if (dpad == "1") {
-	# // 	btns.push("upButton");
-	# // 	btns.push("rightButton");
-	# // } else if (dpad == "5") {
-	# // 	btns.push("downButton");
-	# // 	btns.push("leftButton");
-	# // } else if (dpad == "3") {
-	# // 	btns.push("downButton");
-	# // 	btns.push("rightButton");
-	# // } else if (dpad == "0") {
-	# // 	btns.push("upButton");
-	# // } else if (dpad == "4") {
-	# // 	btns.push("downButton");
-	# // } else if (dpad == "6") {
-	# // 	btns.push("leftButton");
-	# // } else if (dpad == "2") {
-	# // 	btns.push("rightButton");
-	# // } else if (dpad == "8") {
-	# // 	// nothing
-	# // }
 		if (btns[0] == "1" and btns[2] == "1"):
 			controller.dpad = int(7)
 		elif (btns[0] == "1" and btns[3] == "1"):
-			controller.dpad = int(7)
+			controller.dpad = int(1)
 		elif (btns[1] == "1" and btns[2] == "1"):
 			controller.dpad = int(5)
 		elif (btns[1] == "1" and btns[3] == "1"):
@@ -360,6 +360,14 @@ class Client(object):
 			controller.dpad = int(8)
 
 
+		if (btns[0] == "1"):
+			controller.up = 1
+		if (btns[1] == "1"):
+			controller.down = 1
+		if (btns[2] == "1"):
+			controller.left = 1
+		if (btns[3] == "1"):
+			controller.right = 1
 		if (btns[4] == "1"):
 			controller.lstick = 1;
 		if (btns[5] == "1"):
@@ -401,36 +409,29 @@ class Client(object):
 		reset = 0
 		send_and_reset(duration, reset, cNum)
 
+		return
+
 	# player 1:
-	def on_controller_state1(*args):
-		client.on_controller_state(args[1], 0)
+	def on_controller_state1(self, data):
+		self.on_controller_state(data, 0)
+		return
 
 	# player 2:
-	def on_controller_state2(*args):
-		client.on_controller_state(args[1], 1)
+	def on_controller_state2(self, data):
+		self.on_controller_state(data, 1)
+		return
 
 	# player 3:
-	def on_controller_state3(*args):
-		client.on_controller_state(args[1], 2)
+	def on_controller_state3(self, data):
+		self.on_controller_state(data, 2)
+		return
 
 	# player 4:
-	def on_controller_state4(*args):
-		client.on_controller_state(args[1], 3)
+	def on_controller_state4(self, data):
+		client.on_controller_state(data, 3)
+		return
 
-	def on_internet_status(*args):
-		# msg = ""
-		# if (args[1]):
-		# 	msg = "The internet is on right now!"
-		# else:
-		# 	msg = "The internet is off right now!"
-		# twitchBot.send_message(msg)
-		# if (args[1]):
-		# 	client.socketio.emit("wifiOn")
-		# else:
-		# 	client.socketio.emit("wifiOff")
-		pass
-
-	def on_afk(*args):
+	def on_afk(self):
 		game = random.choice(gameList)
 		msg = "!goto " + game
 		send_message(msg, "both")
@@ -439,20 +440,44 @@ class Client(object):
 		msg = "yea"
 		send_message(msg, "both")
 		client.handleChat("tpnsbot", msg)
+		return
 
-	def on_lock(*args):
+	def on_lock(self):
 		client.locked = True
 		client.voting = True
 		client.chatEnabled = False
+		return
 
-
-	def on_unlock(*args):
+	def on_unlock(self):
 		client.locked = False
 		client.voting = False
-		client.chatEnabled = False
+		client.chatEnabled = True
+		return
+
+	def on_chat_message(self, data):
+
+		message = data["message"].lower()
+		username = data["username"].lower()
+
+		# ignore TPNSbot on site:
+		if (username == "TPNSbot" or username == "tpnsbot"):
+			return
+
+		self.handleChat(username, message, "site", None)
+
+		if (self.chatRelayEnabled):
+
+			if (message[0] != "[" and username != "tpnsbot" and username != "TPNSbot"):
+				msg = "[site:" + username + "] " + message
+				chatRelayTimer = Timer(0.5, send_message, (msg, "twitch"))
+				chatRelayTimer.start()
+				chatRelayTimer = Timer(0.5, send_message, (msg, "youtube"))
+				chatRelayTimer.start()
+		return
 
 	def enableChatRelay(self):
 		self.chatRelayEnabled = True
+		return
 
 	def findImage(self, frame, imagefile, threshold=0.6):
 
@@ -658,23 +683,25 @@ class Client(object):
 		counter = 0
 		while (iconLoc == None and counter < 5):
 
+			waitTime = 2
+
 			if (counter > 0):
 				# move down and try again:
 				# move down 3 times and up once:
 				controller1.LY = STICK_MAX
 				send_and_reset(0.1, 1)
-				sleep(0.5)
+				sleep(waitTime)
 				controller1.LY = STICK_MAX
 				send_and_reset(0.1, 1)
-				sleep(0.5)
+				sleep(waitTime)
 				controller1.LY = STICK_MAX
 				send_and_reset(0.1, 1)
-				sleep(0.5)
+				sleep(waitTime)
 				controller1.LY = STICK_MIN
 				send_and_reset(0.1, 1)
-				sleep(0.5)
+				sleep(waitTime)
 
-			iconLoc = client.findImage2(imagefile, x1, y1, width, height, windowName, 0.8)
+			iconLoc = self.findImage2(imagefile, x1, y1, width, height, windowName, 0.8)
 
 			if (iconLoc != None):
 				break
@@ -721,11 +748,11 @@ class Client(object):
 		for i in range(0, iconLoc[0]):
 			controller1.LX = STICK_MAX
 			send_and_reset(0.1, 1)
-			sleep(0.5)
+			sleep(waitTime)
 		for i in range(0, iconLoc[1]):
 			controller1.LY = STICK_MAX
 			send_and_reset(0.1, 1)
-			sleep(0.5)
+			sleep(waitTime)
 
 		controller1.a = 1
 		send_and_reset(0.1)
@@ -787,7 +814,7 @@ class Client(object):
 		return
 
 	def end_goto_vote(self, imagefile, delay, nameofgame="Twitch Plays"):
-		# twitchBot.send_message("Voting has ended!")
+
 		msg = "With " + str(self.yeaVotes) + " VoteYea and " + str(self.nayVotes) + " VoteNay"
 
 		leaving = False
@@ -797,11 +824,11 @@ class Client(object):
 			self.gotoLeft = True
 			msg = msg + " We will be LEAVING"
 			leaving = True
-			timeGotoisDisabled = 8*60# 8 minutes
+			timeGotoisDisabled = 10*60# 10 minutes
 		else:
 			self.gotoLeft = False
 			msg = msg + " We will be STAYING"
-			timeGotoisDisabled = 2*60# 2 minutes
+			timeGotoisDisabled = 4*60# 4 minutes
 
 		self.gotoUsed = True
 		gotoTimer = Timer(timeGotoisDisabled, self.reenable_goto)
@@ -831,15 +858,17 @@ class Client(object):
 		if (self.gotoUsed == True):
 			msg = ""
 			if (self.gotoLeft == True):
-				msg = "The !goto command was used in the last 8 minutes, please wait before trying to change the game again"
+				msg = "The !goto command was used in the last 10 minutes, please wait before trying to change the game again"
 			else:
-				msg = "The !goto command was used in the last 2 minutes, please wait before trying to change the game again"
+				msg = "The !goto command was used in the last 4 minutes, please wait before trying to change the game again"
 			send_message(msg, "both")
 			return
 
 		self.yeaVotes = 0
 		self.nayVotes = 0
-		twitchBot.send_message("A vote has been started to goto " + nameofgame + "! Vote now with VoteYea to LEAVE and VoteNay to STAY! Voting ends in 20 seconds!")
+		msg = "A vote has been started to goto " + nameofgame + "! Vote now with VoteYea to LEAVE and VoteNay to STAY! Voting ends in 20 seconds!"
+		send_message(msg, "both")
+		self.socketio.emit("voteStarted")
 		self.voting = True
 
 		voteTimer = Timer(20.0, self.end_goto_vote, (imagefile, delay, nameofgame))
@@ -849,7 +878,7 @@ class Client(object):
 
 
 
-	def handleChat(self, username, message, source="Twitch", uniqueID=None):
+	def handleChat(self, username, message, source="twitch", uniqueID=None):
 		print("<" + username + "> " + message)
 
 		commands = None
@@ -859,9 +888,6 @@ class Client(object):
 			commands = [x.strip() for x in message.split(" ")]
 
 		cmd = "none"
-
-		if (source == "YouTube"):
-			username = "YouTube"
 
 		valid = True
 		for cmd in commands:
@@ -874,6 +900,7 @@ class Client(object):
 
 			if (self.voting):
 				if ((cmd == "voteyea" or cmd == "yea") and username not in voted):
+					print(username)
 					voted.append(username)
 					self.yeaVotes += 1
 				if ((cmd == "votenay" or cmd == "nay") and username not in voted):
@@ -912,7 +939,8 @@ class Client(object):
 				send_message(msg3, source)
 
 			if (cmd == "!discord"):
-				msg = "Discord invite link: https://discord.gg/ARTbddH/"
+				msg = "Discord invite link: https://discord.io/tpns/"
+
 				send_message(msg, source)
 
 			if (cmd == "!site"):
@@ -977,12 +1005,12 @@ class Client(object):
 				self.socketio.emit("restart3")
 
 			if (cmd == "!restartserver" and username in modlist):
-				msg = "Restarting the server! maybe @fosse if you're using this!"
+				msg = "Restarting the server!"
 				send_message(msg, "both")
-				self.socketio.emit("restart server")
+				self.socketio.emit("restartServer")
 
 			if (cmd == "!restartscript" and username in modlist):
-				msg = "Restarting the python script!"
+				msg = "Restarting the python script! This can take about 30 seconds."
 				send_message(msg, "both")
 				with open("pluslist.pkl", "wb") as f:
 					pickle.dump([pluslist], f)
@@ -1014,6 +1042,26 @@ class Client(object):
 				self.chatEnabled = False
 				self.socketio.emit("lock")
 
+			if (cmd == "!unlockqueues" and username in modlist):
+				msg = "Unlocking Queues!"
+				send_message(msg, "both")
+				self.socketio.emit("unlockqueues")
+
+			if (cmd == "!lockqueues" and username in modlist):
+				msg = "Locking Queues!"
+				send_message(msg, "both")
+				self.socketio.emit("lockqueues")
+
+			if (cmd == "!disablegyro"):
+				msg = "disabling gyro controls!"
+				send_message(msg, "both")
+				controller1.gyroEnabled = 0
+
+			if (cmd == "!enablegyro"):
+				msg = "enabling gyro controls!"
+				send_message(msg, "both")
+				controller1.gyroEnabled = 1
+
 			if (cmd == "!unlock" and username in modlist):
 				msg = "Unlocking!"
 				send_message(msg, "both")
@@ -1022,27 +1070,27 @@ class Client(object):
 				self.chatEnabled = True
 				self.socketio.emit("unlock")
 
-			if (cmd == "!1p" and username in modlist):
+			if (cmd == "!1p" and username in pluslist):
 				msg = "Changing to 1 Player Mode!"
 				send_message(msg, "both")
 				self.socketio.emit("setMaxPlayers", 1)
 
-			if (cmd == "!2p" and username in modlist):
+			if (cmd == "!2p" and username in pluslist):
 				msg = "Changing to 2 Player Mode!"
 				send_message(msg, "both")
 				self.socketio.emit("setMaxPlayers", 2)
 
-			if (cmd == "!3p" and username in modlist):
+			if (cmd == "!3p" and username in pluslist):
 				msg = "Changing to 3 Player Mode!"
 				send_message(msg, "both")
 				self.socketio.emit("setMaxPlayers", 3)
 
-			if (cmd == "!4p" and username in modlist):
+			if (cmd == "!4p" and username in pluslist):
 				msg = "Changing to 4 Player Mode!"
 				send_message(msg, "both")
 				self.socketio.emit("setMaxPlayers", 4)
 
-			if (cmd == "!5p" and username in modlist):
+			if (cmd == "!5p" and username in pluslist):
 				msg = "Changing to 5 Player Mode!"
 				send_message(msg, "both")
 				self.socketio.emit("setMaxPlayers", 5)
@@ -1063,11 +1111,9 @@ class Client(object):
 
 			if (cmd == "!expired"):
 				msg = "expired status: " + youtubeBot.credentials.expired()
-				send_message(msg, "Twitch")
+				send_message(msg, "twitch")
 
 			if (cmd == "!egg"):
-				# msg = "Rickrolling!: " + commands[1]
-				# twitchBot.send_message(msg)
 				self.socketio.emit("rickroll", username)
 
 			if (cmd == "!rr"):
@@ -1182,7 +1228,7 @@ class Client(object):
 			if (commands[0] == "!giveplus" and username in modlist):
 
 				msg = "Giving plus permission to: " + commands[1]
-				twitchBot.send_message(msg)
+				send_message(msg, "both")
 
 				pluslist.append(commands[1])
 
@@ -1193,7 +1239,7 @@ class Client(object):
 			if (commands[0] == "!removeplus" and username in modlist):
 
 				msg = "Removing plus permissions from: " + commands[1]
-				twitchBot.send_message(msg)
+				send_message(msg, "both")
 
 				# revoke plus permission:
 				if commands[1] in pluslist:
@@ -1206,7 +1252,7 @@ class Client(object):
 
 			if (commands[0] == "!ban" and username in modlist):
 				msg = "Banning: " + commands[1]
-				twitchBot.send_message(msg)
+				send_message(msg, "both")
 				banlist.append(commands[1])
 				self.socketio.emit("banlist", banlist)
 
@@ -1217,7 +1263,7 @@ class Client(object):
 
 			if (commands[0] == "!unban" and username in modlist):
 				msg = "Unbanning: " + commands[1]
-				twitchBot.send_message(msg)
+				send_message(msg, "both")
 				banlist.remove(commands[1])
 				self.socketio.emit("banlist", banlist)
 
@@ -1244,18 +1290,18 @@ class Client(object):
 			# if (commands[0] == "!game" and username in modlist):
 			# 	self.currentGame = commands[1]
 			# 	msg = "Setting game to: " + commands[1]
-			# 	twitchBot.send_message(msg)
+			# 	send_message(msg, "both")
 
 
 			# if (commands[0] == "!mod" and username in adminlist):
 			# 	msg = "Modding: " + commands[1]
-			# 	twitchBot.send_message(msg)
+			# 	send_message(msg, "both")
 			# 	banlist.append(commands[1])
 			# 	self.socketio.emit("banlist", banlist)
 
 			# if (commands[0] == "!unmod" and username in adminlist):
 			# 	msg = "UnModding: " + commands[1]
-			# 	twitchBot.send_message(msg)
+			#	send_message(msg, "both")
 			# 	modlist.remove(commands[1])
 			# 	self.socketio.emit("banlist", banlist)
 
@@ -1324,12 +1370,17 @@ class Client(object):
 					imageLoc, waitTime, nameofgame = "icons/mta.png", 10, "Mario Tennis Aces"
 				if (game == "nes"):
 					imageLoc, waitTime, nameofgame = "icons/nes.png", 10, "Nintendo Entertainment System"
+				if (game == "brawlhalla"):
+					imageLoc, waitTime, nameofgame = "icons/brawlhalla.png", 10, "Brawlhalla"
+				# if (game == "youtube"):
+				# 	imageLoc, waitTime, nameofgame = "icons/youtube.png", 10, "YouTube"
 				# if (cmd == "!goto cave"):
 				# 	imageLoc, waitTime, nameofgame = "icons/cave.png", 10, "Cave Story"
 				# if (cmd == "!goto isaac"):
 				# 	imageLoc, waitTime, nameofgame = "icons/isaac.png", 10, "The Binding of Isaac: Afterbirth"
 				# if (cmd == "!goto mario"):
 				# 	imageLoc, waitTime, nameofgame = "icons/mario.png", 10, "Twitch Plays"
+
 
 
 				if (self.currentGame == nameofgame):
@@ -1340,7 +1391,7 @@ class Client(object):
 				if (commands[0] == "!setgame"):
 					self.currentGame = nameofgame
 					msg = "!game " + nameofgame
-					send_message(msg, "Twitch")
+					send_message(msg, "twitch")
 					return
 
 				if (commands[0] == "!forcegoto"):
@@ -1979,8 +2030,9 @@ class Client(object):
 			self.socketio.emit("pluslist", pluslist)
 			self.socketio.emit("sublist", sublist)
 
-			msg = "Type \"!help\" for help! Join the discord server! https://discord.gg/ARTbddH/\
-			hate the stream delay? go here! https://twitchplaysnintendoswitch.com"
+			msg = "Type \"!help\" for help! Join the discord server! https://discord.io/tpns/\
+			use the website for low latency and better controls: https://twitchplaysnintendoswitch.com\
+			Subscribe and get a longer turn!"
 			send_message(msg, "both")
 
 		self.controllerEnd = time.time()
@@ -2012,18 +2064,14 @@ class Client(object):
 				message = message.strip()
 				message = message.lower()
 
-				# check if we have the uniqueID of this username:
-				if username in self.twitchToUniqueID:
-					self.handleChat(username, message, "Twitch", self.twitchToUniqueID[username])
-				else:
-					self.handleChat(username, message, "Twitch", None)
-					# self.socketio.emit("getUniqueID")
-
+				self.handleChat(username, message, "twitch", None)
 
 				if (self.chatRelayEnabled):
 					if (message[0] != "[" and username != "tpnsbot" and username != "TPNSbot"):
-						msg = "[" + username + "] " + str(message)
-						chatRelayTimer = Timer(0.1, send_message, (msg, "YouTube"))
+						msg = "[twitch:" + username + "] " + str(message)
+						chatRelayTimer = Timer(0.5, send_message, (msg, "youtube"))
+						chatRelayTimer.start()
+						chatRelayTimer = Timer(0.5, send_message, (msg, "site"))
 						chatRelayTimer.start()
 			except:
 				print("twitch chat error")
@@ -2039,17 +2087,15 @@ class Client(object):
 			if (username == "TPNSbot"):
 				continue
 
-			# check if we have the uniqueID of this channel:
-			if channelID in self.youtubeToUniqueID:
-				self.handleChat(username, message, "YouTube", self.youtubeToUniqueID[channelID])
-			else:
-				self.handleChat(username, message, "YouTube", None)
+			self.handleChat(username, message, "youtube", None)
 
 
 			if (self.chatRelayEnabled):
 				if (message[0] != "[" and username != "tpnsbot" and username != "TPNSbot"):
-					msg = "[" + username + "] " + message
-					chatRelayTimer = Timer(0.1, send_message, (msg, "Twitch"))
+					msg = "[youtube:" + username + "] " + message
+					chatRelayTimer = Timer(0.5, send_message, (msg, "twitch"))
+					chatRelayTimer.start()
+					chatRelayTimer = Timer(0.5, send_message, (msg, "site"))
 					chatRelayTimer.start()
 
 		self.decreaseQueue()
@@ -2065,6 +2111,14 @@ def emergency_lock():
 	height = 720
 	windowName = "OBS"
 	iconLoc = None
+
+	# botw game over:
+	if (client.currentGame == "The Legend of Zelda: Breath of the Wild"):
+		iconLoc = client.findImage2("icons/screenshots/botw-game-over.png", x1, y1, width, height, windowName, 0.8)
+		if (iconLoc != None):
+			controller1.a = 1
+			send_and_reset(0.1)
+			iconLoc = None
 
 	if (iconLoc == None):
 		iconLoc = client.findImage2("icons/screenshots/settingspage.png", x1, y1, width, height, windowName, 0.8)
@@ -2096,16 +2150,26 @@ def emergency_lock():
 		# 	send_and_reset(0.1)
 
 
-
-
 	lockTimer = Timer(lockInterval, emergency_lock)
 	lockTimer.start()
 
 lockTimer = Timer(lockInterval, emergency_lock)
 lockTimer.start()
 
-client = Client()
 
+
+subInterval = 30
+def getSubListForever():
+	try:
+		sublist = getSubList()
+	except:
+		sublist = []
+	subTimer = Timer(subInterval, getSubListForever)
+	subTimer.start()
+subTimer = Timer(subInterval, getSubListForever)
+subTimer.start()
+
+client = Client()
 
 enableChatRelayTimer = Timer(20.0, client.enableChatRelay)
 enableChatRelayTimer.start()

@@ -20,7 +20,7 @@ class YouTubeBot:
 
 	def __init__(self):
 
-		
+
 		self.credentialsBot = Credentials("oauth-tpnsbot.json")
 		self.credentialsChannel = Credentials("oauth-fosse.json")
 
@@ -41,7 +41,7 @@ class YouTubeBot:
 		if msg["snippet"]["type"] != "textMessageEvent":
 			print("non text message event")
 			return
-		
+
 		# print(msg["authorDetails"])
 		username = msg["authorDetails"]["displayName"]
 		message = msg["snippet"]["displayMessage"]
@@ -92,9 +92,9 @@ class YouTubeBot:
 				delay = 30
 				delay = 3  #FIXME testing
 
-			if win32api.GetAsyncKeyState(ord("Q")):
-				print("sending message!")
-				self.send_message("test message")
+			# if win32api.GetAsyncKeyState(ord("Q")):
+			# 	print("sending message!")
+			# 	self.send_message("test message")
 
 			time.sleep(delay)
 

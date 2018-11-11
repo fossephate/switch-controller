@@ -13,7 +13,7 @@ def getSubList():
 	##########################################################
 
 	clientId="jhopzq3gncn6u41vp7lh9jtvj68wdx"  #Register a Twitch Developer application and put its client ID here
-	accessToken="m1n2we1s1v3rxb5e4oiu1n0q0z4vio" #Generate an OAuth token with channel_subscriptions scope and insert your token here
+	accessToken="e4nwjkqgyqhgxzf9uu873y2fdi06r4" #Generate an OAuth token with channel_subscriptions scope and insert your token here
 
 	channelName="twitchplaysconsoles"  #Put your channel name here
 	saveLocation = "subscriberList.txt" #Put the location you'd like to save your list here
