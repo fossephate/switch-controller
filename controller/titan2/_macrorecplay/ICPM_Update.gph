@@ -1,0 +1,56 @@
+#ifndef _ICPM_UPDATE
+#define _ICPM_UPDATE
+  
+// update the Interactive Configuration window and pmem_save only every n secs
+// use anywhere in your code with a toggle when you want to update
+// for pmem_save execution flag:
+//     PM_Update(TRUE);
+//
+// use for interactive windows refreshing flag:
+//    IC_Update(TRUE);
+//
+// for both use: ICPM_Update(TRUE);
+// to change the intervall/speed it is allows to updates use the time in ms like: ICPM_Update(3000);
+// ! The update interval has to be >= 1000ms or it will have no effect
+
+uint16 ICPM_Interval = 1000;
+  
+main {
+  IC_Update(); // only run once when it was called once with ICRefresh(TRUE); somewhere else
+  PM_Update(); // only run once when it was called once with PM_Update(TRUE); somewhere else
+}
+
+
+// update both
+void ICPM_Update(uint16 now) {
+  if ( now >= 1000 ) ICPM_Interval=now;
+  IC_Update(now);
+  PM_Update(now);
+}
+
+// Update the interactive configuration window, but not faster than every 1 second
+void IC_Update(uint16 now) {
+  static bool ICUpdate = FALSE;
+  static uint32 ICULast = system_time();
+  if (now==1) ICUpdate=now;
+	if (ICUpdate==1 && ICULast < system_time()) {
+		//printf("IC updated");
+		printf("GCMD:InteractiveConfiguration.Refresh");
+		ICUpdate = FALSE;
+		ICULast = system_time() + ICPM_Interval;
+	}
+}
+
+// Update the persistent memory, but not faster than every 1 second
+void PM_Update(uint16 now) {
+  static bool PMUpdate = FALSE;
+  static uint32 PMULast = system_time();
+  if (now==1) PMUpdate=now;
+	if (PMUpdate==1 && PMULast < system_time()) { 
+		//printf("pmem saved");
+		PMUpdate = FALSE;
+		PMULast = system_time() + ICPM_Interval;
+		pmem_save();
+	}
+}
+#endif

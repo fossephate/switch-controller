@@ -76,7 +76,7 @@ class TwitchBot():
 			response = self.sock.recv(1024).decode("utf-8")
 		except:
 			pass
-		if(response == "PING :tmi.twitch.tv\r\n"):
+		if (response == "PING :tmi.twitch.tv\r\n"):
 			self.sock.send("PONG :tmi.twitch.tv\r\n".encode("utf-8"))
 			return "none"
 		else:
@@ -88,7 +88,7 @@ class TwitchBot():
 	def set_title_game(self, title, game):
 		scope = "&scope=channel_editor"
 		client_id = "&client_id=" + CLIENT_ID
-		redirect_uri = "&redirect_uri=https://twitchplaysnintendoswitch.com/8110/auth/twitch/callback"
+		redirect_uri = "&redirect_uri=https://twitchplaysnintendoswitch.com/8100/auth/twitch/callback"
 		response_type = "&response_type=code"
 		url = "https://api.twitch.tv/kraken/oauth2/authorize?" + client_id + redirect_uri + response_type + scope
 		params = {"Client-ID" : ""+ CLIENT_ID +"",

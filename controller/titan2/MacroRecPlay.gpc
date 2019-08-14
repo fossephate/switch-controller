@@ -1,0 +1,1751 @@
+#pragma METAINFO("MacroRecPlay", 1, 04, "Scachi")
+#include <display.gph>
+#include "ICPM_Update.gph" // limit speed of writing to pmem and refresh of Interactive Configuration
+
+/*** Online Resource Info
+<shortdesc>
+Please report bugs/problems via consoletuners forum - click the DOC link to get to this scripts topic.<br>
+
+Record and playback macros on the fly, without GTuner, a SD-card is required !
+
+Features: Record&playback macro without GTuner IV &#9702; different start and stop conditions to choose from
+
+</shortdesc>
+
+<keywords>macro recorder, macro playback</keywords>
+
+<docurl>https://www.consoletuner.com/forum/viewtopic.php?f=23&t=9745#p68771</docurl>
+***/
+
+/***   ToDo:
+            Test if the errorcheck is still catching all or most configuration errors
+***/
+
+/*** Interactive Configuration
+<cfgdesc>
+[Macro Recording and Playback]
+collapsible = 1
+control     = info
+shortdesc	  = <<<MULTILINE
+<b>Record and Playback macros on the fly - *SD-card required!</b>
+
+&#10153; Different start, stop and playback options to choose from
+&#10153; Now supporting 9 macros with unique filenames for using the same script in different T2 slots
+&#10153; Option to configure playback loop count per macro file
+
+<b>Default Setting/Usage:</b>
+-> <b>Start</b> : Hold Down L3/LS for 2 seconds, the LED turns yellow, now release that button.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;With the next input it will start the recording.
+-> <b>Stop</b> : After no input/idle time of 5 seconds the recording will stop.
+-> <b>Play</b> : Playback in an endless loop starts and stops with Hold Down R3/RS for > 2 seconds.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;It skips the idle time on play back (4850ms)
+
+<b>Hint: You can't use the same button/s to start recording and start playback.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The T2 will blink <b><font color=red>red</font></b> fast if it has found such an issue.</b>
+
+
+<b><u>The T2 LED display will show specific colors:</u></b>
+<b><font color=blue>blue</font>&nbsp;&nbsp;&nbsp;&nbsp; for <font color=blue>Standby</font>,
+<font color=green>green</font>&nbsp; for <font color=green>Playback</font>,
+<font color=Orange>yellow</font> for <font color=Orange>Record On Next Activity</font>,
+<font color=DarkViolet>purple</font> for <font color=DarkViolet>Active Recording</font></b>
+On script start or macrofile selection it displays letters a..i for the selected macrofile.
+
+More information can be found at the forum : <a href="https://www.consoletuner.com/forum/viewtopic.php?f=23&t=9745&p=68771#p68771">Here</a> 
+MULTILINE
+
+
+[Main Settings]
+collapsible = 2
+control     = info
+shortdesc	  = <<<MULTILINE
+
+MULTILINE
+
+
+[Default Macro]
+group       = true
+control     = combobox
+byteoffset  = 0
+bitsize     = 8
+shortdesc	  = <<<MULTILINE
+
+<b>Default Macrofile</b> to use:
+MULTILINE
+control     = combobox
+default     = 0
+item        = A
+item        = B
+item        = C
+item        = D
+item        = E
+item        = F
+item        = G
+item        = H
+item        = I
+
+[Default Macro Info]
+group       = true
+control     = info
+shortdesc	  = <<<MULTILINE
+The resulting filename on the sd-card will be macrp{slot}{selection}.gmk
+Example: Script running from <b>Slot 1</b> and selecting "<b>A</b>" : <b>macrp1A.gmk</b>
+<i>Running via GTuner IV "Test and Debug" mode will use 0 as the slot number.</i>
+MULTILINE
+
+[Macro Selection Cycle]
+group       = true
+control     = combobox
+byteoffset  = 1
+bitsize     = 8
+shortdesc	  = <<<MULTILINE
+
+<b><font color=blue>Cycle</font> through macro files</b> A-I with selected button combination
+<b>!</b> Only works during <b><font color=blue>Blue LED = Standby</font></b> Mode <b>!</b>
+MULTILINE
+control     = combobox
+default     = 0
+item        = ---------------- NONE ---------------------
+item        = ::::::::::::: Playstation ::::::::::::::::::
+item        = L3+L1                //  L3+R1
+item        = R3+L1               //  R3+R1
+item        = L3+PS               //  R3+PS
+item        = R3+Dpad_Left  //  R3+Dpad_Right
+item        = R3+Dpad_Up    //  R3+Dpad_Down
+item        = :::::::::::::::: XBox ::::::::::::::::::::::
+item        = LS+LB                //  LS+RB
+item        = RS+LB               //  RS+RB
+item        = LS+Xbox           //  RS+Xbox
+item        = RS+Dpad_Left  //  RS+Dpad_Right
+item        = RS+Dpad_Up    //  RS+Dpad_Down
+
+
+[Recall Last Used]
+group       = true
+control     = checkbox
+byteoffset  = 2
+bitsize     = 1
+bitoffset   = 0
+default     = 1
+item        = Recall last used macro file
+
+
+
+
+[Record start mode]
+group       = true
+control     = combobox
+byteoffset  = 3
+bitsize     = 8
+shortdesc	  = <<<MULTILINE
+
+<b><font color="DarkViolet">____RECORDING____</font>
+
+<font color="DarkViolet">Start recording</b> on action:</b></font>
+MULTILINE
+default     = 1
+item        = 0) Press: Button "Alpha"
+item        = 1) Holding down: Button "Alpha"
+item        = 2) Double Tap: Button "Alpha"
+item        = 3) Hold: Button "Alpha" and Tap: Button "Beta"
+
+[Record start activity]
+group       = true
+control     = checkbox
+byteoffset  = 4
+bitsize     = 1
+bitoffset   = 0
+default     = 1
+item        = Start recording on next activity after action selected above
+
+
+[Record start hold Timer ]
+group       = true
+control     = spinbox
+step			  = 1
+byteoffset  = 5
+bitsize     = 8
+shortdesc	  = <<<MULTILINE
+<font color=DarkViolet><b>Hold Time</b></font> (seconds) for Start recording on action <b>1)</b>
+MULTILINE
+default     = 2
+minimum     = 0
+maximum     = 10
+
+
+[Record Start Btn "Alpha"]
+group       = true
+control     = combobox
+byteoffset  = 6
+bitsize     = 8
+shortdesc	  = <<<MULTILINE
+
+<font color=DarkViolet><b>Button "Alpha"</b></font> for start actions <b>0), 1), 2), 3)</b> and stop actions <b>0), 1), 2), 3), 7)</b>
+PS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /      XB
+MULTILINE
+default     = 9
+item        = - NONE -
+item        = PS            / XBox
+item        = Touchclick/ View
+item        = Options    / Menu
+item        = R1            / RB
+item        = R2            / RT
+item        = R3            / RS
+item        = L1             / LB
+item        = L2             / LT
+item        = L3             / LS
+item        = DPAD Up
+item        = DPAD Down
+item        = DPAD Left
+item        = DPAD Right
+item        = Triangle    / Y
+item        = Circle        / B
+item        = Cross       / A
+item        = Square     / X
+item        = Share       / P1
+item        = Touch P1 / P2
+item        = Touch P2 / P3
+item        = Btn_21    / P4
+
+[Record Start Btn "Beta"]
+group       = true
+control     = combobox
+byteoffset  = 7
+bitsize     = 8
+shortdesc	  = <<<MULTILINE
+<font color=DarkViolet><b>Button "Beta"</b></font> for start action <b>3)</b> and stop actions <b>3), 4), 5), 6), 7)</b>
+PS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /      XB
+MULTILINE
+default     = 0
+item        = - NONE -
+item        = PS            / XBox
+item        = Touchclick/ View
+item        = Options    / Menu
+item        = R1            / RB
+item        = R2            / RT
+item        = R3            / RS
+item        = L1             / LB
+item        = L2             / LT
+item        = L3             / LS
+item        = DPAD Up
+item        = DPAD Down
+item        = DPAD Left
+item        = DPAD Right
+item        = Triangle    / Y
+item        = Circle        / B
+item        = Cross       / A
+item        = Square     / X
+item        = Share        / P1
+item        = Touch P1  / P2
+item        = Touch P2  / P3
+item        = Btn_21     / P4
+
+[Record Stop mode]
+group       = true
+control     = combobox
+byteoffset  = 10
+bitsize     = 8
+shortdesc	  = <<<MULTILINE
+
+<b><font color=DarkViolet>Stop recording</font> on action:</b>
+MULTILINE
+default     = 8
+item        = 0) Press: Button "Alpha"
+item        = 1) Holding down: Button "Alpha"
+item        = 2) Double Tap: Button "Alpha"
+item        = 3) Hold: Button "Alpha" and Tap: Button "Beta"
+item        = 4) Press: Button "Beta"
+item        = 5) Holding down: Button "Beta"
+item        = 6) Double Tap: Button "Beta"
+item        = 7) Hold: Button "Beta" and Tap: Button "Alpha"
+item        = 8) On Inactivity/no input for "Time of inactivity" (seconds)
+
+[Record Stop hold Timer ]
+group       = true
+control     = spinbox
+step			  = 1
+byteoffset  = 11
+bitsize     = 8
+shortdesc	  = <<<MULTILINE
+<font color=DarkViolet><b>Hold Time</b></font> (seconds) for Stop recording on actions <b>1), 5)</b>
+MULTILINE
+default     = 2
+minimum     = 0
+maximum     = 10
+
+[Record Stop Timer End]
+group       = true
+control     = spinbox
+byteoffset  = 12
+bitsize     = 8
+step			  = 1
+shortdesc	  = <<<MULTILINE
+<font color=DarkViolet><b>Time of inactivity</b></font> (seconds) for Stop recording on stop action <b>8)</b>
+MULTILINE
+default     = 5
+minimum     = 1
+maximum     = 120
+
+
+
+
+[Record Play Mode]
+group       = true
+control     = combobox
+byteoffset  = 20
+bitsize     = 8
+shortdesc	  = <<<MULTILINE 
+
+<font color=green><b>____PLAYBACK____</b></font>
+
+<font color=green><b>Start Playback</b></font> on action:
+MULTILINE
+default     = 1
+item        = 0) Press: Button "Gamma"
+item        = 1) Holding down: Button "Gamma"
+item        = 2) Double Tap: Button "Gamma"
+item        = 3) Hold: Button "Gamma" and Tap: Button "Delta"
+
+[Record Play Hold Timer ]
+group       = true
+control     = spinbox
+step			  = 1
+byteoffset  = 21
+bitsize     = 8
+shortdesc	  = <<<MULTILINE
+<font color=green><b>Hold Time</b></font> (seconds) for toggle playback on action <b>1)</b>
+MULTILINE
+default     = 2
+minimum     = 0
+maximum     = 10
+
+[Record Play Btn "Gamma"]
+group       = true
+control     = combobox
+byteoffset  = 22
+bitsize     = 8
+shortdesc	  = <<<MULTILINE
+
+<font color=green><b>Button "Gamma"</b></font> for actions <b>0), 1), 2), 3)</b>
+PS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /      XB
+MULTILINE
+default     = 6
+item        = - NONE -
+item        = PS            / XBox
+item        = Touchclick/ View
+item        = Options    / Menu
+item        = R1            / RB
+item        = R2            / RT
+item        = R3            / RS
+item        = L1             / LB
+item        = L2             / LT
+item        = L3             / LS
+item        = DPAD Up
+item        = DPAD Down
+item        = DPAD Left
+item        = DPAD Right
+item        = Triangle    / Y
+item        = Circle        / B
+item        = Cross       / A
+item        = Square     / X
+item        = Share        / P1
+item        = Touch P1  / P2
+item        = Touch P2  / P3
+item        = Btn_21     / P4
+
+[Record Btn "Delta"]
+group       = true
+control     = combobox
+byteoffset  = 23
+bitsize     = 8
+shortdesc	  = <<<MULTILINE
+<font color=green><b>Button "Delta"</b></font> for action <b>3)</b>
+PS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /      XB
+MULTILINE
+default     = 0
+item        = - NONE -
+item        = PS            / XBox
+item        = Touchclick/ View
+item        = Options    / Menu
+item        = R1            / RB
+item        = R2            / RT
+item        = R3            / RS
+item        = L1             / LB
+item        = L2             / LT
+item        = L3             / LS
+item        = DPAD Up
+item        = DPAD Down
+item        = DPAD Left
+item        = DPAD Right
+item        = Triangle    / Y
+item        = Circle        / B
+item        = Cross       / A
+item        = Square     / X
+item        = Share        / P1
+item        = Touch P1  / P2
+item        = Touch P2  / P3
+item        = Btn_21     / P4
+
+
+
+[Record Play Stop Mode]
+group       = true
+control     = combobox
+byteoffset  = 16
+bitsize     = 8
+shortdesc	  = <<<MULTILINE 
+
+<b><font color=MediumBlue>Stop</font> <font color=green>Playback</font></b> on action:
+MULTILINE
+default     = 4
+item        = 0) Press: Button "Epsilon"
+item        = 1) Holding down: Button "Epsilon"
+item        = 2) Double Tap: Button "Epsilon"
+item        = 3) Hold: Button "Epsilon" and Tap: Button "Zeta"
+item        = 4) Use "Start Playback" settings to stop ( ignoring Hold,Epsilon,Zeta below )
+
+[Record Play Stop Hold Timer ]
+group       = true
+control     = spinbox
+step			  = 1
+byteoffset  = 17
+bitsize     = 8
+shortdesc	  = <<<MULTILINE
+<b><font color=MediumBlue>Hold</font> <font color=green> Time</font></b> (seconds) for stop playback on action <b>1)</b>
+MULTILINE
+default     = 2
+minimum     = 0
+maximum     = 10
+
+[Record Play Stop Btn "Epsilon"]
+group       = true
+control     = combobox
+byteoffset  = 18
+bitsize     = 8
+shortdesc	  = <<<MULTILINE
+
+<b><font color=MediumBlue>Button</font> <font color=green>"Epsilon"</font></b> for actions <b>0), 1), 2), 3)</b>
+PS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /      XB
+MULTILINE
+default     = 6
+item        = - NONE -
+item        = PS            / XBox
+item        = Touchclick/ View
+item        = Options    / Menu
+item        = R1            / RB
+item        = R2            / RT
+item        = R3            / RS
+item        = L1             / LB
+item        = L2             / LT
+item        = L3             / LS
+item        = DPAD Up
+item        = DPAD Down
+item        = DPAD Left
+item        = DPAD Right
+item        = Triangle    / Y
+item        = Circle        / B
+item        = Cross       / A
+item        = Square     / X
+item        = Share        / P1
+item        = Touch P1  / P2
+item        = Touch P2  / P3
+item        = Btn_21     / P4
+
+[Record Play Stop Btn "Zeta"]
+group       = true
+control     = combobox
+byteoffset  = 19
+bitsize     = 8
+shortdesc	  = <<<MULTILINE
+<b><font color=MediumBlue>Button </font><font color=green>"Zeta"</b></font> for action <b>3)</b>
+PS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /      XB
+MULTILINE
+default     = 0
+item        = - NONE -
+item        = PS            / XBox
+item        = Touchclick/ View
+item        = Options    / Menu
+item        = R1            / RB
+item        = R2            / RT
+item        = R3            / RS
+item        = L1             / LB
+item        = L2             / LT
+item        = L3             / LS
+item        = DPAD Up
+item        = DPAD Down
+item        = DPAD Left
+item        = DPAD Right
+item        = Triangle    / Y
+item        = Circle        / B
+item        = Cross       / A
+item        = Square     / X
+item        = Share        / P1
+item        = Touch P1  / P2
+item        = Touch P2  / P3
+item        = Btn_21     / P4
+
+
+
+[Default Play Loop]
+group       = true
+control     = spinbox
+byteoffset  = 24
+bitsize     = 8
+step			  = 1
+shortdesc	  = <<<MULTILINE
+
+<font color=green><b>Default Play/Loop</b></font> that many times (0 = endless / until Playback action triggered again)
+MULTILINE
+default     = 0
+minimum     = 0
+maximum     = 255
+
+[Default Play Skip]
+group       = true
+control     = spinbox
+byteoffset  = 25
+bitsize     = 32
+step			  = 1
+shortdesc	  = <<<MULTILINE
+<b><font color=green>Default Skip milliseconds</font> at the end of playback</b> (like the Idle time used to stop recording)
+MULTILINE
+default     = 5850
+minimum     = 0
+maximum     = 2147483647
+
+[Macrofile Specific Space]
+control     = space
+default     = 10
+
+[Macrofile Specific Settings]
+collapsible = 2
+control     = info
+shortdesc	  = <<<MULTILINE
+
+MULTILINE
+
+[Macrofile A headline]
+group       = true
+control     = info
+shortdesc	  = <<<MULTILINE
+<hr><b>Macro A</b><hr>
+MULTILINE
+
+[Macro A Use Default]
+group       = true
+control     = checkbox
+byteoffset  = 30
+bitsize     = 1
+bitoffset   = 0
+shortdesc   = <<<MULTILINE
+<b>A: <font color=green>Use Default settings</font></b> configured in Main Settings ____PLAYBACK____
+MULTILINE
+default     = 1
+item        = Use Default, ignore both values below
+
+[Macro A Play Loop]
+group       = true
+control     = spinbox
+byteoffset  = 31
+bitsize     = 8
+step			  = 1
+shortdesc	  = <<<MULTILINE
+<b>A: <font color=green>Play/Loop</font></b> that many times (0 = endless / until Playback action triggered again)
+MULTILINE
+default     = 0
+minimum     = 0
+maximum     = 255
+
+
+[Macro A Play Skip]
+group       = true
+control     = spinbox
+byteoffset  = 32
+bitsize     = 32
+step			  = 1
+shortdesc	  = <<<MULTILINE
+<b>A: <font color=green>Skip milliseconds</font> at the end of playback</b> (like the Idle time used to stop recording)
+MULTILINE
+default     = 5850
+minimum     = 0
+maximum     = 2147483647
+
+[Macro A Recording Time]
+color       = #808080
+group       = true
+shortdesc	  = <<<MULTILINE
+<b><font color=#808080>A: DO NOT EDIT THIS</font></b> (used internally by script)
+MULTILINE
+control     = spinbox
+byteoffset  = 36
+bitsize     = 32
+step			  = 1
+default     = 0
+minimum     = 0
+maximum     = 2147483647
+
+
+
+[Macrofile B headline]
+group       = true
+control     = info
+shortdesc	  = <<<MULTILINE
+
+<hr><b>Macro B</b><hr>
+MULTILINE
+
+[Macro B Use Default]
+group       = true
+control     = checkbox
+byteoffset  = 40
+bitsize     = 1
+bitoffset   = 0
+shortdesc   = <<<MULTILINE
+<b>B: <font color=green>Use Default settings</font></b> configured in Main Settings ____PLAYBACK____
+MULTILINE
+default     = 1
+item        = Use Default, ignore both values below
+
+[Macro B Play Loop]
+group       = true
+control     = spinbox
+byteoffset  = 41
+bitsize     = 8
+step			  = 1
+shortdesc	  = <<<MULTILINE
+<b>B: <font color=green>Play/Loop</font></b> that many times (0 = endless / until Playback action triggered again)
+MULTILINE
+default     = 0
+minimum     = 0
+maximum     = 255
+
+[Macro B Play Skip]
+group       = true
+control     = spinbox
+byteoffset  = 42
+bitsize     = 32
+step			  = 1
+shortdesc	  = <<<MULTILINE
+<b>B: <font color=green>Skip milliseconds</font> at the end of playback</b> (like the Idle time used to stop recording)
+MULTILINE
+default     = 5850
+minimum     = 0
+maximum     = 2147483647
+
+[Macro B Recording Time]
+color       = #808080
+group       = true
+shortdesc	  = <<<MULTILINE
+<b><font color=#808080>B: DO NOT EDIT THIS</font></b> (used internally by script)
+MULTILINE
+control     = spinbox
+byteoffset  = 46
+bitsize     = 32
+step			  = 1
+default     = 0
+minimum     = 0
+maximum     = 2147483647
+
+
+
+
+[Macrofile C headline]
+group       = true
+control     = info
+shortdesc	  = <<<MULTILINE
+
+<hr><b>Macro C</b><hr>
+MULTILINE
+
+[Macro C Use Default]
+group       = true
+control     = checkbox
+byteoffset  = 50
+bitsize     = 1
+bitoffset   = 0
+shortdesc   = <<<MULTILINE
+<b>C: <font color=green>Use Default settings</font></b> configured in Main Settings ____PLAYBACK____
+MULTILINE
+default     = 1
+item        = Use Default, ignore both values below
+
+[Macro C Play Loop]
+group       = true
+control     = spinbox
+byteoffset  = 51
+bitsize     = 8
+step			  = 1
+shortdesc	  = <<<MULTILINE
+<b>C: <font color=green>Play/Loop</font></b> that many times (0 = endless / until Playback action triggered again)
+MULTILINE
+default     = 0
+minimum     = 0
+maximum     = 255
+
+[Macro C Play Skip]
+group       = true
+control     = spinbox
+byteoffset  = 52
+bitsize     = 32
+step			  = 1
+shortdesc	  = <<<MULTILINE
+<b>C: <font color=green>Skip milliseconds</font> at the end of playback</b> (like the Idle time used to stop recording)
+MULTILINE
+default     = 5850
+minimum     = 0
+maximum     = 2147483647
+
+[Macro C Recording Time]
+color       = #808080
+group       = true
+shortdesc	  = <<<MULTILINE
+<b><font color=#808080>C: DO NOT EDIT THIS</font></b> (used internally by script)
+MULTILINE
+control     = spinbox
+byteoffset  = 56
+bitsize     = 32
+step			  = 1
+default     = 0
+minimum     = 0
+maximum     = 2147483647
+
+
+
+[Macrofile D headline]
+group       = true
+control     = info
+shortdesc	  = <<<MULTILINE
+
+<hr><b>Macro D</b><hr>
+MULTILINE
+
+[Macro D Use Default]
+group       = true
+control     = checkbox
+byteoffset  = 60
+bitsize     = 1
+bitoffset   = 0
+shortdesc   = <<<MULTILINE
+<b>D: <font color=green>Use Default settings</font></b> configured in Main Settings ____PLAYBACK____
+MULTILINE
+default     = 1
+item        = Use Default, ignore both values below
+
+[Macro D Play Loop]
+group       = true
+control     = spinbox
+byteoffset  = 61
+bitsize     = 8
+step			  = 1
+shortdesc	  = <<<MULTILINE
+<b>D: <font color=green>Play/Loop</font></b> that many times (0 = endless / until Playback action triggered again)
+MULTILINE
+default     = 0
+minimum     = 0
+maximum     = 255
+
+[Macro D Play Skip]
+group       = true
+control     = spinbox
+byteoffset  = 62
+bitsize     = 32
+step			  = 1
+shortdesc	  = <<<MULTILINE
+<b>D: <font color=green>Skip milliseconds</font> at the end of playback</b> (like the Idle time used to stop recording)
+MULTILINE
+default     = 5850
+minimum     = 0
+maximum     = 2147483647
+
+[Macro D Recording Time]
+color       = #808080
+group       = true
+shortdesc	  = <<<MULTILINE
+<b><font color=#808080>D: DO NOT EDIT THIS</font></b> (used internally by script)
+MULTILINE
+control     = spinbox
+byteoffset  = 66
+bitsize     = 32
+step			  = 1
+default     = 0
+minimum     = 0
+maximum     = 2147483647
+
+
+
+[Macrofile E headline]
+group       = true
+control     = info
+shortdesc	  = <<<MULTILINE
+
+<hr><b>Macro E</b><hr>
+MULTILINE
+
+[Macro E Use Default]
+group       = true
+control     = checkbox
+byteoffset  = 70
+bitsize     = 1
+bitoffset   = 0
+shortdesc   = <<<MULTILINE
+<b>E: <font color=green>Use Default settings</font></b> configured in Main Settings ____PLAYBACK____
+MULTILINE
+default     = 1
+item        = Use Default, ignore both values below
+
+[Macro E Play Loop]
+group       = true
+control     = spinbox
+byteoffset  = 71
+bitsize     = 8
+step			  = 1
+shortdesc	  = <<<MULTILINE
+<b>E: <font color=green>Play/Loop</font></b> that many times (0 = endless / until Playback action triggered again)
+MULTILINE
+default     = 0
+minimum     = 0
+maximum     = 255
+
+[Macro E Play Skip]
+group       = true
+control     = spinbox
+byteoffset  = 72
+bitsize     = 32
+step			  = 1
+shortdesc	  = <<<MULTILINE
+<b>E: <font color=green>Skip milliseconds</font> at the end of playback</b> (like the Idle time used to stop recording)
+MULTILINE
+default     = 5850
+minimum     = 0
+maximum     = 2147483647
+
+[Macro E Recording Time]
+color       = #808080
+group       = true
+shortdesc	  = <<<MULTILINE
+<b><font color=#808080>E: DO NOT EDIT THIS</font></b> (used internally by script)
+MULTILINE
+control     = spinbox
+byteoffset  = 76
+bitsize     = 32
+step			  = 1
+default     = 0
+minimum     = 0
+maximum     = 2147483647
+
+
+[Macrofile F headline]
+group       = true
+control     = info
+shortdesc	  = <<<MULTILINE
+
+<hr><b>Macro F</b><hr>
+MULTILINE
+
+[Macro F Use Default]
+group       = true
+control     = checkbox
+byteoffset  = 80
+bitsize     = 1
+bitoffset   = 0
+shortdesc   = <<<MULTILINE
+<b>F: <font color=green>Use Default settings</font></b> configured in Main Settings ____PLAYBACK____
+MULTILINE
+default     = 1
+item        = Use Default, ignore both values below
+
+[Macro F Play Loop]
+group       = true
+control     = spinbox
+byteoffset  = 81
+bitsize     = 8
+step			  = 1
+shortdesc	  = <<<MULTILINE
+<b>F: <font color=green>Play/Loop</font></b> that many times (0 = endless / until Playback action triggered again)
+MULTILINE
+default     = 0
+minimum     = 0
+maximum     = 255
+
+[Macro F Play Skip]
+group       = true
+control     = spinbox
+byteoffset  = 82
+bitsize     = 32
+step			  = 1
+shortdesc	  = <<<MULTILINE
+<b>F: <font color=green>Skip milliseconds</font> at the end of playback</b> (like the Idle time used to stop recording)
+MULTILINE
+default     = 5850
+minimum     = 0
+maximum     = 2147483647
+
+[Macro F Recording Time]
+color       = #808080
+group       = true
+shortdesc	  = <<<MULTILINE
+<b><font color=#808080>F: DO NOT EDIT THIS</font></b> (used internally by script)
+MULTILINE
+control     = spinbox
+byteoffset  = 86
+bitsize     = 32
+step			  = 1
+default     = 0
+minimum     = 0
+maximum     = 2147483647
+
+
+
+[Macrofile G headline]
+group       = true
+control     = info
+shortdesc	  = <<<MULTILINE
+
+<hr><b>Macro G</b><hr>
+MULTILINE
+
+[Macro G Use Default]
+group       = true
+control     = checkbox
+byteoffset  = 90
+bitsize     = 1
+bitoffset   = 0
+shortdesc   = <<<MULTILINE
+<b>G: <font color=green>Use Default settings</font></b> configured in Main Settings ____PLAYBACK____
+MULTILINE
+default     = 1
+item        = Use Default, ignore both values below
+
+[Macro G Play Loop]
+group       = true
+control     = spinbox
+byteoffset  = 91
+bitsize     = 8
+step			  = 1
+shortdesc	  = <<<MULTILINE
+<b>G: <font color=green>Play/Loop</font></b> that many times (0 = endless / until Playback action triggered again)
+MULTILINE
+default     = 0
+minimum     = 0
+maximum     = 255
+
+[Macro G Play Skip]
+group       = true
+control     = spinbox
+byteoffset  = 92
+bitsize     = 32
+step			  = 1
+shortdesc	  = <<<MULTILINE
+<b>G: <font color=green>Skip milliseconds</font> at the end of playback</b> (like the Idle time used to stop recording)
+MULTILINE
+default     = 5850
+minimum     = 0
+maximum     = 2147483647
+
+[Macro G Recording Time]
+color       = #808080
+group       = true
+shortdesc	  = <<<MULTILINE
+<b><font color=#808080>G: DO NOT EDIT THIS</font></b> (used internally by script)
+MULTILINE
+control     = spinbox
+byteoffset  = 96
+bitsize     = 32
+step			  = 1
+default     = 0
+minimum     = 0
+maximum     = 2147483647
+
+
+
+[Macrofile H headline]
+group       = true
+control     = info
+shortdesc	  = <<<MULTILINE
+
+<hr><b>Macro H</b><hr>
+MULTILINE
+
+[Macro H Use Default]
+group       = true
+control     = checkbox
+byteoffset  = 100
+bitsize     = 1
+bitoffset   = 0
+shortdesc   = <<<MULTILINE
+<b>H: <font color=green>Use Default settings</font></b> configured in Main Settings ____PLAYBACK____
+MULTILINE
+default     = 1
+item        = Use Default, ignore both values below
+
+[Macro H Play Loop]
+group       = true
+control     = spinbox
+byteoffset  = 101
+bitsize     = 8
+step			  = 1
+shortdesc	  = <<<MULTILINE
+<b>H: <font color=green>Play/Loop</font></b> that many times (0 = endless / until Playback action triggered again)
+MULTILINE
+default     = 0
+minimum     = 0
+maximum     = 255
+
+[Macro H Play Skip]
+group       = true
+control     = spinbox
+byteoffset  = 102
+bitsize     = 32
+step			  = 1
+shortdesc	  = <<<MULTILINE
+<b>H: <font color=green>Skip milliseconds</font> at the end of playback</b> (like the Idle time used to stop recording)
+MULTILINE
+default     = 5850
+minimum     = 0
+maximum     = 2147483647
+
+[Macro H Recording Time]
+color       = #808080
+group       = true
+shortdesc	  = <<<MULTILINE
+<b><font color=#808080>H: DO NOT EDIT THIS</font></b> (used internally by script)
+MULTILINE
+control     = spinbox
+byteoffset  = 106
+bitsize     = 32
+step			  = 1
+default     = 0
+minimum     = 0
+maximum     = 2147483647
+
+
+
+
+[Macrofile I headline]
+group       = true
+control     = info
+shortdesc	  = <<<MULTILINE
+
+<hr><b>Macro I</b><hr>
+MULTILINE
+
+[Macro I Use Default]
+group       = true
+control     = checkbox
+byteoffset  = 110
+bitsize     = 1
+bitoffset   = 0
+shortdesc   = <<<MULTILINE
+<b>I: <font color=green>Use Default settings</font></b> configured in Main Settings ____PLAYBACK____
+MULTILINE
+default     = 1
+item        = Use Default, ignore both values below
+
+[Macro I Play Loop]
+group       = true
+control     = spinbox
+byteoffset  = 111
+bitsize     = 8
+step			  = 1
+shortdesc	  = <<<MULTILINE
+<b>I: <font color=green>Play/Loop</font></b> that many times (0 = endless / until Playback action triggered again)
+MULTILINE
+default     = 0
+minimum     = 0
+maximum     = 255
+
+[Macro I Play Skip]
+group       = true
+control     = spinbox
+byteoffset  = 112
+bitsize     = 32
+step			  = 1
+shortdesc	  = <<<MULTILINE
+<b>I: <font color=green>Skip milliseconds</font> at the end of playback</b> (like the Idle time used to stop recording)
+MULTILINE
+default     = 5850
+minimum     = 0
+maximum     = 2147483647
+
+[Macro I Recording Time]
+color       = #808080
+group       = true
+shortdesc	  = <<<MULTILINE
+<b><font color=#808080>I: DO NOT EDIT THIS</font></b> (used internally by script)
+MULTILINE
+control     = spinbox
+byteoffset  = 116
+bitsize     = 32
+step			  = 1
+default     = 0
+minimum     = 0
+maximum     = 2147483647
+
+
+</cfgdesc>
+
+***/
+
+/***
+***/
+
+bool CFGERROR     = FALSE;
+
+// state helper
+bool bRecording   = FALSE;
+bool bRecordStart = FALSE;
+bool bRecordStop  = FALSE;
+bool bRecordPrep  = FALSE;
+
+bool bPlay        = FALSE;
+bool bPlayStart   = FALSE;
+bool bPlayStop    = FALSE;
+
+// recording time tracking
+//int32 RecTime = 0;
+
+// tracking press of buttons, block next processing until the buttons are released
+bool StartBtnA_Released = TRUE;
+bool StartBtnB_Released = TRUE;
+bool PlayBtnA_Released  = TRUE;
+bool PlayBtnB_Released  = TRUE;
+bool PlayStopBtnA_Released  = TRUE;
+bool PlayStopBtnB_Released  = TRUE;
+
+uint8 MacrofileDefault  = 0; // default macrofile combobox id on start of script
+uint8 MacroFileActive   = 0;   // currently active macro file
+uint8 MacroFileLetters[]= {_a_,_b_,_c_,_d_,_e_,_f_,_g_,_h_,_i_};
+
+bool  MacroFileUseDef[] = {0,0,0,0,0,0,0,0,0}; // use default settings flag
+uint8 MacroFileLoop[]   = {0,0,0,0,0,0,0,0,0}; // macrofile specific looping
+int32 MacroFileSkip[]   = {0,0,0,0,0,0,0,0,0}; // macrofile specific skip time
+int32 MacroFileTime[]   = {0,0,0,0,0,0,0,0,0}; // macrofile specific recording time
+
+/*** comboboxindex for  Macro file selection cycle buttons  ***/
+//#define MSel_None0      0   //item        = - NONE -
+//#define MSel_PS         1   //item        = ::::::::::::: Playstation ::::::::::::::::::
+#define MSel_L3L1_L3R1  2   //item        = L3+L1                //  L3+R1
+#define MSel_R3L1_R3R1  3   //item        = R3+L1               //  R3+R1
+#define MSel_L3PS_R3PS  4   //item        = L3+PS               //  R3+PS
+#define MSel_R3DL_R3DR  5   //item        = R3+Dpad_Left  //  R3+Dpad_Right
+#define MSel_R3DU_R3DD  6   //item        = R3+Dpad_Up    //  R3+Dpad_Down
+//#define MSel_XB         7   //item        = :::::::::::::::: XBox ::::::::::::::::::::::
+#define MSel_LSLB_LSRB  8   //item        = LS+LB                //  LS+RB
+#define MSel_RSLB_RSRB  9   //item        = RS+LB               //  RS+RB
+#define MSel_LSXB_RSXB  10  //item        = LS+Xbox           //  RS+Xbox
+#define MSel_RSDL_RSDR  11  //item        = RS+Dpad_Left  //  RS+Dpad_Right
+#define MSel_RSDU_RSDD  12  //item        = RS+Dpad_Up    //  RS+Dpad_Down
+
+uint8 MacroSelectMode = 0; // for cycling through the macro files
+bool  MacroRecallLast = 1; // save last used macrofile_combobox id ?
+uint8 MC_Hold1=0, MC_Tap1=0, MC_Hold2=0, MC_Tap2=0;
+
+/***    START RECORD    ***/
+// combobox index for start action
+#define Start_Tap       0 // on press / event_active
+#define Start_Hold      1 // hold down button >= holdtime
+#define Start_DblTap    2 // double tap button
+#define Start_HoldTap   3 // hold A and tap B
+
+// checkbox for start recording on next input after enabling recording
+bool    Start_NextAct   = FALSE; // on next action/input after start action
+
+// start stuff
+uint8 StartMode       = 3; // start on next input after hold-time of L3 >= 2 secs
+uint8 StartBtnA       = 9; // L3
+uint8 StartBtnB       = 0; // None
+uint8 StartHoldTime   = 2;
+
+
+/***    STOP RECORD    ***/
+// combobox index for stop action
+#define Stop_Tap        0 // hold down button >= holdtime
+#define Stop_Hold       1 // hold down button >= holdtime
+#define Stop_DblTap     2 // double tap button
+#define Stop_HoldTap    3 // hold A and tap B
+#define Stop_Tap_B      4 // tap B
+#define Stop_Hold_B     5 // hold down button Beta >= holdtime
+#define Stop_DblTap_B   6 // double tap button Beta
+#define Stop_HoldTap_B  7 // hold B and tap A
+#define Stop_Idle       8 // inactivity
+
+// stop stuff
+uint8 StopMode        = 8; // stop on inactivity
+uint8 StopHoldTime    = 2;
+uint8 StopIdleTime    = 5; // inactivity/idle stop time seconds
+
+
+/***    PLAYBACK      ***/
+// combobox index for play action
+#define Play_Tap        0 // tap button
+#define Play_Hold       1 // hold down button >= holdtime
+#define Play_DblTap     2 // double tap button
+#define Play_HoldTap    3 // hold A and tap B
+
+// play stuff (start/toggle)
+uint8 PlayMode        = 1; // holding down PlayBtnA
+uint8 PlayBtnA        = 8; // R3
+uint8 PlayBtnB        = 0; // None
+uint8 PlayHoldTime    = 2;
+
+
+// combobox index for play stop action
+#define PlayStop_Tap        0 // tap button
+#define PlayStop_Hold       1 // hold down button >= holdtime
+#define PlayStop_DblTap     2 // double tap button
+#define PlayStop_HoldTap    3 // hold A and tap B
+#define PlayStop_Toggle     4 // use the same buttons for start and stop of playback (default)
+
+// play stop stuff
+bool  PlayStopModeToggle  = FALSE;
+uint8 PlayStopMode        = 1; // holding down PlayStopBtnA
+uint8 PlayStopBtnA        = 8; // R3
+uint8 PlayStopBtnB        = 0; // None
+uint8 PlayStopHoldTime    = 2;
+
+// play stuff default macro settings
+uint8 PlayLoopsDef    = 0; // play back that many time 0 = endless , default value
+int32 PlaySkipEndDef  = 0; // to skip playback of some ms at the end of recording , default value
+
+
+uint32 LoopCount      = 0; // keep track of the times the macro has run & restarted
+
+uint8 SlotActive      = 0; // for using the correct file names
+
+// 9 macros / filenames per slot
+char *files[]          = {
+  "macrp1A.gmk","macrp1B.gmk","macrp1C.gmk","macrp1D.gmk","macrp1E.gmk","macrp1F.gmk","macrp1G.gmk","macrp1H.gmk","macrp1I.gmk",
+  "macrp2A.gmk","macrp2B.gmk","macrp2C.gmk","macrp2D.gmk","macrp2E.gmk","macrp2F.gmk","macrp2G.gmk","macrp2H.gmk","macrp2I.gmk",
+  "macrp3A.gmk","macrp3B.gmk","macrp3C.gmk","macrp3D.gmk","macrp3E.gmk","macrp3F.gmk","macrp3G.gmk","macrp3H.gmk","macrp3I.gmk",
+  "macrp4A.gmk","macrp4B.gmk","macrp4C.gmk","macrp4D.gmk","macrp4E.gmk","macrp4F.gmk","macrp4G.gmk","macrp4H.gmk","macrp4I.gmk",
+  "macrp5A.gmk","macrp5B.gmk","macrp5C.gmk","macrp5D.gmk","macrp5E.gmk","macrp5F.gmk","macrp5G.gmk","macrp5H.gmk","macrp5I.gmk",
+  "macrp6A.gmk","macrp6B.gmk","macrp6C.gmk","macrp6D.gmk","macrp6E.gmk","macrp6F.gmk","macrp6G.gmk","macrp6H.gmk","macrp6I.gmk",
+  "macrp7A.gmk","macrp7B.gmk","macrp7C.gmk","macrp7D.gmk","macrp7E.gmk","macrp7F.gmk","macrp7G.gmk","macrp7H.gmk","macrp7I.gmk",
+  "macrp8A.gmk","macrp8B.gmk","macrp8C.gmk","macrp8D.gmk","macrp8E.gmk","macrp8F.gmk","macrp8G.gmk","macrp8H.gmk","macrp8I.gmk",
+  "macrp9A.gmk","macrp9B.gmk","macrp9C.gmk","macrp9D.gmk","macrp9E.gmk","macrp9F.gmk","macrp9G.gmk","macrp9H.gmk","macrp9I.gmk",
+  // 0 for debug slot
+  "macrp0A.gmk","macrp0B.gmk","macrp0C.gmk","macrp0D.gmk","macrp0E.gmk","macrp0F.gmk","macrp0G.gmk","macrp0H.gmk","macrp0I.gmk",
+}; // 0,9,18,27,36,45,54,63,72,81
+
+#define MacroFilesIdx (SlotActive*9+MacroFileActive)// return the index for filename
+#define printfMacroFile printf(files[MacroFilesIdx]) // printf the filename
+
+init {
+  pmem_load();
+  
+  pmem_read(0,&MacrofileDefault); // macro file combobox id active on default
+  pmem_read(1,&MacroSelectMode);  // for cycling through the macro files
+  pmem_read(2,&MacroRecallLast);       // save last used macrofile_combobox id
+  
+  // assign macro cycle/selection keys according to selection
+  switch(MacroSelectMode) {
+        // L3/LS R3/RS
+        case MSel_L3L1_L3R1: 
+        case MSel_LSLB_LSRB: MC_Hold1=BUTTON_9; MC_Tap1=BUTTON_7; MC_Hold2=BUTTON_9; MC_Tap2=BUTTON_4;
+        break;
+        case MSel_R3L1_R3R1: 
+        case MSel_RSLB_RSRB: MC_Hold1=BUTTON_6; MC_Tap1=BUTTON_7; MC_Hold2=BUTTON_6; MC_Tap2=BUTTON_4;
+        break;
+        // ps/xb
+        case MSel_L3PS_R3PS:
+        case MSel_LSXB_RSXB: MC_Hold1=BUTTON_9; MC_Tap1=BUTTON_1; MC_Hold2=BUTTON_6; MC_Tap2=BUTTON_1;
+        break;
+        // dpad
+        case MSel_R3DL_R3DR: 
+        case MSel_RSDL_RSDR: MC_Hold1=BUTTON_6; MC_Tap1=BUTTON_12; MC_Hold2=BUTTON_6; MC_Tap2=BUTTON_13;
+        break;
+        case MSel_R3DU_R3DD: 
+        case MSel_RSDU_RSDD: MC_Hold1=BUTTON_6; MC_Tap1=BUTTON_10; MC_Hold2=BUTTON_6; MC_Tap2=BUTTON_11;
+        break;
+        // skip -NONE- and "headline" values
+        default:// printf("switch default: break");
+        break;
+  }
+  
+  pmem_read(3,&StartMode);        // start init mode
+  pmem_read(4,&Start_NextAct);    // start recording after next activity
+  pmem_read(5,&StartHoldTime);    // start hold time
+  pmem_read(6,&StartBtnA);        // button a to press for start
+  if ( StartBtnA == 0 ) StartBtnA=41;
+  else StartBtnA=StartBtnA-1;
+  
+  pmem_read(7,&StartBtnB);        // button b to press for start
+  if ( StartBtnB == 0 ) StartBtnB=41;
+  else StartBtnB=StartBtnB-1;
+  
+  pmem_read(10,&StopMode);        // stop init mode
+  pmem_read(11,&StopHoldTime);    // stop hold time
+  pmem_read(12,&StopIdleTime);    // idle time required before stop recording
+  
+  // play start
+  pmem_read(20,&PlayMode);        // play init mode
+  pmem_read(21,&PlayHoldTime);    // play hold time
+  pmem_read(22,&PlayBtnA);        // the button a to press for playback
+  if ( PlayBtnA == 0 ) PlayBtnA=41;
+  else PlayBtnA=PlayBtnA-1;
+  
+  pmem_read(23,&PlayBtnB);        // the button b to press for playback
+  if ( PlayBtnB == 0 ) PlayBtnB=41;
+  else PlayBtnB=PlayBtnB-1;
+  
+  // play stop settings
+  pmem_read(16,&PlayStopMode);        // play init mode
+  pmem_read(17,&PlayStopHoldTime);    // play hold time
+  pmem_read(18,&PlayStopBtnA);        // the button a to press for playback
+  if ( PlayStopBtnA == 0 ) PlayStopBtnA=41;
+  else PlayStopBtnA=PlayStopBtnA-1;
+  
+  pmem_read(19,&PlayStopBtnB);        // the button b to press for playback
+  if ( PlayStopBtnB == 0 ) PlayStopBtnB=41;
+  else PlayStopBtnB=PlayStopBtnB-1;
+  
+  // playback TOGGLE
+  // use the playback start setting to stop / toggle state
+  if (PlayStopMode == PlayStop_Toggle) {
+    PlayStopModeToggle = TRUE;
+    PlayStopMode = PlayMode;
+    PlayStopHoldTime= PlayHoldTime;
+    PlayStopBtnA = PlayBtnA;
+    PlayStopBtnB = PlayBtnB;
+  }
+    //printf(" %d %d %d %d ",PlayMode, PlayHoldTime, PlayBtnA, PlayBtnB);
+    //printf(" %d %d %d %d ",PlayStopMode, PlayStopHoldTime, PlayStopBtnA, PlayStopBtnB);
+
+  
+  CFGERROR=CfgErrorCheck();       // configuration error checking, blink red fast if problems are found
+  
+  // for each macro file:
+  pmem_read(24,&PlayLoopsDef);    // play back that many times
+  pmem_read(25,&PlaySkipEndDef);  // skip playback time at the end of the recording
+  //printf("time to skip at the end: %ld",PlaySkipEnd); // 4debug
+  
+  SlotActive=mslot_get() -1;
+  SlotActive=clamp(SlotActive,0,9);      // point to the filenames to use by the active T2 slot
+      
+  MacroFileActive = MacrofileDefault;     // the currently selected macrofile
+  //printf("macrofileactive: %d, slotactive: %d",MacroFileActive,SlotActive);
+  display_overlay(MacroFileLetters[MacroFileActive],3000);
+  
+  //printf(files[SlotActive*9+MacroFileActive]);
+  //printf(files[MacroFilesIdx]);
+  //printfMacroFile;
+  
+  // macrofile specific settings
+  uint8 ri;
+  for (ri=0;ri<9;ri++) {
+    pmem_read(30+ri*10,&MacroFileUseDef[ri] ); // use default settings
+    pmem_read(31+ri*10,&MacroFileLoop[ri]   ); // loop count
+    pmem_read(32+ri*10,&MacroFileSkip[ri]   ); // skip time of the recording at the end
+    pmem_read(36+ri*10,&MacroFileTime[ri]   ); // recording time
+    //printf("usedef: %d, loop: %d, skip: %d, time: %d",MacroFileUseDef[ri],MacroFileLoop[ri],MacroFileSkip[ri],MacroFileTime[ri]);
+  }
+  
+  ICPM_Update(5000); // set pmem write interval for changes
+}
+
+main {
+  // only use the MacroControl when no configuration error was found
+  if ( !CFGERROR ) MacroControl();
+}
+
+
+void MacroControl() {
+    
+  BtnsReleaseUpdate();
+    
+  /*** --- macrofilename cycle --- / --- start recording --- ***/
+  // check for trigger start macro recording if no recording or playing is active
+  if (!bRecording && !bRecordStart && !bRecordStop && !bPlay && !bPlayStart && !bPlayStop && !bRecordPrep
+        && BtnsReleased() )
+  { 
+      /***  start recording ***/
+      switch(StartMode) {
+        case Start_Tap    : if (event_active(StartBtnA)) RecordStartOrPrep_Flag();
+        break;
+        case Start_Hold   : if (check_active(StartBtnA,StartHoldTime*1000) && getLastButtonActive() == StartBtnA) RecordStartOrPrep_Flag();
+        break;
+        case Start_DblTap : if (event_active(StartBtnA) && time_release(StartBtnA) < 200) RecordStartOrPrep_Flag();
+        break;
+        case Start_HoldTap: if (get_val(StartBtnA) && event_active(StartBtnB)) RecordStartOrPrep_Flag();
+        break;
+        
+      }
+      
+      /***  cycle through macronames ***/
+      if (!bRecording && !bRecordPrep && MacroSelectMode) MacroFileCycle(MC_Hold1,MC_Tap1,MC_Hold2,MC_Tap2);
+  }
+
+  // start recording check
+  if (!bRecording && !bRecordStop && !bPlay && !bPlayStart && !bPlayStop
+        && BtnsReleased() ) 
+  {
+    if (!bRecordStart && bRecordPrep) bRecordStart=AnyActivity(); // check for any event_active
+    if (bRecordStart) {
+        bRecording=TRUE;
+        bRecordPrep=FALSE;bRecordStart=FALSE; bRecordStop=FALSE; bPlay=FALSE; bPlayStart=FALSE; bPlayStop=FALSE;
+        BtnsSetPressed();
+        printf("started recording of:");
+        printfMacroFile;
+        ColorLEDVM('P',0,0,-1);
+        macro_rec(files[MacroFilesIdx]);
+        combo_run(RecordCheck); // test in 300ms if the recording works
+    }
+  } // eo: start recording
+  //
+  
+  /*** --- stop recording --- ***/
+  if (bRecording && BtnsReleased()) {
+      if (!bRecordStop) {
+        switch(StopMode) {
+          case Stop_Tap     : if (event_active(StartBtnA)) RecordStop_Flag();
+          break;
+          case Stop_Hold    : if (check_active(StartBtnA,StopHoldTime*1000) && getLastButtonActive()==StartBtnA) RecordStop_Flag();
+          break;
+          case Stop_DblTap  : if (event_active(StartBtnA) && time_release(StartBtnA) < 200) RecordStop_Flag();
+          break;
+          case Stop_HoldTap : if (get_val(StartBtnA) && event_active(StartBtnB)) RecordStop_Flag();
+          break;          
+          case Stop_Tap_B   :  if (event_active(StartBtnB)) RecordStop_Flag();
+          break;
+          case Stop_Hold_B  : if (check_active(StartBtnB,StopHoldTime*1000) && getLastButtonActive()==StartBtnB) RecordStop_Flag();
+          break;
+          case Stop_DblTap_B: if (event_active(StartBtnB) && time_release(StartBtnB) < 200) RecordStop_Flag();
+          break;
+          case Stop_HoldTap_B: if (get_val(StartBtnB) && event_active(StartBtnA)) RecordStop_Flag();
+          break;
+          case Stop_Idle    : bRecordStop=NoActivity(StopIdleTime*1000); break;
+
+        }
+      }
+  }
+  
+  if (bRecording && bRecordStop) {
+    bRecording=FALSE; bRecordStop=FALSE;    
+    BtnsSetPressed();
+    MacroFileTime[MacroFileActive]=macro_time();
+    macro_stop();
+    pmem_write(36+10*MacroFileActive,MacroFileTime[MacroFileActive]);
+    ICPM_Update(TRUE);
+    printf("stopped recording after %ldms of file:",MacroFileTime[MacroFileActive]);
+    printfMacroFile;
+    ColorLEDVM('B',0,0,-1);
+  }
+  
+  
+  /*** --- play back start --- ***/
+  if (!bRecording && !bPlayStart && !bPlayStop && BtnsReleased() && !bPlay) {
+      switch(PlayMode) {
+          case Play_Tap     : if (event_active(PlayBtnA)) PlayStart_Flag();
+          break;
+          case Play_Hold    : if (check_active(PlayBtnA,PlayHoldTime*1000) && getLastButtonActive()==PlayBtnA) PlayStart_Flag();
+          break;
+          case Play_DblTap  : if (event_active(PlayBtnA) && time_release(PlayBtnA) < 200) PlayStart_Flag();
+          break;
+          case Play_HoldTap : if (get_val(PlayBtnA) && event_active(PlayBtnB)) PlayStart_Flag();
+          break;
+      }
+  }
+  
+  /*** --- play back stop --- ***/
+  if (!bRecording && !bPlayStart && !bPlayStop && BtnsReleased() && bPlay) {
+      switch(PlayStopMode) {
+          case Play_Tap     : if ( event_active(PlayStopBtnA)) PlayStop_Flag();
+          break;
+          case Play_Hold    : if ( check_active(PlayStopBtnA,PlayStopHoldTime*1000) && getLastButtonActive()==PlayStopBtnA) PlayStop_Flag();
+          break;
+          case Play_DblTap  : if ( event_active(PlayStopBtnA) && time_release(PlayStopBtnA) < 200) PlayStop_Flag();
+          break;
+          case Play_HoldTap : if ( get_val(PlayStopBtnA) && event_active(PlayStopBtnB)) PlayStop_Flag();
+          break;
+      }
+  }
+  
+    // start
+    if (!bPlay && bPlayStart) {
+      LoopCount=0;
+      BtnsSetPressed(); 
+      bPlay = TRUE;
+      bPlayStart = FALSE;
+      ColorLEDVM('G',0,0,-1);
+      printf("Start macro run: %d of file:",LoopCount+1);
+      printfMacroFile;
+      macro_run(files[MacroFilesIdx]);
+    }
+    
+    // stop
+    else if (bPlay && bPlayStop) {
+      BtnsSetPressed(); 
+      bPlay = FALSE;
+      bPlayStop = FALSE;
+      ColorLEDVM('B',0,0,-1);
+      printf("Stopped playback run: %d of file:",LoopCount+1);
+      printfMacroFile;
+      macro_stop();
+    }
+    
+    
+  
+  /*** --- do Playback --- ***/
+  if (bPlay && !bPlayStop) {
+      // use default loop and skip ?
+      if (MacroFileUseDef[MacroFileActive]) {
+        // check if to skip the rest of the playback now, example: 60sec    - 4sec  >  50sec
+        if (PlaySkipEndDef > 0 && MacroFileTime[MacroFileActive] - PlaySkipEndDef <= macro_time()) {
+          printf("play back was active for %ldms - skipping at the end %ldms", macro_time(), PlaySkipEndDef);
+          macro_stop();
+        }
+      } else { // macrofile specific settings
+        if (MacroFileSkip[MacroFileActive] > 0 && MacroFileTime[MacroFileActive] - MacroFileSkip[MacroFileActive] <= macro_time()) {
+          printf("play back was active for %ldms - skipping at the end %ldms", macro_time(), MacroFileSkip[MacroFileActive]);
+          macro_stop();
+        }
+      }
+      if ( macro_time() == -1 ) { // -1 == no macro operation active, playback done
+      LoopCount++;
+      
+      // default settings
+      if (MacroFileUseDef[MacroFileActive]) {
+        if ( LoopCount >= PlayLoopsDef && PlayLoopsDef > 0) {
+          bPlayStop=TRUE; // selected amount of loops played
+        } else {
+          printf("Start run: %d of file:",LoopCount+1);
+          printfMacroFile;
+          macro_run(files[MacroFilesIdx]); // play again
+        }
+      } else { // macrofile specific settings
+        if ( LoopCount >= MacroFileLoop[MacroFileActive] && MacroFileLoop[MacroFileActive] > 0) {
+          bPlayStop=TRUE; // selected amount of loops played
+        } else {
+          printf("Start run: %d of file:",LoopCount+1);
+          printfMacroFile;
+          macro_run(files[MacroFilesIdx]); // play again
+        }
+      }
+    }
+  }
+
+}
+
+
+// some configuration error checking
+bool CfgErrorCheck() {
+  bool err=FALSE;
+  
+  /*** record configuration check ***/
+  if ( StartBtnA == PlayBtnA && StartBtnB == PlayBtnB ) 
+    { err=TRUE; printf("Can't use the same buttons for recording and playback!"); }
+    
+  if ( StartBtnA == 41) // 41 == nothing selected
+    { err=TRUE; printf("Button 'Alpha' has to be selected"); }
+    
+  if ( (StartMode == Start_HoldTap || StopMode == Stop_HoldTap || StopMode == Stop_HoldTap_B) 
+          && (StartBtnA == 41 || StartBtnB == 41))
+    { err=TRUE; printf("Button 'Alpha' + 'Beta' has to be selected"); }
+    
+  
+  if ( (StartMode == Start_Tap || StopMode == Stop_Tap) && StartBtnA == 41)
+    { err=TRUE; printf("Button 'Alpha' has to be selected"); }
+    
+  if ( StopMode == Stop_HoldTap && (StartBtnA == 41 || StartBtnB == 41))
+    { err=TRUE; printf("Button 'Alpha' + 'Beta' has to be selected"); }
+    
+  if ( (StopMode == Stop_Hold_B || StopMode == Stop_DblTap_B || StopMode == Stop_Tap_B) && StartBtnB == 41)
+    { err=TRUE; printf("Button 'Beta' has to be selected"); }
+    
+    
+  /*** play start configuration check ***/
+  if ( PlayBtnA == 41) 
+    { err=TRUE; printf("Button 'Gamma' has to be selected"); }
+
+  if ( PlayMode == Play_HoldTap && (PlayBtnA == 41 || PlayBtnB == 41))
+    { err=TRUE; printf("Button 'Gamma' + 'Delta' has to be selected"); }
+    
+  /*** play stop configuration check ***/
+  //      only check when not using the same as playback start 
+  if (!PlayStopModeToggle) {
+    if ( PlayStopBtnA == 41) 
+      { err=TRUE; printf("Button 'Epsilon' has to be selected"); }
+  
+    if ( PlayStopMode == PlayStop_HoldTap && (PlayStopBtnA == 41 || PlayStopBtnB == 41))
+      { err=TRUE; printf("Button 'Epsilon' + 'Zeta' has to be selected"); }      
+  }
+
+    
+  /*** macrofile change check ***/
+  if ( StartBtnA == MC_Hold1 && StartBtnB == MC_Tap1 ) 
+    { err=TRUE; printf("Can't use the same buttons for recording and macro file selection!"); }
+
+  if ( StartBtnA == MC_Hold2 && StartBtnB == MC_Tap2 ) 
+    { err=TRUE; printf("Can't use the same buttons for recording and macro file selection!"); }
+
+  if ( PlayBtnA == MC_Hold1 && PlayBtnB == MC_Tap1 ) 
+    { err=TRUE; printf("Can't use the same buttons for playback and macro file selection!"); }
+
+  if ( PlayBtnA == MC_Hold2 && PlayBtnB == MC_Tap2 ) 
+    { err=TRUE; printf("Can't use the same buttons for playback and macro file selection!"); }
+
+  if (  (StartMode == Start_Tap && StartBtnA == MC_Tap1)
+      ||(StopMode  == Stop_Tap  && PlayBtnA  == MC_Tap2)
+     )
+    { err=TRUE; printf("Start or Stop Tap button collides with macro file selection buttons"); }
+
+    
+  if (err) ColorLEDVM('R',100,100,-1);
+  else ColorLEDVM('B',0,0,-1);
+  return err;
+}
+
+// cycle 
+bool MacroFileCycle(uint8 btnHoldDn, uint8 btnTapDn, uint8 btnHoldUp, uint8 btnTapUp) {
+  bool changed = FALSE, event = FALSE;
+  
+  if (is_active(btnHoldDn) && event_active(btnTapDn)) {
+    event=TRUE;
+    if (MacroFileActive > 0) { MacroFileActive--; changed=TRUE; }
+  }
+  
+  if (is_active(btnHoldUp) && event_active(btnTapUp)) {
+    event=TRUE;
+    if (MacroFileActive < 9) { MacroFileActive++; changed=TRUE; }
+  }
+  
+  if (event) {
+    display_overlay(MacroFileLetters[MacroFileActive],3000);
+    if (changed && MacroRecallLast) {
+      pmem_write(2,MacroRecallLast);       // save last used macrofile_combobox id
+      ICPM_Update(TRUE);
+    }
+  }  
+  return changed;
+}
+
+// check if the buttons are inactivity and set the release flag
+void BtnsReleaseUpdate() {
+  if (StartBtnA < 41 && !is_active(StartBtnA)) StartBtnA_Released=TRUE;
+  if (StartBtnB < 41 && !is_active(StartBtnB)) StartBtnB_Released=TRUE;
+  if (PlayBtnA < 41 && !is_active(PlayBtnA)) PlayBtnA_Released=TRUE;
+  if (PlayBtnB < 41 && !is_active(PlayBtnB)) PlayBtnB_Released=TRUE;
+  if (PlayStopBtnA < 41 && !is_active(PlayStopBtnA)) PlayStopBtnA_Released=TRUE;
+  if (PlayStopBtnB < 41 && !is_active(PlayStopBtnB)) PlayStopBtnB_Released=TRUE;
+}
+
+// set all configured buttons to pressed to block next processing until they got released
+void BtnsSetPressed() {
+  if (StartBtnA < 41) StartBtnA_Released=FALSE;
+  if (StartBtnB < 41) StartBtnB_Released=FALSE;
+  if (PlayBtnA < 41)  PlayBtnA_Released=FALSE;
+  if (PlayBtnB < 41)  PlayBtnB_Released=FALSE;
+  if (PlayStopBtnA < 41)  PlayStopBtnA_Released=FALSE;
+  if (PlayStopBtnB < 41)  PlayStopBtnB_Released=FALSE;
+}
+
+// check if all configured buttons are currently in release state
+bool BtnsReleased() {
+  if (StartBtnA < 41 && !StartBtnA_Released)  return FALSE;
+  if (StartBtnB < 41 && !StartBtnB_Released)  return FALSE;
+  if (PlayBtnA <  41 && !PlayBtnA_Released)   return FALSE;
+  if (PlayBtnB <  41 && !PlayBtnB_Released)   return FALSE;
+  if (PlayStopBtnA <  41 && !PlayStopBtnA_Released)   return FALSE;
+  if (PlayStopBtnB <  41 && !PlayStopBtnB_Released)   return FALSE;
+  return TRUE;
+}
+
+// set flag to start recording directly or on next input, LED feedback
+void RecordStartOrPrep_Flag() {
+  if (!Start_NextAct) {
+    bRecordStart = TRUE; 
+  } else {
+    bRecordPrep = TRUE; 
+    ColorLEDVM('A',150,150,-1); 
+  }
+  BtnsSetPressed();
+}
+
+// set flag to stop recording
+void RecordStop_Flag() {
+  bRecordStop = TRUE; 
+  BtnsSetPressed(); 
+}
+
+combo RecordCheck {
+  wait(300);
+  bool err=FALSE;
+  if (macro_time() == -1) {
+    err=TRUE;
+    printf("Recording is not working ?!? , macro_time() returned -1");
+    ColorLEDVM('R',100,100,10);
+  }
+  wait(0);
+  wait(2200);
+  if (err) RecordStop_Flag();
+  wait(0);
+  wait(100);
+}
+
+// set flag to start play back
+void PlayStart_Flag() {
+  bPlayStart = TRUE;
+  BtnsSetPressed();
+}
+
+// set flag to stop play back
+void PlayStop_Flag() {
+  bPlayStop = TRUE; 
+  BtnsSetPressed();
+}
+
+
+// check all buttons for event_active 
+bool AnyActivity() {
+  uint8 i;
+  for (i=0;i<25;i++) {
+    if (event_active(i)) {
+      BtnsSetPressed();
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+
+// check if there was no input for a period of idletime
+bool NoActivity(uint32 idletime) {
+  uint8 i;
+  for (i=0;i<25;i++) {
+    if (is_active(i)) return FALSE;
+    if (time_release(i) < idletime) return FALSE;
+  }
+  printf("No activity in the last %d ms",idletime);
+  return TRUE;
+}
+
+// LED Color 'C'olor , blink duration on , blink duration off, blink count
+void ColorLEDVM(char Color, uint16 DurOn, uint16 DurOff, int Count) {
+  if ( DurOff == 0 ) DurOn = 100;
+	int Color1, Color2, Color3, Color4;
+   
+	if(Color == 'B'){Color1 = 1; Color2 = 0; Color3 = 0; Color4 = 0;}
+	if(Color == 'R'){Color1 = 0; Color2 = 1; Color3 = 0; Color4 = 0;}
+	if(Color == 'G'){Color1 = 0; Color2 = 0; Color3 = 1; Color4 = 0;}
+	if(Color == 'P'){Color1 = 0; Color2 = 0; Color3 = 0; Color4 = 1;}
+	if(Color == 'C'){Color1 = 1; Color2 = 0; Color3 = 1; Color4 = 0;}
+	if(Color == 'A'){Color1 = 0; Color2 = 1; Color3 = 1; Color4 = 0;}
+	if(Color == 'W'){Color1 = 1; Color2 = 1; Color3 = 1; Color4 = 1;}
+	led_reset();
+  if (Color1) if (DurOff > 0) led_vmset(LED_1, DurOn, DurOff, Count); else led_set(LED_1,(fix32)DurOn,0);
+	if (Color2) if (DurOff > 0) led_vmset(LED_2, DurOn, DurOff, Count); else led_set(LED_2,(fix32)DurOn,0);
+	if (Color3) if (DurOff > 0) led_vmset(LED_3, DurOn, DurOff, Count); else led_set(LED_3,(fix32)DurOn,0);
+	if (Color4) if (DurOff > 0) led_vmset(LED_4, DurOn, DurOff, Count); else led_set(LED_4,(fix32)DurOn,0);
+}
+
+// last button with event_active
+uint8 getLastButtonActive() {
+	uint8 i, last = BUTTON_1;
+	
+	for(i=BUTTON_2; i<=BUTTON_21; ++i) {
+		if(time_active(i) < time_active(last)) {
+			last = i;
+		}
+	}
+	return(last);
+}

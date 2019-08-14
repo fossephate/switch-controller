@@ -5,6 +5,8 @@ from requests.exceptions import HTTPError, InvalidURL, ConnectionError
 import json
 
 # https://www.reddit.com/r/Twitch/comments/6ycems/an_example_python_script_to_retrieve_a_list_of/
+# https://twitchapps.com/tokengen/
+# channel_subscriptions
 
 def getSubList():
 
@@ -13,7 +15,7 @@ def getSubList():
 	##########################################################
 
 	clientId="jhopzq3gncn6u41vp7lh9jtvj68wdx"  #Register a Twitch Developer application and put its client ID here
-	accessToken="e4nwjkqgyqhgxzf9uu873y2fdi06r4" #Generate an OAuth token with channel_subscriptions scope and insert your token here
+	accessToken="1j7915j2d85l0wdjeyq73sgjnk4w4m" #Generate an OAuth token with channel_subscriptions scope and insert your token here
 
 	channelName="twitchplaysconsoles"  #Put your channel name here
 	saveLocation = "subscriberList.txt" #Put the location you'd like to save your list here

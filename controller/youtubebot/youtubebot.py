@@ -4,9 +4,9 @@ import json
 import time
 import requests
 try:
-	from .credentials import Credentials
+	from .Credentials import Credentials
 except:
-	from credentials import Credentials
+	from Credentials import Credentials
 
 from pprint import pprint
 
@@ -16,7 +16,7 @@ import win32api
 import win32con
 
 
-class YouTubeBot:
+class YoutubeBot:
 
 	def __init__(self):
 
