@@ -250,10 +250,10 @@ def send_message(msg, destination="twitch"):
 switchGameList1 = ["Arms", "Baba Is You", "Brawlhalla", "Celeste", "DELTARUNE Chapter 1", "Fortnite", "Hollow Knight",
 "Human: Fall Flat", "Katamari Damacy REROLL", "Kirby Star Allies", "Mario Kart 8 Deluxe", "Mario Tennis Aces", "New Super Mario Bros. U Deluxe",
 "Nintendo Entertainment System - Nintendo Switch Online", "Paladins", "Rocket League(R)", "Shovel Knight: Treasure Trove", "Snipperclips",
-"Sonic Mania", "Splatoon 2", "SUPER MARIO MAKER 2", "SUPER MARIO ODYSSEY", "Super Mario Party", "Super Smash Bros. Ultimate", "TETRIS 99", "The Elder Scrolls V: Skyrim",
+"Sonic Mania", "Splatoon 2", "SUPER MARIO MAKER 2", "SUPER MARIO ODYSSEY", "Super Mario Party", "Super Nintendo Entertainment System - Nintendo Switch Online", "Super Smash Bros. Ultimate", "TETRIS 99", "The Elder Scrolls V: Skyrim",
 "The Jackbox Party Pack 3", "The Jackbox Party Pack 4", "The Jackbox Party Pack 5", "The Legend of Zelda: Breath of the Wild", "Undertale", "Wizard of Legend"]
 # switchGameList2 = ["arms", "baba", "brawlhalla", "celeste"]
-switchGameList2 = ["arms", "baba", "tetris", "deltarune", "nsmbud", "smash", "botw", "celeste", "smo", "katamari", "undertale", "brawlhalla", "nes", "mta", "hollow", "paladins",\
+switchGameList2 = ["arms", "baba", "tetris", "deltarune", "nsmbud", "snes", "smash", "botw", "celeste", "smo", "katamari", "undertale", "brawlhalla", "nes", "mta", "hollow", "paladins",\
 "snipperclips", "mk8", "human", "shovelknight", "explosion", "jackbox4", "jackbox3", "skyrim", "splatoon2", "smm2", "smp", "rocketleague", "wizard",\
 "sonic", "kirby", "fortnite", "torquel"]
 
